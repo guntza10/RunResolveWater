@@ -1,0 +1,1 @@
+[{"houseHoldId":"unt1v156273771900365505983","roomNumber":null,"subUnit":{"roomNumber":null,"accessCount":1,"accesses":[1],"hasPlumbing":null,"hasPlumbingMeter":null,"isPlumbingMeterXWA":null,"hasGroundWater":null,"hasGroundWaterMeter":null},"accessCount":1,"lastAccess":1,"comments":[],"status":"pause"}]

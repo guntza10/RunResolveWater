@@ -1,0 +1,1 @@
+[{"buildingId":"bld1v156272122681865505983","houseNo":"90","name":"บ้านคลองปากน้ำ","status":"pause","completedCount":0,"unitCount":"1","lastUpdate":1562721802198}]
