@@ -20,9 +20,9 @@ namespace Test
             var database = mongo.GetDatabase("wdata");
             collectionOldDataprocess = database.GetCollection<DataProcessed>("oldDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
-            // checkCountPopulationWrong();
+            checkCountPopulationWrong();
             // resolveCountPopulation();
-            InsertAmountCommunity();
+            // InsertAmountCommunity();
 
         }
 
@@ -162,7 +162,7 @@ namespace Test
            })
            .ToList();
 
-            var dataWrong1 = data.Where(it => it.countPopulation < it.countWorkingAge).ToList();
+            var dataWrong1 = data.Where(it => it.countPopulation < it. ).ToList();
             var dataNotB = dataWrong1.Where(it => it.sampleType != "b").ToList();
             var dataWrong2 = data.Where(it => it.sampleType != "b" && it.countPopulation < it.countWorkingAge).ToList();
             var dataWrong3 = data.Where(it => it.countPopulation > 20000).ToList();
