@@ -22,7 +22,8 @@ namespace Test
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
-            ResolveIsHouseHoldGoodPlumbing();
+            // ResolveIsHouseHoldGoodPlumbing();
+            ResolveCountPopulationOver20000();
 
         }
 
@@ -164,7 +165,41 @@ namespace Test
                 collectionOldDataprocess.UpdateOne(it => it._id == data._id, def);
             }
         }
+        // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
+        public static void ResolveCountPopulationOver20000()
+        {
+            var eaWrong = collectionOldDataprocess.Aggregate()
+             .Match(it => it.EA != "")
+             .Group(it => it.EA, x => new
+             {
+                 Ea = x.Key,
+                 sumCountPopulation = x.Sum(i => i.CountPopulation)
+             })
+             .Match(it => it.sumCountPopulation > 20000)
+             .Project(it => new
+             {
+                 Ea = it.Ea
+             })
+             .ToList();
 
+            eaWrong.ForEach(it =>
+            {
+                var avg = collectionOldDataprocess.Aggregate()
+                .Match(x => x.EA == it.Ea)
+                .Group(x => x.EA, i => new
+                {
+                    sumCountPopulation = i.Sum(k => k.CountPopulation),
+                    total = i.Count()
+                })
+                .Project(x => new
+                {
+                    avg = x.sumCountPopulation / x.total
+                })
+                .ToList();
+            });
+
+
+        }
         //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
         //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
         public static void ResolveAvgWaterHeightCm()
