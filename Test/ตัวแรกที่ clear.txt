@@ -1,0 +1,14 @@
+2.ครัวเรือนทั้งหมด -> IsHouseHold -> (clear)
+Ea ที่มี countPopulation แต่ไม่มีจำนวนครัวเรือน(IsHouseHold) (ตึกสูง)
+    -> ให้เอาจำนวนห้องที่มีคนอยู่อาศัย มาเป็นจำนวนครัวเรือน
+        *ตึกสูง ใช้ Occu - Vacant (IsHouseHole) 
+        = OccupiedRoomCount มาเป็น IsHouseHole
+Note : ถ้ามี "u" ที่มี IsHouseHold = 0 => countPopulation เป็น 0 ?
+
+
+5.ครัวเรือนในเขตเมืองที่มีน้ำประปาใช้ (ในเขตเทศบาล) -> IsHouseHoldHasPlumbingDistrict 
+    -> เปลี่ยนแปลงตามครัวเรือนทั้งหมด (IsHouseHold)
+
+ 
+6.ครัวเรือนในชนบทที่มีน้ำประปาใช้ (นอกเขตเทศบาล) -> IsHouseHoldHasPlumbingCountryside 
+    -> เปลี่ยนแปลงตามครัวเรือนทั้งหมด (IsHouseHold)

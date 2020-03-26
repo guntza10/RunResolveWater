@@ -51,26 +51,44 @@ namespace Test
         public static double percentIsHouseHoldGoodPlumbing(string areaCode)
         {
             var dataArea = collectionOldDataprocess.Aggregate()
-               .Match(it => it.SampleType == "u" && it.Area_Code == areaCode && it.IsHouseHold == 1)
-               .ToList();
-            var percent = 0.0;
+            .Match(it => it.SampleType == "u" && it.Area_Code == areaCode && it.IsHouseHold == 1)
+            .Group(it => it.Area_Code, x => new
+            {
+                sumIsHouseHold = x.Sum(i => i.IsHouseHold),
+                sumIsHouseHoldGoodPlumbing = x.Sum(i => i.IsHouseHoldGoodPlumbing)
+            })
+            .Project(it => new
+            {
+                percent = it.sumIsHouseHoldGoodPlumbing * 100 / it.sumIsHouseHold
+            })
+            .ToList();
 
             if (dataArea.Any())
             {
-                var sumIsHouseHoldArea = dataArea.Sum(it => it.IsHouseHold).Value;
-                var sumIsHouseHoldGoodPlumbingArea = dataArea.Sum(it => it.IsHouseHoldGoodPlumbing).Value;
-                percent = sumIsHouseHoldGoodPlumbingArea * 100 / sumIsHouseHoldArea;
+                // var sumIsHouseHoldArea = dataArea.Sum(it => it.IsHouseHold).Value;
+                // var sumIsHouseHoldGoodPlumbingArea = dataArea.Sum(it => it.IsHouseHoldGoodPlumbing).Value;
+                // return sumIsHouseHoldGoodPlumbingArea * 100 / sumIsHouseHoldArea;
+                return dataArea.FirstOrDefault().percent.Value;
             }
             else
             {
                 var dataAmp = collectionOldDataprocess.Aggregate()
                 .Match(it => it.SampleType == "u" && it.Area_Code.Substring(0, 4) == areaCode.Substring(0, 4) && it.IsHouseHold == 1)
+                .Group(it => it.Area_Code.Substring(0, 4), x => new
+                {
+                    sumIsHouseHold = x.Sum(i => i.IsHouseHold),
+                    sumIsHouseHoldGoodPlumbing = x.Sum(i => i.IsHouseHoldGoodPlumbing)
+                })
+                .Project(it => new
+                {
+                    percent = it.sumIsHouseHoldGoodPlumbing * 100 / it.sumIsHouseHold
+                })
                 .ToList();
-                var sumIsHouseHoldAmp = dataAmp.Sum(it => it.IsHouseHold).Value;
-                var sumIsHouseHoldGoodPlumbingAmp = dataAmp.Sum(it => it.IsHouseHoldGoodPlumbing).Value;
-                percent = sumIsHouseHoldGoodPlumbingAmp * 100 / sumIsHouseHoldAmp;
+                // var sumIsHouseHoldAmp = dataAmp.Sum(it => it.IsHouseHold).Value;
+                // var sumIsHouseHoldGoodPlumbingAmp = dataAmp.Sum(it => it.IsHouseHoldGoodPlumbing).Value;
+                // return sumIsHouseHoldGoodPlumbingAmp * 100 / sumIsHouseHoldAmp;
+                return dataAmp.FirstOrDefault().percent.Value;
             }
-            return percent;
         }
 
         // 3.ครัวเรือนที่มีน้ำประปาคุณภาพดี -> IsHouseHoldGoodPlumbing
@@ -83,7 +101,8 @@ namespace Test
             {
                 Id = it._id,
                 Area_Code = it.Area_Code,
-                IsHouseHold = it.IsHouseHold
+                IsHouseHold = it.IsHouseHold,
+                IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
             })
             .ToList();
             Console.WriteLine($"Qry Building done : {dataBuilding.Count}");
@@ -106,6 +125,8 @@ namespace Test
                     countB++;
                     Console.WriteLine($"round update : {countB} / {areaGroup.Count()}");
                     var newIsHouseHoldGoodPlumbing = Math.Round(it.IsHouseHold.Value * percent / 100);
+                    Console.WriteLine($"oldIsHouseHoldGoodPlumbing : {it.IsHouseHoldGoodPlumbing}");
+                    Console.WriteLine($"newIsHouseHoldGoodPlumbing : {newIsHouseHoldGoodPlumbing}");
                     var def = Builders<DataProcessed>.Update
                     .Set(x => x.IsHouseHoldGoodPlumbing, newIsHouseHoldGoodPlumbing);
                     collectionOldDataprocess.UpdateOne(x => x._id == it.Id, def);
@@ -113,76 +134,6 @@ namespace Test
                 });
             }
             Console.WriteLine("all update done!");
-
-            // Console.WriteLine($"Qry AreaCode done : {listAreaBuilding.Count}");
-
-            // var count = 0;
-            // foreach (var areaCodeBuilding in listAreaBuilding)
-            // {
-            //     count++;
-            //     Console.WriteLine($"Round {count} / {listAreaBuilding.Count}");
-            //     var dataArea = collectionOldDataprocess.Aggregate()
-            //     .Match(it => it.SampleType == "u" && it.Area_Code == areaCodeBuilding && it.IsHouseHold == 1)
-            //     .Group(it => it.Area_Code, x => new
-            //     {
-            //         areaCode = x.Key,
-            //         sumIsHouseHoldGoodPlumbing = x.Sum(i => i.IsHouseHoldGoodPlumbing),
-            //         sumIsHouseHold = x.Sum(i => i.IsHouseHold)
-            //     })
-            //     .Project(it => new
-            //     {
-            //         AreaCode = it.areaCode,
-            //         percent = it.sumIsHouseHoldGoodPlumbing * 100 / it.sumIsHouseHold
-            //     })
-            //     .ToList();
-            //     Console.WriteLine($"dataArea : {dataArea.Count}");
-
-            //     var newIsHouseHoldGoodPlumbing = 0.0;
-            //     var percent = 0.0;
-            //     var dataBuildingWillUpdate = dataBuilding.Where(it => it.Area_Code == areaCodeBuilding).ToList();
-            //     Console.WriteLine($"Total Building update in {areaCodeBuilding}");
-
-            //     if (dataArea.Any())
-            //     {
-            //         Console.WriteLine("dataArea exist");
-            //         percent = dataArea.FirstOrDefault(it => it.AreaCode == areaCodeBuilding)?.percent ?? 0;
-            //         Console.WriteLine("Calculate percent by area done!");
-            //     }
-            //     else
-            //     {
-            //         Console.WriteLine("dataArea not exist,and use dataAmp");
-            //         var dataAmp = collectionOldDataprocess.Aggregate()
-            //         .Match(it => it.SampleType == "u" && it.Area_Code.Substring(0, 4) == areaCodeBuilding.Substring(0, 4))
-            //         .Group(it => it.Area_Code.Substring(0, 4), x => new
-            //         {
-            //             amp = x.Key,
-            //             sumIsHouseHoldGoodPlumbing = x.Sum(i => i.IsHouseHoldGoodPlumbing),
-            //             sumIsHouseHold = x.Sum(i => i.IsHouseHold)
-            //         })
-            //         .Project(it => new
-            //         {
-            //             Amp = it.amp,
-            //             percent = it.sumIsHouseHoldGoodPlumbing * 100 / it.sumIsHouseHold
-            //         })
-            //         .ToList();
-            //         Console.WriteLine($"dataAmp : {dataAmp.Count}");
-            //         percent = dataAmp.FirstOrDefault(it => it.Amp == areaCodeBuilding.Substring(0, 4))?.percent ?? 0;
-            //         Console.WriteLine("Calculate percent by amp done!");
-            //     }
-
-            //     var countB = 0;
-            //     foreach (var data in dataBuildingWillUpdate)
-            //     {
-            //         countB++;
-            //         Console.WriteLine($"round update : {countB} / {dataBuildingWillUpdate.Count}");
-            //         newIsHouseHoldGoodPlumbing = Math.Round(data.IsHouseHold.Value * percent / 100);
-            //         // var def = Builders<DataProcessed>.Update
-            //         // .Set(it => it.IsHouseHoldGoodPlumbing, newIsHouseHoldGoodPlumbing);
-            //         // collectionOldDataprocess.UpdateOne(it => it._id == data.Id, def);
-            //         Console.WriteLine($"{data.Id} update done!");
-            //     }
-            // }
-            // Console.WriteLine("All Update Done!");
         }
 
         // 5.ครัวเรือนในเขตเมืองที่มีน้ำประปาใช้ (ในเขตเทศบาล) -> IsHouseHoldHasPlumbingDistrict
