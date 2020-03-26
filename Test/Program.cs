@@ -106,13 +106,15 @@ namespace Test
                 IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
             })
             .ToList();
+
             Console.WriteLine($"Qry Building done : {dataBuilding.Count}");
 
             var areaGrouping = dataBuilding.GroupBy(it => it.Area_Code).ToList();
+            var areaUse = areaGrouping.Skip(0).ToList();
             Console.WriteLine($"total area : {areaGrouping.Count}");
             var count = 0;
             var countTotalB = 0;
-            foreach (var areaGroup in areaGrouping)
+            foreach (var areaGroup in areaUse)
             {
                 count++;
                 Console.WriteLine($"round area : {count} / {areaGrouping.Count}");
