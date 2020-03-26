@@ -68,7 +68,7 @@ namespace Test
                 // var sumIsHouseHoldArea = dataArea.Sum(it => it.IsHouseHold).Value;
                 // var sumIsHouseHoldGoodPlumbingArea = dataArea.Sum(it => it.IsHouseHoldGoodPlumbing).Value;
                 // return sumIsHouseHoldGoodPlumbingArea * 100 / sumIsHouseHoldArea;
-                return dataArea.FirstOrDefault().percent.Value;
+                return dataArea.FirstOrDefault()?.percent.Value ?? 0;
             }
             else
             {
@@ -87,7 +87,7 @@ namespace Test
                 // var sumIsHouseHoldAmp = dataAmp.Sum(it => it.IsHouseHold).Value;
                 // var sumIsHouseHoldGoodPlumbingAmp = dataAmp.Sum(it => it.IsHouseHoldGoodPlumbing).Value;
                 // return sumIsHouseHoldGoodPlumbingAmp * 100 / sumIsHouseHoldAmp;
-                return dataAmp.FirstOrDefault().percent.Value;
+                return dataAmp.FirstOrDefault()?.percent.Value ?? 0;
             }
         }
 
@@ -110,6 +110,7 @@ namespace Test
             var areaGrouping = dataBuilding.GroupBy(it => it.Area_Code).ToList();
             Console.WriteLine($"total area : {areaGrouping.Count}");
             var count = 0;
+            var countTotalB = 0;
             foreach (var areaGroup in areaGrouping)
             {
                 count++;
@@ -123,6 +124,7 @@ namespace Test
                 areaGroup.ToList().ForEach(it =>
                 {
                     countB++;
+                    countTotalB++;
                     Console.WriteLine($"round update : {countB} / {areaGroup.Count()}");
                     var newIsHouseHoldGoodPlumbing = Math.Round(it.IsHouseHold.Value * percent / 100);
                     Console.WriteLine($"oldIsHouseHoldGoodPlumbing : {it.IsHouseHoldGoodPlumbing}");
@@ -132,6 +134,7 @@ namespace Test
                     collectionOldDataprocess.UpdateOne(x => x._id == it.Id, def);
                     Console.WriteLine($"update done!");
                 });
+                Console.WriteLine($"count building already update : {countTotalB} / {dataBuilding.Count}");
             }
             Console.WriteLine("all update done!");
         }
