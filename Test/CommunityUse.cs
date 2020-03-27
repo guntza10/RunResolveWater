@@ -8,5 +8,6 @@ namespace Test.models
       
         public double? CountCommunityHasDisaster { get; set; }
         public double? CountCommunity { get; set; }
+        public double? CommunityNatureDisaster { get; set; }
     }
 }

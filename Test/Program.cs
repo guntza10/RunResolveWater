@@ -25,7 +25,9 @@ namespace Test
             // ResolveIsHouseHoldGoodPlumbing();
             // ResolveCountPopulationOver20000();
             // ResolveCountCommunity();
-            // ResolveCountPopulationOver20000();
+            
+            ResolveCountCommunity();
+            ResolveAvgWaterHeightCm();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -246,9 +248,11 @@ namespace Test
         //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
         public static void ResolveAvgWaterHeightCm()
         {
+            Console.WriteLine("Start ResolveAvgWaterHeightCm");
             var def = Builders<DataProcessed>.Update
             .Set(it => it.AvgWaterHeightCm, 0)
             .Set(it => it.TimeWaterHeightCm, 0);
+            Console.WriteLine("Updating.......");
             // collectionOldDataprocess.UpdateMany(it => it.EA != "" || it.Area_Code != null && it.AvgWaterHeightCm == 0 || it.TimeWaterHeightCm == 0, def);
             collectionOldDataprocess.UpdateMany(it => it.AvgWaterHeightCm == 0 || it.TimeWaterHeightCm == 0, def);
             Console.WriteLine("update done");
@@ -270,6 +274,9 @@ namespace Test
         // 22.หมู่บ้านในพื้นที่น้ำท่วมซ้ำซากที่มีการเตือนภัยและมาตรการช่วยเหลือ -> CommunityNatureDisaster 
         public static void ResolveCountCommunity()
         {
+            Console.WriteLine("Start ResolveCountCommunity");
+            Console.WriteLine("Quering....................");
+
             var listCountCommu = collectionOldDataprocess.Aggregate()
             .Match(it => it.SampleType == "c")
             .Project(it => new CommunityUse
@@ -277,9 +284,11 @@ namespace Test
                 areaCode = it.Area_Code,
                 CountCommunityHasDisaster = it.CountCommunityHasDisaster,
                 CountCommunity = it.CountCommunity,
+                CommunityNatureDisaster = it.CommunityNatureDisaster
             })
             .ToList();
-            System.Console.WriteLine($"listCountCommu = {listCountCommu.Count}");
+
+            System.Console.WriteLine($"Qry listCountCommu Done = {listCountCommu.Count}");
 
             var listAmountCommu = collectionAmountCommunity.Aggregate()
             .Project(it => new
@@ -288,7 +297,33 @@ namespace Test
                 totalCom = it.totalCom
             })
             .ToList();
-            System.Console.WriteLine($"listAmountCommu = {listAmountCommu.Count}");
+
+            System.Console.WriteLine($"Qry listAmountCommu Done = {listAmountCommu.Count}");
+
+            var listArea = collectionOldDataprocess.Aggregate()
+            .Group(it => it.Area_Code, x => new
+            {
+                areaCode = x.Key,
+                listData = x
+            })
+            .ToList();
+
+            System.Console.WriteLine($"Qry listArea Done = {listArea.Count}");
+
+            var listEACommu = listArea.Select(it =>
+             new
+             {
+                 areaCode = it.areaCode,
+                 listEa = it.listData.Select(i => new
+                 {
+                     Ea = i.EA,
+                     sampleType = i.SampleType
+                 })
+                 .ToList()
+             })
+             .ToList();
+
+            System.Console.WriteLine($"Qry listEACommu Done = {listEACommu.Count}");
 
             var resultDataArea = listCountCommu.GroupBy(it => it.areaCode)
             .Select(it => new CommunityResolve
@@ -298,33 +333,30 @@ namespace Test
                 SumCountCommunity = it.Sum(s => s.CountCommunity)
             })
             .ToList();
-            System.Console.WriteLine($"resultDataArea = {resultDataArea.Count}");
+
+            System.Console.WriteLine($"Qry resultDataArea = {resultDataArea.Count}");
+
             var round = 0;
             foreach (var area in resultDataArea)
             {
                 round++;
-                System.Console.WriteLine($"Round = {round} / {resultDataArea.Count}, area = {area.areaCode}");
+                System.Console.WriteLine($"Round Area = {round} / {resultDataArea.Count}, area = {area.areaCode}");
                 var totalCom = listAmountCommu.FirstOrDefault(it => it.id == area.areaCode).totalCom;
 
                 var dataProcessUpdate = new List<DataProcessed>();
                 if (area.SumCountCommunity < totalCom)
                 {
-                    var listEA = collectionOldDataprocess.Aggregate()
-                    .Match(it => it.Area_Code == area.areaCode)
-                    .ToList();
-
-                    System.Console.WriteLine($"listEA = {listEA.Count}");
-
-                    var groupEA = listEA
-                    .GroupBy(it => it.EA)
-                    .Select(it => new
-                    {
-                        EA_Code = it.Key,
-                        SampleTypeExist = it.Any(i => i.SampleType == "c")
-                    })
-                    .ToList();
+                    var groupEA = listEACommu.FirstOrDefault(it => it.areaCode == area.areaCode).listEa
+                     .GroupBy(it => it.Ea)
+                     .Select(it => new
+                     {
+                         EA_Code = it.Key,
+                         SampleTypeExist = it.Any(i => i.sampleType == "c")
+                     })
+                     .ToList();
 
                     System.Console.WriteLine($"groupEA = {groupEA.Count}");
+
                     var differnt = totalCom - area.SumCountCommunity;
                     var dataRecored = new DataProcessed
                     {
@@ -340,7 +372,8 @@ namespace Test
                         dataRecored._id = Guid.NewGuid().ToString();
                         dataProcessUpdate.Add(dataRecored);
                     }
-                    System.Console.WriteLine($"Generate data done.");
+
+                    System.Console.WriteLine($"Generate dataProcessUpdate done.");
 
                     var amountDataUpdateHasDisaster = AmountCountCommunityHasDisaster(resultDataArea, listCountCommu, area.areaCode, differnt.Value);
                     dataProcessUpdate.Take((int)amountDataUpdateHasDisaster).ToList().ForEach(it => it.CountCommunityHasDisaster = 1);
@@ -354,12 +387,14 @@ namespace Test
                     .ForEach(it => it.CommunityNatureDisaster = 1);
                     System.Console.WriteLine($"Set CommunityNatureDisaster done.");
                     // collectionOldDataprocess.InsertMany(dataProcessUpdate);
+                    System.Console.WriteLine($"Insert new data done!");
                 }
             }
         }
 
         public static double AmountCountCommunityHasDisaster(List<CommunityResolve> resultDataArea, List<CommunityUse> listCountCommu, string area, double differnt)
         {
+            Console.WriteLine("Start AmountCountCommunityHasDisaster");
             var dataArea = resultDataArea.FirstOrDefault(it => it.areaCode == area);
             if (dataArea.SumCountCommunity != 0)
             {
@@ -386,13 +421,14 @@ namespace Test
 
         public static double AmountCommunityNatureDisaster(List<CommunityUse> listCountCommu, string area, int count)
         {
+            Console.WriteLine("Start AmountCommunityNatureDisaster");
             var dataAreaHasDisaster = listCountCommu.Where(it => it.areaCode == area && it.CountCommunityHasDisaster != 0)
             .GroupBy(it => it.areaCode)
             .Select(it =>
             {
-                var SumCountCommunityHasDisaster = it.Sum(s => s.CountCommunityHasDisaster);
+                var SumCommunityNatureDisaster = it.Sum(s => s.CommunityNatureDisaster);
                 var SumCountCommunity = it.Sum(s => s.CountCommunity);
-                return SumCountCommunityHasDisaster * 100 / SumCountCommunity;
+                return SumCommunityNatureDisaster * 100 / SumCountCommunity;
             })
             .ToList();
 
@@ -409,9 +445,9 @@ namespace Test
                .GroupBy(it => it.areaCode.Substring(0, 4))
                .Select(it =>
                {
-                   var SumCountCommunityHasDisaster = it.Sum(s => s.CountCommunityHasDisaster);
+                   var SumCommunityNatureDisaster = it.Sum(s => s.CommunityNatureDisaster);
                    var SumCountCommunity = it.Sum(s => s.CountCommunity);
-                   return SumCountCommunityHasDisaster * 100 / SumCountCommunity;
+                   return SumCommunityNatureDisaster * 100 / SumCountCommunity;
                })
                .ToList();
                 var percentDataAmpHasDisaster = dataAmpHasDisaster.FirstOrDefault() ?? 0.0;
