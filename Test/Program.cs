@@ -22,9 +22,9 @@ namespace Test
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
-            ResolveIsHouseHoldGoodPlumbing();
+            // ResolveIsHouseHoldGoodPlumbing();
             // ResolveCountPopulationOver20000();
-
+            ResolveCountCommunity();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -125,21 +125,21 @@ namespace Test
             {
                 countAreaUpdate++;
                 Console.WriteLine($"round area : {countAreaUpdate} / {areaGrouping.Count}");
-                
+
                 var areaCode = areaGroup.Key;
                 var percent = percentIsHouseHoldGoodPlumbing(areaCode, dataUnit);
 
                 Console.WriteLine($"percent of {areaCode} : {percent}");
-             
+
                 var countBuildingInArea = 0;
                 areaGroup.ToList().ForEach(it =>
                 {
                     countBuildingInArea++;
                     countTotalBuildingAlreadyUpdate++;
                     Console.WriteLine($"round update building : {countBuildingInArea} / {areaGroup.Count()}");
-                    
+
                     var newIsHouseHoldGoodPlumbing = Math.Round(it.IsHouseHold.Value * percent / 100);
-                  
+
                     Console.WriteLine($"newIsHouseHoldGoodPlumbing : {newIsHouseHoldGoodPlumbing}");
 
                     var def = Builders<DataProcessed>.Update
@@ -275,26 +275,26 @@ namespace Test
                 round++;
                 System.Console.WriteLine($"Round = {round} / {resultDataArea.Count}, area = {area.areaCode}");
                 var totalCom = listAmountCommu.FirstOrDefault(it => it.id == area.areaCode).totalCom;
-                var listEA = collectionOldDataprocess.Aggregate()
-                .Match(it => it.Area_Code == area.areaCode)
-                .ToList();
-
-                System.Console.WriteLine($"listEA = {listEA.Count}");
-
-                var groupEA = listEA
-                .GroupBy(it => it.EA)
-                .Select(it => new
-                {
-                    EA_Code = it.Key,
-                    SampleTypeExist = it.Any(i => i.SampleType == "c")
-                })
-                .ToList();
-
-                System.Console.WriteLine($"groupEA = {groupEA.Count}");
 
                 var dataProcessUpdate = new List<DataProcessed>();
                 if (area.SumCountCommunity < totalCom)
                 {
+                    var listEA = collectionOldDataprocess.Aggregate()
+                    .Match(it => it.Area_Code == area.areaCode)
+                    .ToList();
+
+                    System.Console.WriteLine($"listEA = {listEA.Count}");
+
+                    var groupEA = listEA
+                    .GroupBy(it => it.EA)
+                    .Select(it => new
+                    {
+                        EA_Code = it.Key,
+                        SampleTypeExist = it.Any(i => i.SampleType == "c")
+                    })
+                    .ToList();
+
+                    System.Console.WriteLine($"groupEA = {groupEA.Count}");
                     var differnt = totalCom - area.SumCountCommunity;
                     var dataRecored = new DataProcessed
                     {
@@ -349,18 +349,6 @@ namespace Test
                     return SumCountCommunityHasDisaster * 100 / SumCountCommunity;
                 })
                 .ToList();
-                // var dataAmp = collectionOldDataprocess.Aggregate()
-                // .Match(it => it.SampleType == "c" && it.Area_Code.Substring(0, 4) == area.Substring(0, 4))
-                // .Group(it => it.Area_Code.Substring(0, 4), x => new
-                // {
-                //     SumCountCommunityHasDisaster = x.Sum(s => s.CountCommunityHasDisaster),
-                //     SumCountCommunity = x.Sum(s => s.CountCommunity)
-                // })
-                // .Project(it => new
-                // {
-                //     percent = it.SumCountCommunityHasDisaster * 100 / it.SumCountCommunity
-                // })
-                // .ToList();
                 var percentDataArea = dataAmp.FirstOrDefault() ?? 0.0;
                 return Math.Round(differnt * percentDataArea / 100);
             }
