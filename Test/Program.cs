@@ -22,8 +22,7 @@ namespace Test
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
-            ResolveIsHouseHoldGoodPlumbing();
-
+            ResolveCountCommunity();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -202,6 +201,7 @@ namespace Test
                 CountCommunity = it.CountCommunity,
             })
             .ToList();
+            System.Console.WriteLine($"listCountCommu = {listCountCommu.Count}");
 
             var listAmountCommu = collectionAmountCommunity.Aggregate()
             .Project(it => new
@@ -210,6 +210,7 @@ namespace Test
                 totalCom = it.totalCom
             })
             .ToList();
+            System.Console.WriteLine($"listAmountCommu = {listAmountCommu.Count}");
 
             var resultDataArea = listCountCommu.GroupBy(it => it.areaCode)
             .Select(it => new CommunityResolve
@@ -219,18 +220,29 @@ namespace Test
                 SumCountCommunity = it.Sum(s => s.CountCommunity)
             })
             .ToList();
-
+            System.Console.WriteLine($"resultDataArea = {resultDataArea.Count}");
+            var round = 0;
             foreach (var area in resultDataArea)
             {
+                round++;
+                System.Console.WriteLine($"Round = {round} / {resultDataArea.Count}, area = {area.areaCode}");
                 var totalCom = listAmountCommu.FirstOrDefault(it => it.id == area.areaCode).totalCom;
                 var listEA = collectionOldDataprocess.Aggregate()
                 .Match(it => it.Area_Code == area.areaCode)
-                .Group(it => it.EA, x => new
+                .ToList();
+
+                System.Console.WriteLine($"listEA = {listEA.Count}");
+
+                var groupEA = listEA
+                .GroupBy(it => it.EA)
+                .Select(it => new
                 {
-                    EA_Code = x.Key,
-                    SampleTypeExist = x.Any(i => i.SampleType == "c")
+                    EA_Code = it.Key,
+                    SampleTypeExist = it.Any(i => i.SampleType == "c")
                 })
                 .ToList();
+
+                System.Console.WriteLine($"groupEA = {groupEA.Count}");
 
                 var dataProcessUpdate = new List<DataProcessed>();
                 if (area.SumCountCommunity < totalCom)
@@ -239,7 +251,7 @@ namespace Test
                     var dataRecored = new DataProcessed
                     {
                         Area_Code = area.areaCode,
-                        EA = listEA.FirstOrDefault(it => it.SampleTypeExist == false).EA_Code ?? listEA.FirstOrDefault(it => it.SampleTypeExist == true).EA_Code,
+                        EA = groupEA.FirstOrDefault(it => it.SampleTypeExist == false).EA_Code ?? groupEA.FirstOrDefault(it => it.SampleTypeExist == true).EA_Code,
                         SampleType = "c",
                         CountCommunity = 1,
                         IsCommunityWaterManagementHasWaterTreatment = 0,
@@ -250,42 +262,58 @@ namespace Test
                         dataRecored._id = Guid.NewGuid().ToString();
                         dataProcessUpdate.Add(dataRecored);
                     }
+                    System.Console.WriteLine($"Generate data done.");
 
-                    var amountDataUpdateHasDisaster = AmountCountCommunityHasDisaster(resultDataArea, area.areaCode, differnt.Value);
+                    var amountDataUpdateHasDisaster = AmountCountCommunityHasDisaster(resultDataArea, listCountCommu, area.areaCode, differnt.Value);
                     dataProcessUpdate.Take((int)amountDataUpdateHasDisaster).ToList().ForEach(it => it.CountCommunityHasDisaster = 1);
+                    System.Console.WriteLine($"Set CountCommunityHasDisaster done.");
 
                     var count = dataProcessUpdate.Count(it => it.CountCommunityHasDisaster == 1);
                     var amountDataUpdateNatureDisaster = AmountCommunityNatureDisaster(listCountCommu, area.areaCode, count);
-                    dataProcessUpdate.Where(it => it.CountCommunityHasDisaster == 1).Take((int)amountDataUpdateNatureDisaster).ToList().ForEach(it => it.CommunityNatureDisaster = 1);
-
-                    collectionOldDataprocess.InsertMany(dataProcessUpdate);
+                    dataProcessUpdate.Where(it => it.CountCommunityHasDisaster == 1)
+                    .Take((int)amountDataUpdateNatureDisaster)
+                    .ToList()
+                    .ForEach(it => it.CommunityNatureDisaster = 1);
+                    System.Console.WriteLine($"Set CommunityNatureDisaster done.");
+                    // collectionOldDataprocess.InsertMany(dataProcessUpdate);
                 }
             }
         }
 
-        public static double AmountCountCommunityHasDisaster(List<CommunityResolve> resultDataArea, string area, double differnt)
+        public static double AmountCountCommunityHasDisaster(List<CommunityResolve> resultDataArea, List<CommunityUse> listCountCommu, string area, double differnt)
         {
             var dataArea = resultDataArea.FirstOrDefault(it => it.areaCode == area);
             if (dataArea.SumCountCommunity != 0)
             {
+                System.Console.WriteLine($"Data area exist.");
                 var percentDataArea = dataArea.SumCountCommunityHasDisaster * 100 / dataArea.SumCountCommunity;
                 return Math.Round(differnt * percentDataArea.Value / 100);
             }
             else
             {
-                var dataAmp = collectionOldDataprocess.Aggregate()
-                .Match(it => it.SampleType == "c" && it.Area_Code.Substring(0, 4) == area.Substring(0, 4))
-                .Group(it => it.Area_Code.Substring(0, 4), x => new
+                System.Console.WriteLine($"Data area not exist.");
+                var dataAmp = listCountCommu.Where(it => it.areaCode.Substring(0, 4) == area.Substring(0, 4))
+                .GroupBy(it => it.areaCode.Substring(0, 4))
+                .Select(it =>
                 {
-                    SumCountCommunityHasDisaster = x.Sum(s => s.CountCommunityHasDisaster),
-                    SumCountCommunity = x.Sum(s => s.CountCommunity)
-                })
-                .Project(it => new
-                {
-                    percent = it.SumCountCommunityHasDisaster * 100 / it.SumCountCommunity
+                    var SumCountCommunityHasDisaster = it.Sum(s => s.CountCommunityHasDisaster);
+                    var SumCountCommunity = it.Sum(s => s.CountCommunity);
+                    return SumCountCommunityHasDisaster * 100 / SumCountCommunity;
                 })
                 .ToList();
-                var percentDataArea = dataAmp.FirstOrDefault()?.percent ?? 0.0;
+                // var dataAmp = collectionOldDataprocess.Aggregate()
+                // .Match(it => it.SampleType == "c" && it.Area_Code.Substring(0, 4) == area.Substring(0, 4))
+                // .Group(it => it.Area_Code.Substring(0, 4), x => new
+                // {
+                //     SumCountCommunityHasDisaster = x.Sum(s => s.CountCommunityHasDisaster),
+                //     SumCountCommunity = x.Sum(s => s.CountCommunity)
+                // })
+                // .Project(it => new
+                // {
+                //     percent = it.SumCountCommunityHasDisaster * 100 / it.SumCountCommunity
+                // })
+                // .ToList();
+                var percentDataArea = dataAmp.FirstOrDefault() ?? 0.0;
                 return Math.Round(differnt * percentDataArea / 100);
             }
         }
@@ -304,11 +332,13 @@ namespace Test
 
             if (dataAreaHasDisaster.Any())
             {
+                System.Console.WriteLine($"Data area exist.");
                 var percentDataAreaHasDisaster = dataAreaHasDisaster.FirstOrDefault() ?? 0.0;
                 return Math.Round(count * percentDataAreaHasDisaster / 100);
             }
             else
             {
+                System.Console.WriteLine($"Data area not exist.");
                 var dataAmpHasDisaster = listCountCommu.Where(it => it.areaCode.Substring(0, 4) == area.Substring(0, 4) && it.CountCommunityHasDisaster != 0)
                .GroupBy(it => it.areaCode.Substring(0, 4))
                .Select(it =>
