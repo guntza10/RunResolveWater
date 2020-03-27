@@ -22,8 +22,8 @@ namespace Test
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
-            ResolveIsHouseHoldGoodPlumbing();
-            // ResolveCountPopulationOver20000();
+            // ResolveIsHouseHoldGoodPlumbing();
+            ResolveCountPopulationOver20000();
 
         }
 
@@ -125,21 +125,21 @@ namespace Test
             {
                 countAreaUpdate++;
                 Console.WriteLine($"round area : {countAreaUpdate} / {areaGrouping.Count}");
-                
+
                 var areaCode = areaGroup.Key;
                 var percent = percentIsHouseHoldGoodPlumbing(areaCode, dataUnit);
 
                 Console.WriteLine($"percent of {areaCode} : {percent}");
-             
+
                 var countBuildingInArea = 0;
                 areaGroup.ToList().ForEach(it =>
                 {
                     countBuildingInArea++;
                     countTotalBuildingAlreadyUpdate++;
                     Console.WriteLine($"round update building : {countBuildingInArea} / {areaGroup.Count()}");
-                    
+
                     var newIsHouseHoldGoodPlumbing = Math.Round(it.IsHouseHold.Value * percent / 100);
-                  
+
                     Console.WriteLine($"newIsHouseHoldGoodPlumbing : {newIsHouseHoldGoodPlumbing}");
 
                     var def = Builders<DataProcessed>.Update
@@ -180,38 +180,67 @@ namespace Test
         // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
         public static void ResolveCountPopulationOver20000()
         {
-            var eaWrong = collectionOldDataprocess.Aggregate()
-             .Match(it => it.EA != "")
-             .Group(it => it.EA, x => new
-             {
-                 Ea = x.Key,
-                 sumCountPopulation = x.Sum(i => i.CountPopulation)
-             })
-             .Match(it => it.sumCountPopulation > 20000)
+            Console.WriteLine("Start RunResolveCountPopulation");
+            Console.WriteLine("Quering.......");
+
+            var data = collectionOldDataprocess.Aggregate()
+             .Match(it => it.EA != "" && (it.SampleType == "b" || it.SampleType == "u"))
              .Project(it => new
              {
-                 Ea = it.Ea
+                 Id = it._id,
+                 Ea = it.EA,
+                 countPopulation = it.CountPopulation,
+                 countWorkingAge = it.CountWorkingAge
              })
              .ToList();
 
-            eaWrong.ForEach(it =>
+            Console.WriteLine($"Query Done : {data.Count}");
+
+            var EaCountPopulationOver20k = data.GroupBy(it => it.Ea)
+            .Select(it => new
             {
-                var avg = collectionOldDataprocess.Aggregate()
-                .Match(x => x.EA == it.Ea)
-                .Group(x => x.EA, i => new
+                Ea = it.Key,
+                sumCountPopulation = it.Sum(x => x.countPopulation)
+            })
+            .Where(it => it.sumCountPopulation > 20000)
+            .Select(it => new
+            {
+                Ea = it.Ea
+            })
+            .ToList();
+
+            Console.WriteLine($"EaCountPopulationOver20k : {EaCountPopulationOver20k.Count}");
+
+            var count = 0;
+            EaCountPopulationOver20k.ForEach(it =>
+            {
+                count++;
+                Console.WriteLine($"Round Ea : {count} / {EaCountPopulationOver20k.Count}");
+
+                var dataLess20k = data.Where(x => x.Ea == it.Ea && x.countPopulation < 20000).ToList();
+                var dataOver20k = data.Where(x => x.Ea == it.Ea && x.countPopulation > 20000).ToList();
+
+                var avg = Math.Round(dataLess20k.Sum(x => x.countPopulation).Value / dataLess20k.Count);
+
+                Console.WriteLine($"Update For dataOver20k");
+                var countUpdate = 0;
+                dataOver20k.ForEach(x =>
                 {
-                    sumCountPopulation = i.Sum(k => k.CountPopulation),
-                    total = i.Count()
-                })
-                .Project(x => new
-                {
-                    avg = x.sumCountPopulation / x.total
-                })
-                .ToList();
+                    countUpdate++;
+
+                    Console.WriteLine($"Round Update : {countUpdate} / {dataOver20k.Count}");
+                    Console.WriteLine($"CountPopulaiton : {avg} - CountWokringAge :  {x.countWorkingAge}");
+
+                    var newCountPopulation = (avg >= x.countWorkingAge) ? avg : x.countWorkingAge;
+                    Console.WriteLine($"newCountPopulation : {newCountPopulation}");
+                    var def = Builders<DataProcessed>.Update
+                    .Set(i => i.CountPopulation, newCountPopulation);
+                    collectionOldDataprocess.UpdateOne(i => i._id == x.Id, def);
+                    Console.WriteLine($"Update done!");
+                });
             });
-
-
         }
+
         //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
         //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
         public static void ResolveAvgWaterHeightCm()
