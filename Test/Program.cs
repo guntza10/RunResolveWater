@@ -26,7 +26,7 @@ namespace Test
             // ResolveCountPopulationOver20000();
             // ResolveCountCommunity();
             
-            ResolveCountCommunity();
+            // ResolveCountCommunity();
             ResolveAvgWaterHeightCm();
         }
 
