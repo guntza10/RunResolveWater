@@ -76,5 +76,41 @@ namespace Test
             Console.WriteLine($"IsNotHouseHold has IsHouseHoldGoodPlumbing : {IsNotHouseHoldHasGoodPlumbing.Count}");
             Console.WriteLine($"IsNotHouseHold has not IsHouseHoldGoodPlumbing : {IsNotHouseHoldHasGoodPlumbingZero.Count}");
         }
+
+        public void checkIsHouseHoldDistrictCountrySide()
+        {
+            Console.WriteLine("Start checkIsHouseHoldDistrictCountrySide");
+            Console.WriteLine("Qurying...................................");
+            var data = collectionOldDataprocess.Aggregate()
+           .Match(it => it.SampleType == "b" && it.IsHouseHold != 0)
+           .Project(it => new
+           {
+               _id = it._id,
+               EA = it.EA,
+               IsHouseHold = it.IsHouseHold,
+               IsHouseHoldHasPlumbingDistrict = it.IsHouseHoldHasPlumbingDistrict,
+               IsHouseHoldHasPlumbingCountryside = it.IsHouseHoldHasPlumbingCountryside
+           })
+           .ToList();
+            Console.WriteLine($"Query Done : {data.Count}");
+
+            var dataDistrict = data.Where(it => it.EA[7] == '0' || it.EA[7] == '1').ToList();
+            var dataCorrectDistrict = dataDistrict.Where(it => it.IsHouseHoldHasPlumbingDistrict == it.IsHouseHold &&
+            it.IsHouseHoldHasPlumbingCountryside == 0)
+            .ToList();
+            var dataDistrictExceptCorrect = dataDistrict.Except(dataCorrectDistrict).ToList();
+            Console.WriteLine($"dataDistrict : {dataDistrict.Count}");
+            Console.WriteLine($"dataCorrectDistrict : {dataCorrectDistrict.Count}");
+            Console.WriteLine($"dataDistrictExceptCorrect : {dataDistrictExceptCorrect.Count}");
+
+            var dataConutrySide = data.Where(it => it.EA[7] == '2').ToList();
+            var dataCorrectConutrySide = dataConutrySide.Where(it => it.IsHouseHoldHasPlumbingDistrict == 0 &&
+            it.IsHouseHoldHasPlumbingCountryside == it.IsHouseHold)
+            .ToList();
+            var dataConutrySideExceptCorrect = dataConutrySide.Except(dataCorrectConutrySide).ToList();
+            Console.WriteLine($"dataConutrySide : {dataConutrySide.Count}");
+            Console.WriteLine($"dataCorrectConutrySide : {dataCorrectConutrySide.Count}");
+            Console.WriteLine($"dataConutrySideExceptCorrect : {dataConutrySideExceptCorrect.Count}");
+        }
     }
 }

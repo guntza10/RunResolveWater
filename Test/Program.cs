@@ -20,14 +20,15 @@ namespace Test
             var database = mongo.GetDatabase("wdata");
             collectionOldDataprocess = database.GetCollection<DataProcessed>("oldDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
-            // checkCountPopulationWrong();
+            checkCountPopulationWrong();
             // ResolveIsHouseHold();
             // ResolveIsHouseHoldGoodPlumbing();
             // ResolveCountPopulationOver20000();
             // ResolveCountCommunity();
-            
+
             // ResolveCountCommunity();
-            ResolveAvgWaterHeightCm();
+            // ResolveAvgWaterHeightCm();
+            // ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -159,6 +160,8 @@ namespace Test
         // 6.ครัวเรือนในชนบทที่มีน้ำประปาใช้ (นอกเขตเทศบาล) -> IsHouseHoldHasPlumbingCountryside
         public static void ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside()
         {
+            Console.WriteLine("Start ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside");
+            Console.WriteLine("Querying.......................................................................");
             var dataUpdate = collectionOldDataprocess.Aggregate()
             .Match(it => it.SampleType == "b" && it.IsHouseHold != 0)
             .Project(it => new
@@ -168,9 +171,13 @@ namespace Test
                 IsHouseHold = it.IsHouseHold
             })
             .ToList();
+            Console.WriteLine($"Qry done : {dataUpdate.Count}");
 
+            var count = 0;
             foreach (var data in dataUpdate)
             {
+                count++;
+                Console.WriteLine($"Round : {count} / {dataUpdate.Count}");
                 var district = data.EA[7];
                 var IsHouseHoldHasPlumbingDistrict = (district == '0' || district == '1') ? data.IsHouseHold : 0;
                 var IsHouseHoldHasPlumbingCountryside = (district == '2') ? data.IsHouseHold : 0;
@@ -178,7 +185,9 @@ namespace Test
                .Set(it => it.IsHouseHoldHasPlumbingDistrict, IsHouseHoldHasPlumbingDistrict)
                .Set(it => it.IsHouseHoldHasPlumbingCountryside, IsHouseHoldHasPlumbingCountryside);
                 collectionOldDataprocess.UpdateOne(it => it._id == data._id, def);
+                Console.WriteLine($"update done!");
             }
+            Console.WriteLine($"All Update Done!");
         }
         // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
         public static void ResolveCountPopulationOver20000()
@@ -459,7 +468,8 @@ namespace Test
         {
             var checker = new CheckResolve();
             // checker.checkResolveIsHouseHold();
-            checker.checkBuilding();
+            // checker.checkBuilding();
+            checker.checkIsHouseHoldDistrictCountrySide();
         }
 
         // done
