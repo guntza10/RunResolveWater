@@ -4,11 +4,13 @@ namespace Test.models
 {
     public class JsonModel
     {
-        public string buildingId { get; set; }
-        // public string houseNo { get; set; }
-        // public string name { get; set; }
-        public string status { get; set; }
-        public int? completedCount { get; set; }
-        public int? unitCount { get; set; }
+        public string Id { get; set; }
+        public string Area_Code { get; set; }
+        public string EA { get; set; }
+        public string SampleType { get; set; }
+        public double? CountCommunity { get; set; }
+        public double? IsCommunityWaterManagementHasWaterTreatment { get; set; }
+        public double? CountCommunityHasDisaster { get; set; }
+        public double? CommunityNatureDisaster { get; set; }
     }
 }

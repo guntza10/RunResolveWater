@@ -112,5 +112,38 @@ namespace Test
             Console.WriteLine($"dataCorrectConutrySide : {dataCorrectConutrySide.Count}");
             Console.WriteLine($"dataConutrySideExceptCorrect : {dataConutrySideExceptCorrect.Count}");
         }
+
+        public void CheckArea()
+        {
+            var data = collectionOldDataprocess.Aggregate()
+            .Match(it => it.SampleType == "c")
+            .Project(it => new
+            {
+                areaCode = it.Area_Code
+            })
+            .ToList();
+
+            var dataAreaCom = data.GroupBy(it => it.areaCode)
+            .Select(it => it.Key)
+            .ToList();
+
+            var dataAmoutArea = collectionAmountCommunity.Aggregate()
+            .Project(it => new
+            {
+                areaCode = it.Id
+            })
+            .ToList();
+
+            var dataCheck = dataAreaCom.Select(it => new
+            {
+                areaCode = it,
+                exists = dataAmoutArea.Any(x => x.areaCode == it)
+            })
+            .Where(it => it.exists == true)
+            .ToList();
+
+            Console.WriteLine($"dataAreaCom : {dataAreaCom.Count}");
+            Console.WriteLine($"dataCheck : {dataCheck.Count}");
+        }
     }
 }

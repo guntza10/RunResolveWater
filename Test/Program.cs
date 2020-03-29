@@ -321,22 +321,21 @@ namespace Test
 
             System.Console.WriteLine($"Qry listEACommu Done = {listEACommu.Count}");
 
-            var resultDataArea = listCom.GroupBy(it => it.areaCode)
+            var groupArea = listCom.GroupBy(it => it.areaCode)
             .Select(it => new CommunityResolve
             {
                 areaCode = it.Key,
-                // SumCountCommunityHasDisaster = it.Sum(s => s.CountCommunityHasDisaster),
                 SumCountCommunity = it.Sum(s => s.CountCommunity)
             })
             .ToList();
 
-            System.Console.WriteLine($"Qry resultDataArea = {resultDataArea.Count}");
-
+            System.Console.WriteLine($"Qry resultDataArea = {groupArea.Count}");
+            var total = new List<JsonModel>();
             var round = 0;
-            foreach (var area in resultDataArea)
+            foreach (var area in groupArea)
             {
                 round++;
-                System.Console.WriteLine($"Round Area = {round} / {resultDataArea.Count}, area = {area.areaCode}");
+                System.Console.WriteLine($"Round Area = {round} / {groupArea.Count}, area = {area.areaCode}");
                 var totalCom = listAmountCommu.FirstOrDefault(it => it.id == area.areaCode).totalCom;
 
                 var dataProcessUpdate = new List<DataProcessed>();
@@ -351,24 +350,38 @@ namespace Test
                      })
                      .ToList();
 
-                    System.Console.WriteLine($"count Ea in {area.areaCode} = {listSampleTypeEa.Count}");
+                    System.Console.WriteLine($"count Ea don't have commu in {area.areaCode} = {listSampleTypeEa.Count(it => it.SampleTypeExist == false)}");
 
                     var differnt = totalCom - area.SumCountCommunity;
-                    var dataRecored = new DataProcessed
-                    {
-                        Area_Code = area.areaCode,
-                        EA = listSampleTypeEa.FirstOrDefault(it => it.SampleTypeExist == false).EA_Code ?? listSampleTypeEa.FirstOrDefault(it => it.SampleTypeExist == true).EA_Code,
-                        SampleType = "c",
-                        CountCommunity = 1,
-                        IsCommunityWaterManagementHasWaterTreatment = 0,
-                        CountCommunityHasDisaster = 0,
-                        CommunityNatureDisaster = 0
-                    };
+                    // var dataRecored = new DataProcessed
+                    // {
+                    //     Area_Code = area.areaCode,
+                    //     EA = (listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false) != null) ? listSampleTypeEa
+                    //     .FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false).EA_Code :
+                    //     listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == true).EA_Code,
+                    //     SampleType = "c",
+                    //     CountCommunity = 1,
+                    //     IsCommunityWaterManagementHasWaterTreatment = 0,
+                    //     CountCommunityHasDisaster = 0,
+                    //     CommunityNatureDisaster = 0
+                    // };
 
                     for (int i = 0; i < differnt; i++)
                     {
-                        dataRecored._id = Guid.NewGuid().ToString();
-                        dataProcessUpdate.Add(dataRecored);
+                        // dataRecored._id = Guid.NewGuid().ToString();
+                        dataProcessUpdate.Add(new DataProcessed
+                        {
+                            _id = Guid.NewGuid().ToString(),
+                            Area_Code = area.areaCode,
+                            EA = (listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false) != null) ? listSampleTypeEa
+                            .FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false).EA_Code :
+                            listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == true).EA_Code,
+                            SampleType = "c",
+                            CountCommunity = 1,
+                            IsCommunityWaterManagementHasWaterTreatment = 0,
+                            CountCommunityHasDisaster = 0,
+                            CommunityNatureDisaster = 0
+                        });
                     }
 
                     System.Console.WriteLine($"Generate dataProcessUpdate done.");
@@ -390,10 +403,12 @@ namespace Test
                         .ForEach(it => it.CommunityNatureDisaster = 1);
                     }
                     System.Console.WriteLine($"Set CommunityNatureDisaster done.");
-                    
-                    // collectionOldDataprocess.InsertMany(dataProcessUpdate);
-                    var getDataProcess = dataProcessUpdate.Select(it => new
+                    collectionOldDataprocess.InsertMany(dataProcessUpdate);
+                    System.Console.WriteLine($"{area.areaCode} Insert done!");
+
+                    var getDataProcess = dataProcessUpdate.Select(it => new JsonModel
                     {
+                        Id = it._id,
                         Area_Code = it.Area_Code,
                         EA = it.EA,
                         SampleType = it.SampleType,
@@ -403,10 +418,21 @@ namespace Test
                         CommunityNatureDisaster = it.CommunityNatureDisaster
                     })
                     .ToList();
-                    System.Console.WriteLine($"{getDataProcess.Count}");
-                    System.Console.WriteLine($"Insert new data done!");
+                    total.AddRange(getDataProcess);
                 }
             }
+            var test = total.Where(it => it.CountCommunityHasDisaster != 0 || it.CommunityNatureDisaster != 0).ToList();
+            var test2 = total.Where(it => it.CountCommunityHasDisaster != 0 && it.CommunityNatureDisaster != 0).ToList();
+            var test3 = total.Where(it => it.CountCommunityHasDisaster != 0 && it.CommunityNatureDisaster == 0).ToList();
+            var test5 = total.Where(it => it.CountCommunityHasDisaster == 0 && it.CommunityNatureDisaster == 0).ToList();
+            var test4 = total.Where(it => it.EA == "" || it.EA == null).ToList();
+
+            System.Console.WriteLine($"Total Data Insert = {total.Count}");
+            System.Console.WriteLine($"data CountCommunityHasDisaster != 0 || CommunityNatureDisaster != 0 => {test.Count}");
+            System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster != 0 => {test2.Count}");
+            System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster == 0 => {test3.Count}");
+            System.Console.WriteLine($"data CountCommunityHasDisaster == 0 && CommunityNatureDisaster == 0 => {test5.Count}");
+            System.Console.WriteLine($"data Ea == null => {test4.Count}");
         }
 
         public static void Test()
@@ -502,7 +528,8 @@ namespace Test
             var checker = new CheckResolve();
             // checker.checkResolveIsHouseHold();
             // checker.checkBuilding();
-            checker.checkIsHouseHoldDistrictCountrySide();
+            // checker.checkIsHouseHoldDistrictCountrySide();
+            checker.CheckArea();
         }
 
         // done
