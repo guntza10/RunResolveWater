@@ -24,9 +24,10 @@ namespace Test
             // ResolveIsHouseHold();
             // ResolveIsHouseHoldGoodPlumbing();
             // ResolveCountPopulationOver20000();
-            ResolveCountCommunity();
+            // ResolveCountCommunity();
             // ResolveAvgWaterHeightCm();
             // ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside();
+            ResolveHasntPlumbing();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -187,6 +188,43 @@ namespace Test
             }
             Console.WriteLine($"All Update Done!");
         }
+
+        //  9.จำนวนบ่อน้ำบาดาล (สน.2) -> CountGroundWater
+        public static void ResolveCountGroundWater()
+        {
+            var listCom = collectionOldDataprocess.Aggregate()
+            .Match(it => it.SampleType == "c")
+            .ToList();
+
+            var dataEACountGroundWaterOver100 = listCom
+            .GroupBy(it => it.EA)
+            .Select(it => new
+            {
+                EA = it.Key,
+                sumCountGroundWater = it.Sum(i => i.CountGroundWater)
+            })
+            .Where(it => it.sumCountGroundWater > 100)
+            .Select(it => it.EA)
+            .ToList();
+
+            var dataAvgCountGroundWater = listCom
+            .GroupBy(it => it.Area_Code)
+            .Select(it => new
+            {
+                Area_Code = it.Key,
+                sumGroundWaterNotProblem = it.Where(x => !dataEACountGroundWaterOver100.Contains(x.EA))
+                .Sum(x => x.CountGroundWater),
+                total = it.Where(x => !dataEACountGroundWaterOver100.Contains(x.EA)).Count()
+            })
+            .Select(it => new
+            {
+                Area_Code = it.Area_Code,
+                avgCountGroundWater = Math.Round(it.sumGroundWaterNotProblem.Value / it.total)
+            })
+            .ToList();
+            // ส่วน Update
+        }
+
         // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
         public static void ResolveCountPopulationOver20000()
         {
@@ -435,20 +473,34 @@ namespace Test
             System.Console.WriteLine($"data Ea == null => {test4.Count}");
         }
 
-        public static void Test()
+        // 18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing)
+        public static void ResolveHasntPlumbing()
         {
-            var listArea = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
-            .Group(it => it.Area_Code, x => new
-            {
-                areaCode = x.Key,
-                listData = x.Select(it => new
-                {
-                    EA = it.EA,
-                    SampleType = it.SampleType
-                })
-            })
+            Console.WriteLine($"Start ResolveHasntPlumbing");
+            Console.WriteLine($"Querying..................");
+            var dataWrong = collectionOldDataprocess.Aggregate()
+            .Match(it => it.IsHouseHold == 0
+            && it.IsAgriculture == 0
+            && it.IsAllFactorial == 0
+            && it.IsAllCommercial == 0
+            && it.HasntPlumbing > 0)
             .ToList();
-            Console.WriteLine($"{listArea.Count}");
+            Console.WriteLine($"dataWrong : {dataWrong.Count}");
+            var listIdWrongWillUpdate = dataWrong.Select(it => it._id).ToList();
+            Console.WriteLine($"data hasn't G that HasntPlumbing greater than 0 : {listIdWrongWillUpdate.Count}");
+            var skip = 0;
+            var countUpdate = 0;
+            while (skip <= (listIdWrongWillUpdate.Count - 1000))
+            {
+                var listUpate = listIdWrongWillUpdate.Skip(skip).Take(1000).ToList();
+                var def = Builders<DataProcessed>.Update
+                .Set(it => it.HasntPlumbing, 0);
+                collectionOldDataprocess.UpdateMany(it => listUpate.Contains(it._id), def);
+                skip += 1000;
+                countUpdate += listUpate.Count;
+                Console.WriteLine($"count data already update : {countUpdate} / {listIdWrongWillUpdate.Count}");
+            }
+            Console.WriteLine($"All Update Done!");
         }
 
         public static double AmountCountCommunityHasDisaster(List<CommunityUse> listCom, string area, double differnt)

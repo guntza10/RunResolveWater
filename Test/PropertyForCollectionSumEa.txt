@@ -1,0 +1,53 @@
+EA
+IsAgriculture	-> IsAgriculture (sum) 
+IsHouseHold	    -> IsHouseHold (sum)
+IsHouseHoldGoodPlumbing	-> IsHouseHoldGoodPlumbing (sum)
+IsAgricultureHasIrrigationField ->	IsAgricultureHasIrrigationField (sum)
+IsHouseHoldHasPlumbingDistrict  ->	IsHouseHoldHasPlumbingDistrict (sum)
+IsHouseHoldHasPlumbingCountryside  -> IsHouseHoldHasPlumbingCountryside (sum)
+IsFactorialWaterQuality ->	IsFactorialWaterQuality (sum)
+IsCommercialWaterQuality  -> IsCommercialWaterQuality (sum)
+CountGroundWater  (u)  ->	CountGroundWater (sum)
+CountGroundWater (c)   ->	CountGroundWater (sum)
+CountPopulation ->	CountPopulation (sum)
+CountWorkingAge ->	CountWorkingAge (sum)
+IsFactorial ->	IsFactorial (sum)
+IsFactorialWaterTreatment   ->	IsFactorialWaterTreatment (sum)
+IsCommunityWaterManagementHasWaterTreatment ->	IsCommunityWaterManagementHasWaterTreatment (sum)
+FieldCommunity  ->	FieldCommunity (sum)
+AvgWaterHeightCm    ->	AvgWaterHeightCm (avg)
+TimeWaterHeightCm   ->	TimeWaterHeightCm (avg)
+HasntPlumbing   ->	HasntPlumbing (avg)
+IsGovernment    ->	IsGovernment (sum)
+IsGovernmentUsage   ->	IsGovernmentUsage (sum)
+IsGovernmentWaterQuality    ->	IsGovernmentWaterQuality (sum)
+CommunityNatureDisaster ->	CommunityNatureDisaster (sum)
+WaterSources  (u)  ->	WaterSources (sum)
+WaterSources  (c)  ->	WaterSources (sum)
+IndustryHasWasteWaterTreatment  ->	IndustryHasWasteWaterTreatment (sum)
+PeopleInFloodedArea ->	PeopleInFloodedArea (sum)
+CountCommunity  ->	CountCommunity (sum)
+CountCommunityHasDisaster   -> CountCommunityHasDisaster (sum)
+IsAllHouseHoldCountryside -> IsAllHouseHoldCountryside (sum)
+IsAllHouseHoldDistrict -> IsAllHouseHoldDistrict (sum)
+IsAllFactorial -> IsAllFactorial (sum)
+IsAllCommercial ->IsAllCommercial (sum)
+
+AreaCode
+CountGroundWaterUnit -> CountGroundWater	
+CountGroundWaterCom -> CountGroundWater	
+WaterSourcesUnit -> WaterSources	
+WaterSourcesCom -> WaterSources
+CubicMeterGroundWaterForAgriculture -> 	CubicMeterGroundWaterForAgriculture
+CubicMeterGroundWaterForService -> 	CubicMeterGroundWaterForService
+CubicMeterGroundWaterForProduct -> 	CubicMeterGroundWaterForProduct
+CubicMeterGroundWaterForDrink -> 	CubicMeterGroundWaterForDrink
+CubicMeterPlumbingForAgriculture -> CubicMeterPlumbingForAgriculture	
+CubicMeterPlumbingForService -> 	CubicMeterPlumbingForService
+CubicMeterPlumbingForProduct -> 	CubicMeterPlumbingForProduct
+CubicMeterPlumbingForDrink -> CubicMeterPlumbingForDrink	
+CubicMeterSurfaceForAgriculture -> 	CubicMeterSurfaceForAgriculture
+CubicMeterSurfaceForService -> 	CubicMeterSurfaceForService
+CubicMeterSurfaceForProduct -> 	CubicMeterSurfaceForProduct
+CubicMeterSurfaceForDrink -> 	CubicMeterSurfaceForDrink
+CubicMeterGroundWaterForUse -> CubicMeterGroundWaterForUse
