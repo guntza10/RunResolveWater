@@ -5,7 +5,7 @@ G1-G4
 21.สถานที่ราชการที่มีน้ำประปาที่มีคุณภาพมาตรฐาน (IsGovernmentWaterQuality) not require G -------------------------------------------->(clear)
 23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (WaterSources) -------------------------------------------->(clear)
 
-18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing) 
+18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing) (clear)
 - G อันไหนก็ได้ 
     -> G1 IsHouseHold
     -> G2 IsAgriculture
