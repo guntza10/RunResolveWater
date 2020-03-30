@@ -490,7 +490,7 @@ namespace Test
             Console.WriteLine($"data hasn't G that HasntPlumbing greater than 0 : {listIdWrongWillUpdate.Count}");
             var skip = 0;
             var countUpdate = 0;
-            while (skip <= (listIdWrongWillUpdate.Count - 1000))
+            while (skip <= listIdWrongWillUpdate.Count)
             {
                 var listUpate = listIdWrongWillUpdate.Skip(skip).Take(1000).ToList();
                 var def = Builders<DataProcessed>.Update
