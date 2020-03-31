@@ -32,7 +32,7 @@ namespace Test
             // ResolveAvgWaterHeightCm();
             // ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside();
             // ResolveHasntPlumbing();
-            ResolveCountGroundWaterAndWaterSourcesEA();
+            // ResolveCountGroundWaterAndWaterSourcesEA();
             ResolveCountGroundWaterAndWaterSourcesAreaCode();
         }
 
@@ -624,18 +624,30 @@ namespace Test
 
             Console.WriteLine($"listEAUpdate : {listEaUpdate.Count}");
 
-            var dataEA = collectionOldDataprocess.Aggregate()
-            .Match(it => it.EA != "")
-            .Group(it => it.EA, x => new
+            var data = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            .Project(it => new
             {
-                EA = x.Key,
-                listData = x.Select(i => new
+                EA = it.EA,
+                SampleType = it.SampleType,
+                CountGroundWater = it.CountGroundWater,
+                WaterSources = it.WaterSources
+            })
+            .ToList();
+
+            Console.WriteLine($"data : {data.Count}");
+
+            var dataEA = data.GroupBy(it => it.EA)
+            .Select(it => new
+            {
+                EA = it.Key,
+                listData = it.Select(i => new
                 {
                     SampleType = i.SampleType,
                     CountGroundWater = i.CountGroundWater,
                     WaterSources = i.WaterSources
                 })
             })
+            .Where(it => it.EA != "")
             .ToList();
 
             Console.WriteLine($"dataEA : {dataEA.Count}");
@@ -654,14 +666,15 @@ namespace Test
                 var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
                 var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
 
-                var def = Builders<ResultDataEA>.Update
-                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
-                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
-                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
-                .Set(i => i.WaterSourcesCom, waterSourcesCom);
-                collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
+                // var def = Builders<ResultDataEA>.Update
+                // .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                // .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                // .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                // .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                // collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
                 Console.WriteLine($"EA {it.EA} Update Done!");
             });
+            Console.WriteLine("All Update Done!");
         }
 
         // Resolve countGroundWaterAndWaterSourcesEA()
@@ -678,8 +691,8 @@ namespace Test
             .ToList();
             Console.WriteLine($"listAreaCodeUpdate : {listAreaCodeUpdate.Count}");
 
-            var dataAreaCode = collectionOldDataprocess.Aggregate()
-            .Match(it => it.Area_Code != "")
+            var dataAreaCode = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            // .Match(it => it.Area_Code != "")
             .Group(it => it.Area_Code, x => new
             {
                 Area_Code = x.Key,
@@ -707,14 +720,15 @@ namespace Test
                 var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
                 var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
 
-                var def = Builders<ResultDataAreaCode>.Update
-                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
-                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
-                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
-                .Set(i => i.WaterSourcesCom, waterSourcesCom);
-                collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
+                // var def = Builders<ResultDataAreaCode>.Update
+                // .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                // .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                // .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                // .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                // collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
                 Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");
             });
+            Console.WriteLine("Update Done!");
         }
     }
 
