@@ -14,12 +14,16 @@ namespace Test
     {
         private static IMongoCollection<DataProcessed> collectionOldDataprocess { get; set; }
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
+        private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
+        private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
         static void Main(string[] args)
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataprocess = database.GetCollection<DataProcessed>("oldDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
+            collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
+            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
             // ResolveIsHouseHoldGoodPlumbing();
@@ -27,7 +31,9 @@ namespace Test
             // ResolveCountCommunity();
             // ResolveAvgWaterHeightCm();
             // ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside();
-            ResolveHasntPlumbing();
+            // ResolveHasntPlumbing();
+            ResolveCountGroundWaterAndWaterSourcesEA();
+            ResolveCountGroundWaterAndWaterSourcesAreaCode();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -391,22 +397,9 @@ namespace Test
                     System.Console.WriteLine($"count Ea don't have commu in {area.areaCode} = {listSampleTypeEa.Count(it => it.SampleTypeExist == false)}");
 
                     var differnt = totalCom - area.SumCountCommunity;
-                    // var dataRecored = new DataProcessed
-                    // {
-                    //     Area_Code = area.areaCode,
-                    //     EA = (listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false) != null) ? listSampleTypeEa
-                    //     .FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false).EA_Code :
-                    //     listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == true).EA_Code,
-                    //     SampleType = "c",
-                    //     CountCommunity = 1,
-                    //     IsCommunityWaterManagementHasWaterTreatment = 0,
-                    //     CountCommunityHasDisaster = 0,
-                    //     CommunityNatureDisaster = 0
-                    // };
 
                     for (int i = 0; i < differnt; i++)
                     {
-                        // dataRecored._id = Guid.NewGuid().ToString();
                         dataProcessUpdate.Add(new DataProcessed
                         {
                             _id = Guid.NewGuid().ToString(),
@@ -615,6 +608,113 @@ namespace Test
                 collectionAmountCommunity.InsertMany(finalData);
                 Console.WriteLine("Insert Done!");
             }
+        }
+
+        // Resolve countGroundWaterAndWaterSourcesEA()
+        public static void ResolveCountGroundWaterAndWaterSourcesEA()
+        {
+            Console.WriteLine("Start ResolveCountGroundWaterAndWaterSourcesEA");
+            Console.WriteLine("Querying......................................");
+            var listEaUpdate = collectionResultDataEA.Aggregate()
+            .Project(it => new
+            {
+                EA = it.Id
+            })
+            .ToList();
+
+            Console.WriteLine($"listEAUpdate : {listEaUpdate.Count}");
+
+            var dataEA = collectionOldDataprocess.Aggregate()
+            .Match(it => it.EA != "")
+            .Group(it => it.EA, x => new
+            {
+                EA = x.Key,
+                listData = x.Select(i => new
+                {
+                    SampleType = i.SampleType,
+                    CountGroundWater = i.CountGroundWater,
+                    WaterSources = i.WaterSources
+                })
+            })
+            .ToList();
+
+            Console.WriteLine($"dataEA : {dataEA.Count}");
+
+            var count = 0;
+            listEaUpdate.ForEach(it =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {listEaUpdate.Count}, EA = {it.EA}");
+                var listDataEA = dataEA.FirstOrDefault(i => i.EA == it.EA).listData;
+                var dataUnit = listDataEA.Where(i => i.SampleType == "u").ToList();
+                var dataCom = listDataEA.Where(i => i.SampleType == "c").ToList();
+
+                var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
+                var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
+                var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
+                var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
+
+                var def = Builders<ResultDataEA>.Update
+                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
+                Console.WriteLine($"EA {it.EA} Update Done!");
+            });
+        }
+
+        // Resolve countGroundWaterAndWaterSourcesEA()
+        public static void ResolveCountGroundWaterAndWaterSourcesAreaCode()
+        {
+            Console.WriteLine("Start ResolveCountGroundWaterAndWaterSourcesAreaCode");
+            Console.WriteLine("Querying............................................");
+
+            var listAreaCodeUpdate = collectionResultDataAreaCode.Aggregate()
+            .Project(it => new
+            {
+                Area_Code = it.Id
+            })
+            .ToList();
+            Console.WriteLine($"listAreaCodeUpdate : {listAreaCodeUpdate.Count}");
+
+            var dataAreaCode = collectionOldDataprocess.Aggregate()
+            .Match(it => it.Area_Code != "")
+            .Group(it => it.Area_Code, x => new
+            {
+                Area_Code = x.Key,
+                listData = x.Select(i => new
+                {
+                    SampleType = i.SampleType,
+                    CountGroundWater = i.CountGroundWater,
+                    WaterSources = i.WaterSources
+                })
+            })
+            .ToList();
+            Console.WriteLine($"dataAreaCode : {dataAreaCode.Count}");
+
+            var count = 0;
+            listAreaCodeUpdate.ForEach(it =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {listAreaCodeUpdate.Count} , Area_Code = {it.Area_Code}");
+                var listDataAreaCode = dataAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code).listData;
+                var dataUnit = listDataAreaCode.Where(i => i.SampleType == "u").ToList();
+                var dataCom = listDataAreaCode.Where(i => i.SampleType == "c").ToList();
+
+                var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
+                var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
+                var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
+                var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
+
+                var def = Builders<ResultDataAreaCode>.Update
+                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
+                Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");
+            });
         }
     }
 
