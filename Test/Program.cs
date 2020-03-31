@@ -213,6 +213,14 @@ namespace Test
             .Select(it => it.EA)
             .ToList();
 
+            var dataEACountGroundWaterComOver100 = collectionResultDataEA.Aggregate()
+            .Match(it => it.CountGroundWaterCom > 100)
+            .Project(it => new
+            {
+                EA = it.Id
+            })
+            .ToList();
+
             var dataAvgCountGroundWater = listCom
             .GroupBy(it => it.Area_Code)
             .Select(it => new
@@ -229,6 +237,12 @@ namespace Test
             })
             .ToList();
             // ส่วน Update
+            dataEACountGroundWaterOver100.ForEach(it =>
+            {
+                
+            });
+
+
         }
 
         // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
