@@ -792,7 +792,7 @@ namespace Test
             {
                 var SumCountWorkingAgeRegion = it.Sum(s => s.SumCountWorkingAge);
                 var SumCountPopulationRegion = it.Sum(s => s.SumCountPopulation);
-                new
+                return new
                 {
                     Region = it.Key,
                     percentRegion = SumCountWorkingAgeRegion * 100 / SumCountPopulationRegion
@@ -802,16 +802,16 @@ namespace Test
             .ToList();
             Console.WriteLine($"eaNotProblem : {eaNotProblem.Count}");
 
-            var i = 0;
+            var count = 0;
             eaHasProblem.ForEach(it =>
             {
-                i++;
-                System.Console.WriteLine($"Round {i} / {eaHasProblem.Count}");
+                count++;
+                System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
                 var newCountWorkingAge = eaNotProblem
                     .FirstOrDefault(i => i.Region == it.Ea[0]).percentRegion * it.SumCountPopulation / 100;
-                var def = Builders<ResultDataEA>().Update
+                var def = Builders<ResultDataEA>.Update
                 .Set(x => x.CountWorkingAge, newCountWorkingAge);
-                collectionResultDataEA.UpdateOne(it => it.Id == it.Ea, def);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
                 Console.WriteLine($"Update done.");
             });
             Console.WriteLine($"All Update done.");
@@ -841,23 +841,23 @@ namespace Test
              {
                  var sumFieldCommunity = it.Sum(s => s.SumFieldCommunity);
                  var totalFieldCommunity = it.Count();
-                 new
+                 return new
                  {
                      Region = it.Key,
-                     avg = Math.Round(sumFieldCommunity / totalFieldCommunity)
+                     avg = Math.Round(sumFieldCommunity.Value / totalFieldCommunity)
                  };
              })
              .ToList();
             Console.WriteLine($"avgReg : {avgReg.Count}");
-
+            var count = 0;
             eaProblem.ForEach(it =>
             {
-                i++;
-                System.Console.WriteLine($"Round {i} / {eaHasProblem.Count}");
-                var dataAvg = avgReg.FirstOrDefault(i => i.Regtion == it.Ea[0]).avg;
-                var def = Builders<ResultDataEA>().Update
+                count++;
+                System.Console.WriteLine($"Round {count} / {eaProblem.Count}");
+                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.Ea[0]).avg;
+                var def = Builders<ResultDataEA>.Update
                 .Set(x => x.FieldCommunity, dataAvg);
-                collectionResultDataEA.UpdateOne(it => it.Id == it.Ea, def);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
                 Console.WriteLine($"Update done.");
             });
             Console.WriteLine($"All Update done.");
