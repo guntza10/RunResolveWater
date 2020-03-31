@@ -19,9 +19,9 @@ namespace Test.models
         public double? CubicMeterSurfaceForProduct { get; set; }
         public double? CubicMeterSurfaceForDrink { get; set; }
         public double? CubicMeterGroundWaterForUse { get; set; }
-        public int? CountGroundWaterUnit { get; set; }
-        public int? CountGroundWaterCom { get; set; }
-        public int? WaterSourcesUnit { get; set; }
-        public int? WaterSourcesCom { get; set; }
+        public double? CountGroundWaterUnit { get; set; }
+        public double? CountGroundWaterCom { get; set; }
+        public double? WaterSourcesUnit { get; set; }
+        public double? WaterSourcesCom { get; set; }
     }
 }

@@ -35,9 +35,9 @@ namespace Test.models
         public double? IsAllHouseHoldDistrict { get; set; }
         public double? IsAllFactorial { get; set; }
         public double? IsAllCommercial { get; set; }
-        public int? CountGroundWaterUnit { get; set; }
-        public int? CountGroundWaterCom { get; set; }
-        public int? WaterSourcesUnit { get; set; }
-        public int? WaterSourcesCom { get; set; }
+        public double? CountGroundWaterUnit { get; set; }
+        public double? CountGroundWaterCom { get; set; }
+        public double? WaterSourcesUnit { get; set; }
+        public double? WaterSourcesCom { get; set; }
     }
 }
