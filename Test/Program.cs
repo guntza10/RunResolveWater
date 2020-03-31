@@ -34,8 +34,9 @@ namespace Test
             // ResolveHasntPlumbing();
             // ResolveCountGroundWaterAndWaterSourcesEA();
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
-            ResolvecountWorkingAge();
+            // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
+            ResolveCountGroundWater();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -201,9 +202,12 @@ namespace Test
         public static void ResolveCountGroundWater()
         {
             Console.WriteLine("Start ResolveCountGroundWater");
+            Console.WriteLine("Querying.....................");
             var listCom = collectionOldDataprocess.Aggregate()
             .Match(it => it.SampleType == "c")
             .ToList();
+
+            Console.WriteLine($"listCom : {listCom.Count}");
 
             var dataEACountGroundWaterOver100 = listCom
             .GroupBy(it => it.EA)
@@ -215,6 +219,7 @@ namespace Test
             })
             .Where(it => it.sumCountGroundWater > 100)
             .ToList();
+
             Console.WriteLine($"dataEACountGroundWaterOver100 : {dataEACountGroundWaterOver100.Count}");
 
             var dataEACountGroundWaterComOver100 = collectionResultDataEA.Aggregate()
@@ -248,10 +253,10 @@ namespace Test
             {
                 count++;
                 Console.WriteLine($"Round : {count} / {dataEACountGroundWaterOver100.Count},EA = {it.EA}");
-                var avg = Convert.ToInt32(dataAvgCountGroundWater.FirstOrDefault(x => x.Area_Code == it.AreaCode).avgCountGroundWater);
-                var def = Builders<ResultDataEA>.Update
-                .Set(x => x.CountGroundWaterCom, avg);
-                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
+                var avg = dataAvgCountGroundWater.FirstOrDefault(x => x.Area_Code == it.AreaCode).avgCountGroundWater;
+                // var def = Builders<ResultDataEA>.Update
+                // .Set(x => x.CountGroundWaterCom, avg);
+                // collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
                 Console.WriteLine($"EA {it.EA} Update Done!");
             });
             Console.WriteLine("All Update Done!");
@@ -636,7 +641,7 @@ namespace Test
             }
         }
 
-        // Resolve countGroundWaterAndWaterSourcesEA()
+        // Resolve countGroundWaterAndWaterSourcesEA
         public static void ResolveCountGroundWaterAndWaterSourcesEA()
         {
             Console.WriteLine("Start ResolveCountGroundWaterAndWaterSourcesEA");
@@ -703,7 +708,7 @@ namespace Test
             Console.WriteLine("All Update Done!");
         }
 
-        // Resolve countGroundWaterAndWaterSourcesEA()
+        // Resolve CountGroundWaterAndWaterSourcesAreaCode
         public static void ResolveCountGroundWaterAndWaterSourcesAreaCode()
         {
             Console.WriteLine("Start ResolveCountGroundWaterAndWaterSourcesAreaCode");
@@ -804,7 +809,7 @@ namespace Test
             .ToList();
             Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
 
-            var eaNotProblem = listEA.Except(eaHasProblem)
+            var dataPercentRegion = listEA.Except(eaHasProblem)
             .GroupBy(it => it.Ea[0])
             .Select(it =>
             {
@@ -818,15 +823,15 @@ namespace Test
             })
             .ToList();
 
-            Console.WriteLine($"eaNotProblem : {eaNotProblem.Count}");
+            Console.WriteLine($"eaNotProblem : {dataPercentRegion.Count}");
 
             var count = 0;
             eaHasProblem.ForEach(it =>
             {
                 count++;
                 System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
-                var newCountWorkingAge = eaNotProblem
-                    .FirstOrDefault(i => i.Region == it.Ea[0]).percentRegion * it.SumCountPopulation / 100;
+                var newCountWorkingAge = Math.Round(dataPercentRegion
+                    .FirstOrDefault(i => i.Region == it.Ea[0]).percentRegion.Value * it.SumCountPopulation.Value / 100);
                 // var def = Builders<ResultDataEA>.Update
                 // .Set(x => x.CountWorkingAge, newCountWorkingAge);
                 // collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
@@ -852,7 +857,7 @@ namespace Test
             var listEA = data.GroupBy(it => it.EA)
             .Select(it => new
             {
-                Ea = it.Key,
+                EA = it.Key,
                 SumFieldCommunity = it.Sum(s => s.FieldCommunity)
             })
             .ToList();
@@ -866,9 +871,8 @@ namespace Test
             .ToList();
             Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
 
-
-            var avgReg = listEA.Where(it => !eaProblem.Any(i => i.Ea == it.Ea))
-            .GroupBy(it => it.Ea[0])
+            var avgReg = listEA.Where(it => !eaProblem.Any(i => i.EA == it.EA))
+            .GroupBy(it => it.EA[0])
             .Select(it =>
              {
                  var sumFieldCommunity = it.Sum(s => s.SumFieldCommunity);
@@ -876,7 +880,7 @@ namespace Test
                  return new
                  {
                      Region = it.Key,
-                     avg = Math.Round(sumFieldCommunity.Value / totalFieldCommunity)
+                     avg = sumFieldCommunity.Value / totalFieldCommunity
                  };
              })
              .ToList();
@@ -886,7 +890,7 @@ namespace Test
             {
                 count++;
                 System.Console.WriteLine($"Round {count} / {eaProblem.Count}");
-                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.Ea[0]).avg;
+                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.EA[0]).avg;
                 // var def = Builders<ResultDataEA>.Update
                 // .Set(x => x.FieldCommunity, dataAvg);
                 // collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
