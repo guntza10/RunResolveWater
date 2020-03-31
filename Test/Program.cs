@@ -198,6 +198,7 @@ namespace Test
         //  9.จำนวนบ่อน้ำบาดาล (สน.2) -> CountGroundWater
         public static void ResolveCountGroundWater()
         {
+            Console.WriteLine("Start ResolveCountGroundWater");
             var listCom = collectionOldDataprocess.Aggregate()
             .Match(it => it.SampleType == "c")
             .ToList();
@@ -207,11 +208,12 @@ namespace Test
             .Select(it => new
             {
                 EA = it.Key,
+                AreaCode = it.FirstOrDefault().Area_Code,
                 sumCountGroundWater = it.Sum(i => i.CountGroundWater)
             })
             .Where(it => it.sumCountGroundWater > 100)
-            .Select(it => it.EA)
             .ToList();
+            Console.WriteLine($"dataEACountGroundWaterOver100 : {dataEACountGroundWaterOver100.Count}");
 
             var dataEACountGroundWaterComOver100 = collectionResultDataEA.Aggregate()
             .Match(it => it.CountGroundWaterCom > 100)
@@ -220,15 +222,16 @@ namespace Test
                 EA = it.Id
             })
             .ToList();
+            Console.WriteLine($"dataEACountGroundWaterComOver100 : {dataEACountGroundWaterComOver100.Count}");
 
             var dataAvgCountGroundWater = listCom
             .GroupBy(it => it.Area_Code)
             .Select(it => new
             {
                 Area_Code = it.Key,
-                sumGroundWaterNotProblem = it.Where(x => !dataEACountGroundWaterOver100.Contains(x.EA))
+                sumGroundWaterNotProblem = it.Where(x => !dataEACountGroundWaterOver100.Any(i => i.EA == x.EA))
                 .Sum(x => x.CountGroundWater),
-                total = it.Where(x => !dataEACountGroundWaterOver100.Contains(x.EA)).Count()
+                total = it.Where(x => !dataEACountGroundWaterOver100.Any(i => i.EA == x.EA)).Count()
             })
             .Select(it => new
             {
@@ -236,13 +239,20 @@ namespace Test
                 avgCountGroundWater = Math.Round(it.sumGroundWaterNotProblem.Value / it.total)
             })
             .ToList();
+            Console.WriteLine($"dataAvgCountGroundWater : {dataAvgCountGroundWater.Count}");
             // ส่วน Update
+            var count = 0;
             dataEACountGroundWaterOver100.ForEach(it =>
             {
-                
+                count++;
+                Console.WriteLine($"Round : {count} / {dataEACountGroundWaterOver100.Count},EA = {it.EA}");
+                var avg = Convert.ToInt32(dataAvgCountGroundWater.FirstOrDefault(x => x.Area_Code == it.AreaCode).avgCountGroundWater);
+                var def = Builders<ResultDataEA>.Update
+                .Set(x => x.CountGroundWaterCom, avg);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
+                Console.WriteLine($"EA {it.EA} Update Done!");
             });
-
-
+            Console.WriteLine("All Update Done!");
         }
 
         // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
