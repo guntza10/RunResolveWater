@@ -666,12 +666,12 @@ namespace Test
                 var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
                 var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
 
-                // var def = Builders<ResultDataEA>.Update
-                // .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
-                // .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
-                // .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
-                // .Set(i => i.WaterSourcesCom, waterSourcesCom);
-                // collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
+                var def = Builders<ResultDataEA>.Update
+                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
                 Console.WriteLine($"EA {it.EA} Update Done!");
             });
             Console.WriteLine("All Update Done!");
@@ -691,12 +691,23 @@ namespace Test
             .ToList();
             Console.WriteLine($"listAreaCodeUpdate : {listAreaCodeUpdate.Count}");
 
-            var dataAreaCode = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
-            // .Match(it => it.Area_Code != "")
-            .Group(it => it.Area_Code, x => new
+            var data = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            .Match(it => it.Area_Code != "")
+            .Project(it => new
             {
-                Area_Code = x.Key,
-                listData = x.Select(i => new
+                Area_Code = it.Area_Code,
+                SampleType = it.SampleType,
+                CountGroundWater = it.CountGroundWater,
+                WaterSources = it.WaterSources
+            })
+            .ToList();
+            Console.WriteLine($"data : {data.Count}");
+
+            var dataAreaCode = data.GroupBy(it => it.Area_Code)
+            .Select(it => new
+            {
+                Area_Code = it.Key,
+                listData = it.Select(i => new
                 {
                     SampleType = i.SampleType,
                     CountGroundWater = i.CountGroundWater,
@@ -704,6 +715,7 @@ namespace Test
                 })
             })
             .ToList();
+
             Console.WriteLine($"dataAreaCode : {dataAreaCode.Count}");
 
             var count = 0;
@@ -720,12 +732,12 @@ namespace Test
                 var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
                 var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
 
-                // var def = Builders<ResultDataAreaCode>.Update
-                // .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
-                // .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
-                // .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
-                // .Set(i => i.WaterSourcesCom, waterSourcesCom);
-                // collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
+                var def = Builders<ResultDataAreaCode>.Update
+                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
                 Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");
             });
             Console.WriteLine("Update Done!");
