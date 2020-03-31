@@ -766,8 +766,103 @@ namespace Test
             });
             Console.WriteLine("Update Done!");
         }
-    }
 
+        // 11.จำนวนประชากรวัยทำงาน -> countWorkingAge
+        public void ResolvecountWorkingAge()
+        {
+            Console.WriteLine("Start ResolvecountWorkingAge");
+            Console.WriteLine("Querying......................................");
+            var listEA = collectionOldDataprocess.Aggregate()
+            .Group(it => it.EA, x =>
+            new
+            {
+                Ea = x.Key,
+                SumCountWorkingAge = x.Sum(s => s.CountWorkingAge),
+                SumCountPopulation = x.Sum(s => s.CountPopulation)
+            })
+            .ToList();
+            Console.WriteLine($"listEA : {listEA.Count}");
+
+            var eaHasProblem = listEA.Where(it => it.SumCountWorkingAge == 0 && it.SumCountPopulation > 0).ToList();
+            Console.WriteLine($"eaHasProblem : {eaHasProblem.Count}");
+
+            var eaNotProblem = listEA.Except(eaHasProblem)
+            .GroupBy(it => it.Ea[0])
+            .Select(it =>
+            {
+                var SumCountWorkingAgeRegion = it.Sum(s => s.SumCountWorkingAge);
+                var SumCountPopulationRegion = it.Sum(s => s.SumCountPopulation);
+                new
+                {
+                    Region = it.Key,
+                    percentRegion = SumCountWorkingAgeRegion * 100 / SumCountPopulationRegion
+
+                };
+            })
+            .ToList();
+            Console.WriteLine($"eaNotProblem : {eaNotProblem.Count}");
+
+            var i = 0;
+            eaHasProblem.ForEach(it =>
+            {
+                i++;
+                System.Console.WriteLine($"Round {i} / {eaHasProblem.Count}");
+                var newCountWorkingAge = eaNotProblem
+                    .FirstOrDefault(i => i.Region == it.Ea[0]).percentRegion * it.SumCountPopulation / 100;
+                var def = Builders<ResultDataEA>().Update
+                .Set(x => x.CountWorkingAge, newCountWorkingAge);
+                collectionResultDataEA.UpdateOne(it => it.Id == it.Ea, def);
+                Console.WriteLine($"Update done.");
+            });
+            Console.WriteLine($"All Update done.");
+        }
+
+        // 15.พื้นที่ชลประทาน -> FieldCommunity 
+        public void ResolveFieldCommunity()
+        {
+            Console.WriteLine("Start ResolveFieldCommunity");
+            Console.WriteLine("Querying......................................");
+            var listEA = collectionOldDataprocess.Aggregate()
+            .Group(it => it.EA, x =>
+            new
+            {
+                Ea = x.Key,
+                SumFieldCommunity = x.Sum(s => s.FieldCommunity)
+            })
+            .ToList();
+            Console.WriteLine($"listEA : {listEA.Count}");
+
+            var eaProblem = listEA.Where(it => it.SumFieldCommunity >= 300).ToList();
+            Console.WriteLine($"eaProblem : {eaProblem.Count}");
+
+            var avgReg = listEA.Except(eaProblem)
+            .GroupBy(it => it.Ea[0])
+            .Select(it =>
+             {
+                 var sumFieldCommunity = it.Sum(s => s.SumFieldCommunity);
+                 var totalFieldCommunity = it.Count();
+                 new
+                 {
+                     Region = it.Key,
+                     avg = Math.Round(sumFieldCommunity / totalFieldCommunity)
+                 };
+             })
+             .ToList();
+            Console.WriteLine($"avgReg : {avgReg.Count}");
+
+            eaProblem.ForEach(it =>
+            {
+                i++;
+                System.Console.WriteLine($"Round {i} / {eaHasProblem.Count}");
+                var dataAvg = avgReg.FirstOrDefault(i => i.Regtion == it.Ea[0]).avg;
+                var def = Builders<ResultDataEA>().Update
+                .Set(x => x.FieldCommunity, dataAvg);
+                collectionResultDataEA.UpdateOne(it => it.Id == it.Ea, def);
+                Console.WriteLine($"Update done.");
+            });
+            Console.WriteLine($"All Update done.");
+        }
+    }
 }
 enum WeekDays
 {
