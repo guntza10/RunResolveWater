@@ -36,7 +36,10 @@ namespace Test
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
+
             ResolveCountGroundWater();
+            // ResolvecountWorkingAge();
+            // ResolveFieldCommunity();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -247,6 +250,7 @@ namespace Test
             })
             .ToList();
             Console.WriteLine($"dataAvgCountGroundWater : {dataAvgCountGroundWater.Count}");
+
             // ส่วน Update
             var count = 0;
             dataEACountGroundWaterOver100.ForEach(it =>
@@ -254,9 +258,9 @@ namespace Test
                 count++;
                 Console.WriteLine($"Round : {count} / {dataEACountGroundWaterOver100.Count},EA = {it.EA}");
                 var avg = dataAvgCountGroundWater.FirstOrDefault(x => x.Area_Code == it.AreaCode).avgCountGroundWater;
-                // var def = Builders<ResultDataEA>.Update
-                // .Set(x => x.CountGroundWaterCom, avg);
-                // collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
+                var def = Builders<ResultDataEA>.Update
+                .Set(x => x.CountGroundWaterCom, avg);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
                 Console.WriteLine($"EA {it.EA} Update Done!");
             });
             Console.WriteLine("All Update Done!");
@@ -790,7 +794,8 @@ namespace Test
 
             Console.WriteLine($"data : {data.Count}");
 
-            var listEA = data.GroupBy(it => it.EA)
+            var listEA = data.Where(it => it.EA != "")
+            .GroupBy(it => it.EA)
             .Select(it => new
             {
                 Ea = it.Key,
@@ -810,7 +815,7 @@ namespace Test
             Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
 
             var dataPercentRegion = listEA.Except(eaHasProblem)
-            .GroupBy(it => it.Ea[0])
+            .GroupBy(it => it.Ea.Substring(0, 1))
             .Select(it =>
             {
                 var SumCountWorkingAgeRegion = it.Sum(s => s.SumCountWorkingAge);
@@ -831,10 +836,10 @@ namespace Test
                 count++;
                 System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
                 var newCountWorkingAge = Math.Round(dataPercentRegion
-                    .FirstOrDefault(i => i.Region == it.Ea[0]).percentRegion.Value * it.SumCountPopulation.Value / 100);
-                // var def = Builders<ResultDataEA>.Update
-                // .Set(x => x.CountWorkingAge, newCountWorkingAge);
-                // collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
+                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1)).percentRegion.Value * it.SumCountPopulation.Value / 100);
+                var def = Builders<ResultDataEA>.Update
+                .Set(x => x.CountWorkingAge, newCountWorkingAge);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
                 Console.WriteLine($"Update done.");
             });
             Console.WriteLine($"All Update done.");
@@ -854,7 +859,8 @@ namespace Test
             .ToList();
             Console.WriteLine($"data : {data.Count}");
 
-            var listEA = data.GroupBy(it => it.EA)
+            var listEA = data.Where(it => it.EA != "")
+            .GroupBy(it => it.EA)
             .Select(it => new
             {
                 EA = it.Key,
@@ -872,7 +878,7 @@ namespace Test
             Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
 
             var avgReg = listEA.Where(it => !eaProblem.Any(i => i.EA == it.EA))
-            .GroupBy(it => it.EA[0])
+            .GroupBy(it => it.EA.Substring(0, 1))
             .Select(it =>
              {
                  var sumFieldCommunity = it.Sum(s => s.SumFieldCommunity);
@@ -890,10 +896,10 @@ namespace Test
             {
                 count++;
                 System.Console.WriteLine($"Round {count} / {eaProblem.Count}");
-                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.EA[0]).avg;
-                // var def = Builders<ResultDataEA>.Update
-                // .Set(x => x.FieldCommunity, dataAvg);
-                // collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
+                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.EA.Substring(0, 1)).avg;
+                var def = Builders<ResultDataEA>.Update
+                .Set(x => x.FieldCommunity, dataAvg);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
                 Console.WriteLine($"Update done.");
             });
             Console.WriteLine($"All Update done.");
