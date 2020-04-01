@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using NSOWater.HotMigration.Models;
@@ -16,6 +17,7 @@ namespace Test
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
+        static IMongoCollection<EaInfomation> collectionEaData { get; set; }
         static void Main(string[] args)
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
@@ -24,6 +26,7 @@ namespace Test
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
+            collectionEaData = database.GetCollection<EaInfomation>("ea");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
             // ResolveIsHouseHoldGoodPlumbing();
@@ -36,10 +39,10 @@ namespace Test
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
+            //  ResolveCountGroundWater();
 
-            ResolveCountGroundWater();
-            // ResolvecountWorkingAge();
-            // ResolveFieldCommunity();
+            var fileManager = new CreateFileManager();
+            fileManager.ResultDataAreaCodeWriteFile();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -904,6 +907,97 @@ namespace Test
             });
             Console.WriteLine($"All Update done.");
         }
+
+
+
+        static void GetDataAndLookUpForAddAnAddressInfomationInResultDataEa()
+        {
+            Console.WriteLine("Programe start Process...");
+            var eaRawData = collectionEaData.Aggregate()
+                .Project(it => new
+                {
+                    EA = it._id,
+                    Area_Code = it.Area_Code,
+                    REG = it.REG,
+                    REG_NAME = it.REG_NAME,
+                    CWT = it.CWT,
+                    CWT_NAME = it.CWT_NAME,
+                    AMP = it.AMP,
+                    AMP_NAME = it.AMP_NAME,
+                    TAM = it.TAM,
+                    TAM_NAME = it.TAM_NAME
+                }).ToList();
+            var i = 0;
+            eaRawData.ForEach(it =>
+            {
+                var defEA = Builders<ResultDataEA>.Update
+                    .Set(data => data.REG, it.REG)
+                    .Set(data => data.REG_NAME, it.REG_NAME)
+                    .Set(data => data.CWT, it.CWT)
+                    .Set(data => data.CWT_NAME, it.CWT_NAME)
+                    .Set(data => data.AMP, it.AMP)
+                    .Set(data => data.AMP_NAME, it.AMP_NAME)
+                    .Set(data => data.TAM, it.TAM)
+                    .Set(data => data.TAM_NAME, it.TAM_NAME);
+
+                collectionResultDataEA.UpdateOne(colldata => colldata.Id == it.EA, defEA);
+                i++;
+                Console.WriteLine($"{i} / {eaRawData.Count()}");
+            });
+
+
+        }
+
+        static void GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode()
+        {
+            Console.WriteLine("Programe start Process...");
+            var eaRawData = collectionEaData.Aggregate()
+               .Project(it => new
+               {
+                   EA = it._id,
+                   Area_Code = it.Area_Code,
+                   REG = it.REG,
+                   REG_NAME = it.REG_NAME,
+                   CWT = it.CWT,
+                   CWT_NAME = it.CWT_NAME,
+                   AMP = it.AMP,
+                   AMP_NAME = it.AMP_NAME,
+                   TAM = it.TAM,
+                   TAM_NAME = it.TAM_NAME
+               }).ToList();
+
+            var rawDataAreaCode = eaRawData.GroupBy(it => it.Area_Code)
+                .Select(it => new
+                {
+                    Area_Code = it.Key,
+                    REG = it.FirstOrDefault().REG,
+                    REG_NAME = it.FirstOrDefault().REG_NAME,
+                    CWT = it.FirstOrDefault().CWT,
+                    CWT_NAME = it.FirstOrDefault().CWT_NAME,
+                    AMP = it.FirstOrDefault().AMP,
+                    AMP_NAME = it.FirstOrDefault().AMP_NAME,
+                    TAM = it.FirstOrDefault().TAM,
+                    TAM_NAME = it.FirstOrDefault().TAM_NAME
+                }).ToList();
+            var i = 0;
+            rawDataAreaCode.ForEach(it =>
+            {
+                var defEA = Builders<ResultDataAreaCode>.Update
+                        .Set(data => data.REG, it.REG)
+                        .Set(data => data.REG_NAME, it.REG_NAME)
+                        .Set(data => data.CWT, it.CWT)
+                        .Set(data => data.CWT_NAME, it.CWT_NAME)
+                        .Set(data => data.AMP, it.AMP)
+                        .Set(data => data.AMP_NAME, it.AMP_NAME)
+                        .Set(data => data.TAM, it.TAM)
+                        .Set(data => data.TAM_NAME, it.TAM_NAME);
+
+                i++;
+                Console.WriteLine($"{i} / {eaRawData.Count()}");
+                collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defEA);
+            });
+        }
+
     }
 }
 enum WeekDays
