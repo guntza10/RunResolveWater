@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Test.models;
+using System.Linq;
 
 namespace Test
 {
@@ -22,35 +23,46 @@ namespace Test
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
         }
+
         public void ResultDataAreaCodeWriteFile()
         {
-            var eaRawData = collectionResultDataEA.Aggregate()
-            .Match(it=>it.Id=="11001011000001")
+            var rawData = collectionResultDataAreaCode.Aggregate()
             .ToList();
+            var data = rawData.GroupBy(it => it.Id).ToList();
+            Console.WriteLine("Data start processnig ....");
+            data.ForEach(it =>
+            {
+                WriteFile(it.FirstOrDefault().REG,it.Key,it.ToList());
+            });
+
+            Console.WriteLine("finish");
+
         }
 
 
-        //private static void WriteFile(this List<ResultDataAreaCode> dataList)
-        //{
+        static void WriteFile(string reg, string address ,List<ResultDataAreaCode> dataList )
+        {
+            var regions = reg;
+            var cwt = address.Substring(0, 2);
+            var amp = address.Substring(2,2);
+            var tam = address.Substring(4, 2);
+            var folderPath = $@"C:\Users\Mana PC\Documents\CSVFile\{regions}\{cwt}\{amp}\{tam}";
+            var filePath = $@"C:\Users\Mana PC\Documents\CSVFile\{regions}\{cwt}\{amp}\{tam}\{address}.csv";
+          
+            if (!Directory.Exists(folderPath)) { Directory.CreateDirectory(folderPath); }
+            using (var writer = new StreamWriter(filePath))
+            using (var csv = new CsvWriter(writer))
+            {
+                csv.WriteRecords(dataList);
+            }
+        }
 
-            ////var reg = ea.Substring(0, 1);
-            ////var cwt = ea.Substring(1, 2);
-            ////var amp = ea.Substring(1, 4);
-            ////var tam = ea.Substring(1, 6);
-            //var folderPath = $@"C:\Users\Mana PC\Documents\CSVFile\{dataList.REG}\{cwt}\{amp}\{tam}";
-            //var filePath = $@"DataProcesses\{reg}\{cwt}\{amp}\{tam}\{ea}.csv";
 
-            //if (!Directory.Exists(path))
-            //{
-            //    Directory.CreateDirectory(path);
-            //}
-
-            //using (var writer = new StreamWriter(filePath))
-            //using (var csv = new CsvWriter(writer))
-            //{
-            //    csv.WriteRecords(dataLst);
-            //}
-        //}
-
+        void ResultDataEa()
+        {
+            var  rawDataEA = collectionResultDataEA.Aggregate()
+            .ToList();
+            
+        }
     }
 }
