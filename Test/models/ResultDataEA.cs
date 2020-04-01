@@ -7,6 +7,8 @@ namespace Test.models
     {
         // EA
         public string Id { get; set; }
+        [JsonProperty("Area_Code")]
+        public string Area_Code { get; set; }
         [JsonProperty("REG")]
         public string REG { get; set; }
         [JsonProperty("REG_NAME")]

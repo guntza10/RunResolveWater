@@ -41,8 +41,10 @@ namespace Test
             // ResolveFieldCommunity();
             //  ResolveCountGroundWater();
 
-            var fileManager = new CreateFileManager();
-            fileManager.ResultDataAreaCodeWriteFile();
+            // var fileManager = new CreateFileManager();
+            // fileManager.ResultDataAreaCodeWriteFile();
+            GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
+            // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -917,6 +919,7 @@ namespace Test
                 .Project(it => new
                 {
                     EA = it._id,
+                    Area_Code = it.Area_Code,
                     REG = it.REG,
                     REG_NAME = it.REG_NAME,
                     CWT = it.CWT,
@@ -929,20 +932,30 @@ namespace Test
 
             Console.WriteLine($"eaRawData : {eaRawData.Count}");
 
+            var eaExist = collectionResultDataEA.Aggregate()
+            .Project(it => new
+            {
+                EA = it.Id
+            })
+            .ToList();
+            Console.WriteLine($"eaExist : {eaExist.Count}");
+
             var count = 0;
-            eaRawData.ForEach(it =>
+            eaExist.ForEach(it =>
             {
                 count++;
-                Console.WriteLine($"Round : {count} / {eaRawData.Count()}, EA = {it.EA}");
+                Console.WriteLine($"Round : {count} / {eaExist.Count()}, EA = {it.EA}");
+                var dataInfo = eaRawData.FirstOrDefault(i => i.EA == it.EA);
                 var defEA = Builders<ResultDataEA>.Update
-                    .Set(data => data.REG, it.REG)
-                    .Set(data => data.REG_NAME, it.REG_NAME)
-                    .Set(data => data.CWT, it.CWT)
-                    .Set(data => data.CWT_NAME, it.CWT_NAME)
-                    .Set(data => data.AMP, it.AMP)
-                    .Set(data => data.AMP_NAME, it.AMP_NAME)
-                    .Set(data => data.TAM, it.TAM)
-                    .Set(data => data.TAM_NAME, it.TAM_NAME);
+                    .Set(data => data.Area_Code, dataInfo.Area_Code)
+                    .Set(data => data.REG, dataInfo.REG)
+                    .Set(data => data.REG_NAME, dataInfo.REG_NAME)
+                    .Set(data => data.CWT, dataInfo.CWT)
+                    .Set(data => data.CWT_NAME, dataInfo.CWT_NAME)
+                    .Set(data => data.AMP, dataInfo.AMP)
+                    .Set(data => data.AMP_NAME, dataInfo.AMP_NAME)
+                    .Set(data => data.TAM, dataInfo.TAM)
+                    .Set(data => data.TAM_NAME, dataInfo.TAM_NAME);
                 collectionResultDataEA.UpdateOne(colldata => colldata.Id == it.EA, defEA);
                 Console.WriteLine($"EA {it.EA} Update Done!");
             });
@@ -957,7 +970,6 @@ namespace Test
             var eaRawData = collectionEaData.Aggregate()
                .Project(it => new
                {
-                   EA = it._id,
                    Area_Code = it.Area_Code,
                    REG = it.REG,
                    REG_NAME = it.REG_NAME,
@@ -969,6 +981,14 @@ namespace Test
                    TAM_NAME = it.TAM_NAME
                }).ToList();
             Console.WriteLine($"eaRawData : {eaRawData.Count}");
+
+            var areaExist = collectionResultDataAreaCode.Aggregate()
+            .Project(it => new
+            {
+                Area_Code = it.Id
+            })
+            .ToList();
+            Console.WriteLine($"areaExist  : {areaExist.Count}");
 
             var rawDataAreaCode = eaRawData.GroupBy(it => it.Area_Code)
                 .Select(it => new
@@ -986,21 +1006,22 @@ namespace Test
             Console.WriteLine($"rawDataAreaCode : {rawDataAreaCode.Count}");
 
             var count = 0;
-            rawDataAreaCode.ForEach(it =>
+            areaExist.ForEach(it =>
             {
                 count++;
-                Console.WriteLine($"Round : {count} / {rawDataAreaCode.Count()}");
+                Console.WriteLine($"Round : {count} / {areaExist.Count()}");
+                var dataInfo = rawDataAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code);
                 var defArea = Builders<ResultDataAreaCode>.Update
-                        .Set(data => data.REG, it.REG)
-                        .Set(data => data.REG_NAME, it.REG_NAME)
-                        .Set(data => data.CWT, it.CWT)
-                        .Set(data => data.CWT_NAME, it.CWT_NAME)
-                        .Set(data => data.AMP, it.AMP)
-                        .Set(data => data.AMP_NAME, it.AMP_NAME)
-                        .Set(data => data.TAM, it.TAM)
-                        .Set(data => data.TAM_NAME, it.TAM_NAME);
+                        .Set(data => data.REG, dataInfo.REG)
+                        .Set(data => data.REG_NAME, dataInfo.REG_NAME)
+                        .Set(data => data.CWT, dataInfo.CWT)
+                        .Set(data => data.CWT_NAME, dataInfo.CWT_NAME)
+                        .Set(data => data.AMP, dataInfo.AMP)
+                        .Set(data => data.AMP_NAME, dataInfo.AMP_NAME)
+                        .Set(data => data.TAM, dataInfo.TAM)
+                        .Set(data => data.TAM_NAME, dataInfo.TAM_NAME);
                 collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
-                Console.WriteLine($"area : {it.Area_Code} Update Done!");
+                Console.WriteLine($"area {it.Area_Code} Update Done!");
             });
             Console.WriteLine("All Update Done!");
         }
