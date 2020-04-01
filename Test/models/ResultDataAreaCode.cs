@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json;
 
 namespace Test.models
 {
@@ -6,6 +7,22 @@ namespace Test.models
     {
         // AreaCode
         public string Id { get; set; }
+        [JsonProperty("REG")]
+        public string REG { get; set; }
+        [JsonProperty("REG_NAME")]
+        public string REG_NAME { get; set; }
+        [JsonProperty("CWT")]
+        public string CWT { get; set; }
+        [JsonProperty("CWT_NAME")]
+        public string CWT_NAME { get; set; }
+        [JsonProperty("AMP")]
+        public string AMP { get; set; }
+        [JsonProperty("AMP_NAME")]
+        public string AMP_NAME { get; set; }
+        [JsonProperty("TAM")]
+        public string TAM { get; set; }
+        [JsonProperty("TAM_NAME")]
+        public string TAM_NAME { get; set; }
         public double? CubicMeterGroundWaterForAgriculture { get; set; }
         public double? CubicMeterGroundWaterForService { get; set; }
         public double? CubicMeterGroundWaterForProduct { get; set; }
