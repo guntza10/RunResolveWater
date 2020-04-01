@@ -908,16 +908,15 @@ namespace Test
             Console.WriteLine($"All Update done.");
         }
 
-
-
+        // resolve add filed info EA 
         static void GetDataAndLookUpForAddAnAddressInfomationInResultDataEa()
         {
+            Console.WriteLine("Start Add Info of DataEA");
             Console.WriteLine("Programe start Process...");
             var eaRawData = collectionEaData.Aggregate()
                 .Project(it => new
                 {
                     EA = it._id,
-                    Area_Code = it.Area_Code,
                     REG = it.REG,
                     REG_NAME = it.REG_NAME,
                     CWT = it.CWT,
@@ -927,9 +926,14 @@ namespace Test
                     TAM = it.TAM,
                     TAM_NAME = it.TAM_NAME
                 }).ToList();
-            var i = 0;
+
+            Console.WriteLine($"eaRawData : {eaRawData.Count}");
+
+            var count = 0;
             eaRawData.ForEach(it =>
             {
+                count++;
+                Console.WriteLine($"Round : {count} / {eaRawData.Count()}, EA = {it.EA}");
                 var defEA = Builders<ResultDataEA>.Update
                     .Set(data => data.REG, it.REG)
                     .Set(data => data.REG_NAME, it.REG_NAME)
@@ -939,17 +943,16 @@ namespace Test
                     .Set(data => data.AMP_NAME, it.AMP_NAME)
                     .Set(data => data.TAM, it.TAM)
                     .Set(data => data.TAM_NAME, it.TAM_NAME);
-
                 collectionResultDataEA.UpdateOne(colldata => colldata.Id == it.EA, defEA);
-                i++;
-                Console.WriteLine($"{i} / {eaRawData.Count()}");
+                Console.WriteLine($"EA {it.EA} Update Done!");
             });
-
-
+            Console.WriteLine($"All Update Done!");
         }
 
+        // resolve add filed info Area
         static void GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode()
         {
+            Console.WriteLine("Start Add Info of DataArea");
             Console.WriteLine("Programe start Process...");
             var eaRawData = collectionEaData.Aggregate()
                .Project(it => new
@@ -965,6 +968,7 @@ namespace Test
                    TAM = it.TAM,
                    TAM_NAME = it.TAM_NAME
                }).ToList();
+            Console.WriteLine($"eaRawData : {eaRawData.Count}");
 
             var rawDataAreaCode = eaRawData.GroupBy(it => it.Area_Code)
                 .Select(it => new
@@ -979,10 +983,14 @@ namespace Test
                     TAM = it.FirstOrDefault().TAM,
                     TAM_NAME = it.FirstOrDefault().TAM_NAME
                 }).ToList();
-            var i = 0;
+            Console.WriteLine($"rawDataAreaCode : {rawDataAreaCode.Count}");
+
+            var count = 0;
             rawDataAreaCode.ForEach(it =>
             {
-                var defEA = Builders<ResultDataAreaCode>.Update
+                count++;
+                Console.WriteLine($"Round : {count} / {rawDataAreaCode.Count()}");
+                var defArea = Builders<ResultDataAreaCode>.Update
                         .Set(data => data.REG, it.REG)
                         .Set(data => data.REG_NAME, it.REG_NAME)
                         .Set(data => data.CWT, it.CWT)
@@ -991,11 +999,10 @@ namespace Test
                         .Set(data => data.AMP_NAME, it.AMP_NAME)
                         .Set(data => data.TAM, it.TAM)
                         .Set(data => data.TAM_NAME, it.TAM_NAME);
-
-                i++;
-                Console.WriteLine($"{i} / {eaRawData.Count()}");
-                collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defEA);
+                collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
+                Console.WriteLine($"area : {it.Area_Code} Update Done!");
             });
+            Console.WriteLine("All Update Done!");
         }
 
     }
