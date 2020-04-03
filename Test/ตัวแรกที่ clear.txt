@@ -13,6 +13,12 @@ G1-G4
     -> G4 IsAllCommercial
 
 
+    
+    HasntPlumbing == 0 ->  12
+    HasntPlumbing > 0 and < 6 -> avg areacode ตัดที่ผิดปกติออก
+
+
+
 ลบ -------------------------------------------->(clear)
 - Skip
 - ResidentialPersonCount

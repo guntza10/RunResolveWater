@@ -43,8 +43,10 @@ namespace Test
 
             // var fileManager = new CreateFileManager();
             // fileManager.ResultDataAreaCodeWriteFile();
-            GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
+            // GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
+            // ResolveNewHasntPlumbing();
+            ResolveUpdateHasntPlumbingForEA();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -911,7 +913,7 @@ namespace Test
         }
 
         // resolve add filed info EA 
-        static void GetDataAndLookUpForAddAnAddressInfomationInResultDataEa()
+        public static void GetDataAndLookUpForAddAnAddressInfomationInResultDataEa()
         {
             Console.WriteLine("Start Add Info of DataEA");
             Console.WriteLine("Programe start Process...");
@@ -963,7 +965,7 @@ namespace Test
         }
 
         // resolve add filed info Area
-        static void GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode()
+        public static void GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode()
         {
             Console.WriteLine("Start Add Info of DataArea");
             Console.WriteLine("Programe start Process...");
@@ -1022,6 +1024,121 @@ namespace Test
                         .Set(data => data.TAM_NAME, dataInfo.TAM_NAME);
                 collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
                 Console.WriteLine($"area {it.Area_Code} Update Done!");
+            });
+            Console.WriteLine("All Update Done!");
+        }
+
+        public static void ResolveNewHasntPlumbing()
+        {
+            Console.WriteLine("Start ResolveNewHasntPlumbing");
+
+            var data = collectionOldDataprocess.Aggregate()
+            .Match(it => it.IsHouseHold != 0 ||
+            it.IsAgriculture != 0 ||
+            it.IsAllFactorial != 0 ||
+            it.IsAllCommercial != 0)
+            .Project(it => new
+            {
+                Id = it._id,
+                Area_Code = it.Area_Code,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            Console.WriteLine($"data {data.Count}");
+
+            var dataHasntPlumbing0 = data.Where(it => it.HasntPlumbing == 0)
+            .Select(it => it.Id)
+            .ToList();
+
+            Console.WriteLine($"dataHasntPlumbing0 {dataHasntPlumbing0.Count}");
+
+            Console.WriteLine($"start Updata Case HasntPlumbing == 0");
+
+            var defHasntPlumbing0 = Builders<DataProcessed>.Update
+            .Set(it => it.HasntPlumbing, 12);
+            collectionOldDataprocess.UpdateMany(it => dataHasntPlumbing0.Contains(it._id), defHasntPlumbing0);
+
+            Console.WriteLine($"Updata Case HasntPlumbing == 0 Done!");
+
+            var dataHasntPlumbingbetween0To6 = data.Where(it => it.HasntPlumbing > 0 && it.HasntPlumbing < 6)
+             .Select(it => new
+             {
+                 Id = it.Id,
+                 Area_Code = it.Area_Code
+             })
+             .ToList();
+
+            Console.WriteLine($"dataHasntPlumbingbetween0To6 : {dataHasntPlumbingbetween0To6.Count}");
+
+            var avgAreaCode = data.Where(it => it.HasntPlumbing >= 6)
+             .GroupBy(it => it.Area_Code)
+             .Select(it => new
+             {
+                 Area_Code = it.Key,
+                 Avg = it.Sum(i => i.HasntPlumbing) / it.Count()
+             })
+             .ToList();
+
+            Console.WriteLine($"avgAreaCode : {avgAreaCode.Count}");
+
+            var count = 0;
+            dataHasntPlumbingbetween0To6.ForEach(it =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {dataHasntPlumbingbetween0To6.Count}");
+                var avg = avgAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code).Avg;
+                var def = Builders<DataProcessed>.Update
+                .Set(i => i.HasntPlumbing, avg);
+                collectionOldDataprocess.UpdateOne(i => i._id == it.Id, def);
+                Console.WriteLine($"{it.Id} update done");
+            });
+            Console.WriteLine("All Update Done!");
+        }
+
+        public static void ResolveUpdateHasntPlumbingForEA()
+        {
+            Console.WriteLine("Start ResolveUpdateHasntPlumbingForEA");
+
+            var listEAUpdate = collectionResultDataEA.Aggregate()
+            .Project(it => new
+            {
+                EA = it.Id
+            })
+            .ToList();
+
+            Console.WriteLine($"listEAUpdate : {listEAUpdate.Count}");
+
+            var data = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            .Project(it => new
+            {
+                EA = it.EA,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            Console.WriteLine($"data : {data.Count}");
+
+            var listEASumHasntPlumbing = data.GroupBy(it => it.EA)
+            .Select(it => new
+            {
+                EA = it.Key,
+                sumHasntPlumbing = it.Sum(i => i.HasntPlumbing)
+            })
+            .ToList();
+
+            Console.WriteLine($"listEASumHasntPlumbing : {listEASumHasntPlumbing.Count}");
+
+            var count = 0;
+            listEAUpdate.ForEach(ea =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {listEAUpdate.Count}, EA = {ea.EA}");
+                var newHasntPlumbing = listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA).sumHasntPlumbing.Value;
+                var def = Builders<ResultDataEA>.Update
+                .Set(it => it.HasntPlumbing, newHasntPlumbing);
+                collectionResultDataEA.UpdateOne(it => it.Id == ea.EA, def);
+                Console.WriteLine("Update Done!");
             });
             Console.WriteLine("All Update Done!");
         }
