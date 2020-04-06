@@ -46,7 +46,8 @@ namespace Test
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
             // ResolveNewHasntPlumbing();
-            ResolveUpdateHasntPlumbingForEA();
+            // ResolveUpdateHasntPlumbingForEA();
+            DataResultEAAddField();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -1143,6 +1144,53 @@ namespace Test
             Console.WriteLine("All Update Done!");
         }
 
+        public static void DataResultEAAddField()
+        {
+            Console.WriteLine("Start DataResultEAAddField");
+            var dataEA = collectionEaData.Aggregate()
+            .Project(it => new
+            {
+                Id = it._id,
+                MUN = it.MUN,
+                MUN_NAME = it.MUN_NAME,
+                TAO = it.TAO,
+                TAO_NAME = it.TAO_NAME,
+                EA = it.EA,
+                VIL = it.VIL,
+                VIL_NAME = it.VIL_NAME
+            })
+            .ToList();
+
+            Console.WriteLine($"dataEA : {dataEA.Count}");
+
+            var dataResultEA = collectionResultDataEA.Aggregate()
+            .Project(it => new
+            {
+                EA = it.Id
+            })
+            .ToList();
+
+            Console.WriteLine($"dataResultEA : {dataResultEA.Count}");
+
+            var count = 0;
+            dataResultEA.ForEach(data =>
+            {
+                count++;
+                Console.WriteLine($"Round {count} / {dataResultEA.Count}, EA = {data.EA}");
+                var eaInfo = dataEA.FirstOrDefault(it => it.Id == data.EA);
+                var def = Builders<ResultDataEA>.Update
+                .Set(it => it.MUN, eaInfo.MUN)
+                .Set(it => it.MUN_NAME, eaInfo.MUN_NAME)
+                .Set(it => it.TAO, eaInfo.TAO)
+                .Set(it => it.TAO_NAME, eaInfo.TAO_NAME)
+                .Set(it => it.EA, eaInfo.EA)
+                .Set(it => it.VIL, eaInfo.VIL)
+                .Set(it => it.VIL_NAME, eaInfo.VIL_NAME);
+                collectionResultDataEA.UpdateOne(it => it.Id == data.EA, def);
+                Console.WriteLine("Update Done!");
+            });
+            Console.WriteLine("All Update Done!");
+        }
     }
 }
 enum WeekDays

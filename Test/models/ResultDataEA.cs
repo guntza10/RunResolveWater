@@ -25,6 +25,20 @@ namespace Test.models
         public string TAM { get; set; }
         [JsonProperty("TAM_NAME")]
         public string TAM_NAME { get; set; }
+        [JsonProperty("MUN")]
+        public string MUN { get; set; }
+        [JsonProperty("MUN_NAME")]
+        public string MUN_NAME { get; set; }
+        [JsonProperty("TAO")]
+        public string TAO { get; set; }
+        [JsonProperty("TAO_NAME")]
+        public string TAO_NAME { get; set; }
+        [JsonProperty("EA")]
+        public string EA { get; set; }
+        [JsonProperty("VIL")]
+        public string VIL { get; set; }
+        [JsonProperty("VIL_NAME")]
+        public string VIL_NAME { get; set; }
 
         public double? IsAgriculture { get; set; }
         public double? IsHouseHold { get; set; }
