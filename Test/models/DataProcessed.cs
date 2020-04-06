@@ -1,5 +1,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Newtonsoft.Json;
 
 namespace Test.models
 {
@@ -12,7 +13,22 @@ namespace Test.models
         public string EA { get; set; }
         public string Area_Code { get; set; }
         public string Status { get; set; }
-
+        [JsonProperty("REG")]
+        public string REG { get; set; }
+        [JsonProperty("REG_NAME")]
+        public string REG_NAME { get; set; }
+        [JsonProperty("CWT")]
+        public string CWT { get; set; }
+        [JsonProperty("CWT_NAME")]
+        public string CWT_NAME { get; set; }
+        [JsonProperty("AMP")]
+        public string AMP { get; set; }
+        [JsonProperty("AMP_NAME")]
+        public string AMP_NAME { get; set; }
+        [JsonProperty("TAM")]
+        public string TAM { get; set; }
+        [JsonProperty("TAM_NAME")]
+        public string TAM_NAME { get; set; }
         #region GroundWater
         /// <summary>
         /// จำนวนบ่อบาดาลทั้งหมดในตำบล

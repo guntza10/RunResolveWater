@@ -47,7 +47,8 @@ namespace Test
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
             // ResolveNewHasntPlumbing();
             // ResolveUpdateHasntPlumbingForEA();
-            DataResultEAAddField();
+            // DataResultEAAddField();
+            AddFieldEaInfoForDataProcess();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -1188,6 +1189,66 @@ namespace Test
                 .Set(it => it.VIL_NAME, eaInfo.VIL_NAME);
                 collectionResultDataEA.UpdateOne(it => it.Id == data.EA, def);
                 Console.WriteLine("Update Done!");
+            });
+            Console.WriteLine("All Update Done!");
+        }
+
+        public static void AddFieldEaInfoForDataProcess()
+        {
+            Console.WriteLine("Start AddFieldEaInfoForDataProcess");
+
+            var dataEA = collectionEaData.Aggregate()
+            .Project(it => new
+            {
+                EA = it._id,
+                REG = it.REG,
+                REG_NAME = it.REG_NAME,
+                CWT = it.CWT,
+                CWT_NAME = it.CWT_NAME,
+                AMP = it.AMP,
+                AMP_NAME = it.AMP_NAME,
+                TAM = it.TAM,
+                TAM_NAME = it.TAM_NAME
+            })
+            .ToList();
+
+            Console.WriteLine($"dataEA : {dataEA.Count}");
+
+            var eaDataProcess = collectionOldDataprocess.Aggregate()
+            .Project(it => new
+            {
+                EA = it.EA
+            })
+            .ToList();
+
+            Console.WriteLine($"eaDataProcess : {eaDataProcess.Count}");
+
+            var ea = eaDataProcess.Where(it => it.EA != "")
+            .Distinct()
+            .ToList();
+
+            Console.WriteLine($"ea : {ea.Count}");
+
+            var count = 0;
+            ea.ForEach(data =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {ea.Count} , EA = {data.EA}");
+                var eaInfo = dataEA.FirstOrDefault(it => it.EA == data.EA);
+
+                var def = Builders<DataProcessed>.Update
+                .Set(it => it.REG, eaInfo.REG)
+                .Set(it => it.REG_NAME, eaInfo.REG_NAME)
+                .Set(it => it.CWT, eaInfo.CWT)
+                .Set(it => it.CWT_NAME, eaInfo.CWT_NAME)
+                .Set(it => it.AMP, eaInfo.AMP)
+                .Set(it => it.AMP_NAME, eaInfo.AMP_NAME)
+                .Set(it => it.TAM, eaInfo.TAM)
+                .Set(it => it.TAM_NAME, eaInfo.TAM_NAME);
+
+                collectionOldDataprocess.UpdateMany(it => it.EA == data.EA, def);
+                Console.WriteLine("Update Done!");
+
             });
             Console.WriteLine("All Update Done!");
         }
