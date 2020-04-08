@@ -46,9 +46,9 @@ namespace Test
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
             // ResolveNewHasntPlumbing();
-            // ResolveUpdateHasntPlumbingForEA();
+            ResolveUpdateHasntPlumbingForEA();
             // DataResultEAAddField();
-            AddFieldEaInfoForDataProcess();
+            // AddFieldEaInfoForDataProcess();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
@@ -1125,7 +1125,7 @@ namespace Test
             .Select(it => new
             {
                 EA = it.Key,
-                sumHasntPlumbing = it.Sum(i => i.HasntPlumbing)
+                avg = it.Sum(i => i.HasntPlumbing) / it.Count()
             })
             .ToList();
 
@@ -1136,7 +1136,7 @@ namespace Test
             {
                 count++;
                 Console.WriteLine($"Round : {count} / {listEAUpdate.Count}, EA = {ea.EA}");
-                var newHasntPlumbing = listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA).sumHasntPlumbing.Value;
+                var newHasntPlumbing = listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA).avg.Value;
                 var def = Builders<ResultDataEA>.Update
                 .Set(it => it.HasntPlumbing, newHasntPlumbing);
                 collectionResultDataEA.UpdateOne(it => it.Id == ea.EA, def);
