@@ -1115,6 +1115,7 @@ namespace Test
             .Project(it => new
             {
                 EA = it.EA,
+                SampleType = it.SampleType,
                 IsHouseHold = it.IsHouseHold,
                 IsAgriculture = it.IsAgriculture,
                 IsAllFactorial = it.IsAllFactorial,
@@ -1129,14 +1130,24 @@ namespace Test
             .Select(it => new
             {
                 EA = it.Key,
-                avg = it.Where(i => i.IsHouseHold != 0
+                sumHasntPlumbing = it.Where(i => i.SampleType == "u" && (i.IsHouseHold != 0
                 || i.IsAgriculture != 0
                 || i.IsAllFactorial != 0
-                || i.IsAllCommercial != 0)
-                .Sum(i => i.HasntPlumbing) / it.Count(i => i.IsHouseHold != 0
+                || i.IsAllCommercial != 0))
+                .Sum(i => i.HasntPlumbing),
+                total = it.Count(i => i.SampleType == "u" && (i.IsHouseHold != 0
                 || i.IsAgriculture != 0
                 || i.IsAllFactorial != 0
-                || i.IsAllCommercial != 0)
+                || i.IsAllCommercial != 0))
+            })
+            .Select(it =>
+            {
+                var avg = (it.sumHasntPlumbing == 0 && it.total == 0) ? 0 : it.sumHasntPlumbing / it.total;
+                return new
+                {
+                    EA = it.EA,
+                    Avg = avg
+                };
             })
             .ToList();
 
@@ -1147,7 +1158,7 @@ namespace Test
             {
                 count++;
                 Console.WriteLine($"Round : {count} / {listEAUpdate.Count}, EA = {ea.EA}");
-                var newHasntPlumbing = listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA).avg.Value;
+                var newHasntPlumbing = listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA).Avg.Value;
                 var def = Builders<ResultDataEA>.Update
                 .Set(it => it.HasntPlumbing, newHasntPlumbing);
                 collectionResultDataEA.UpdateOne(it => it.Id == ea.EA, def);
