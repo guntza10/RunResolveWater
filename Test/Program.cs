@@ -1115,7 +1115,11 @@ namespace Test
             .Project(it => new
             {
                 EA = it.EA,
-                HasntPlumbing = it.HasntPlumbing
+                IsHouseHold = it.IsHouseHold,
+                IsAgriculture = it.IsAgriculture,
+                IsAllFactorial = it.IsAllFactorial,
+                IsAllCommercial = it.IsAllCommercial,
+                HasntPlumbing = it.HasntPlumbing,
             })
             .ToList();
 
@@ -1125,7 +1129,14 @@ namespace Test
             .Select(it => new
             {
                 EA = it.Key,
-                avg = it.Sum(i => i.HasntPlumbing) / it.Count()
+                avg = it.Where(i => i.IsHouseHold != 0
+                || i.IsAgriculture != 0
+                || i.IsAllFactorial != 0
+                || i.IsAllCommercial != 0)
+                .Sum(i => i.HasntPlumbing) / it.Count(i => i.IsHouseHold != 0
+                || i.IsAgriculture != 0
+                || i.IsAllFactorial != 0
+                || i.IsAllCommercial != 0)
             })
             .ToList();
 
