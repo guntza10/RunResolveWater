@@ -18,6 +18,7 @@ namespace Test
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
         static IMongoCollection<EaInfomation> collectionEaData { get; set; }
+        static IMongoCollection<EaApproved> collectionEaApproved { get; set; }
         static void Main(string[] args)
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
@@ -27,6 +28,7 @@ namespace Test
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
+            collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
             // checkCountPopulationWrong();
             // ResolveIsHouseHold();
             // ResolveIsHouseHoldGoodPlumbing();
@@ -46,7 +48,7 @@ namespace Test
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
             // ResolveNewHasntPlumbing();
-            ResolveUpdateHasntPlumbingForEA();
+            InsertEaApproved();
             // DataResultEAAddField();
             // AddFieldEaInfoForDataProcess();
         }
@@ -1273,6 +1275,40 @@ namespace Test
 
             });
             Console.WriteLine("All Update Done!");
+        }
+
+        public static void InsertEaApproved()
+        {
+            Console.WriteLine("Start Insert EaApproved");
+            var dataProcess = collectionOldDataprocess.Aggregate()
+            .Project(it => new
+            {
+                EA = it.EA
+            })
+            .ToList();
+
+            var eaApproved = dataProcess.GroupBy(it => it.EA).Select(it => new EaApproved
+            {
+                _id = Guid.NewGuid().ToString(),
+                EA = it.Key
+            })
+            .ToList();
+            Console.WriteLine($"eaApproved : {eaApproved.Count}");
+
+            var skip = 0;
+            var countDataInsert = 0;
+            var round = 0;
+            while (skip < eaApproved.Count)
+            {
+                round++;
+                Console.WriteLine($"Round : {round} / {eaApproved.Count}");
+                var final = eaApproved.Skip(skip).Take(1000).ToList();
+                collectionEaApproved.InsertMany(final);
+                skip += 1000;
+                countDataInsert += final.Count;
+                Console.WriteLine($"total insert already : {countDataInsert} / {eaApproved.Count}");
+            }
+            Console.WriteLine("EaApproved Insert Done!");
         }
     }
 }
