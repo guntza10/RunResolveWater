@@ -23,43 +23,43 @@ namespace Test
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
-            collectionOldDataprocess = database.GetCollection<DataProcessed>("oldDataProcess");
+            collectionOldDataprocess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
             collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
-            // checkCountPopulationWrong();
+            // check error 
+            // var checkResolve = new CheckResolve();
+            // checkResolve.checkResolveIsHouseHold();
+            // checkResolve.checkResolveHasntPlumbing();
+
+            // run resolve dataProcess (ระดับ record)
             // ResolveIsHouseHold();
             // ResolveIsHouseHoldGoodPlumbing();
             // ResolveCountPopulationOver20000();
-            // ResolveCountCommunity();
-            // ResolveAvgWaterHeightCm();
-            // ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside();
+            // ResolveAvgWaterHeightCmAndTimeWaterHeightCm();
+            // ResolveWaterSources();
             // ResolveHasntPlumbing();
-            // ResolveCountGroundWaterAndWaterSourcesEA();
-            // ResolveCountGroundWaterAndWaterSourcesAreaCode();
+            // ResolveNewHasntPlumbing();
+            // ResolveCountCommunity()
+
+            // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
+            // ResolveCountGroundWater();
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
-            //  ResolveCountGroundWater();
-
-            // var fileManager = new CreateFileManager();
-            // fileManager.ResultDataAreaCodeWriteFile();
-            // GetDataAndLookUpForAddAnAddressInfomationInResultDataEa();
-            // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
-            // ResolveNewHasntPlumbing();
-            InsertEaApproved();
-            // DataResultEAAddField();
-            // AddFieldEaInfoForDataProcess();
         }
 
-        // 2.ครัวเรือนทั้งหมด -> IsHouseHold 
+        // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
         public static void ResolveIsHouseHold()
         {
             Console.WriteLine("Start ResolveIsHouseHold");
             var data = collectionOldDataprocess.Aggregate()
              .Match(it => it.SampleType == "u" && it.IsHouseHold == 0 && it.CountPopulation > 0)
-             .Project(it => it._id)
+             .Project(it => new
+             {
+                 id = it._id
+             })
              .ToList();
             var count = 0;
             foreach (var item in data)
@@ -68,7 +68,7 @@ namespace Test
                 Console.WriteLine($"Round : {count} / {data.Count}");
                 var def = Builders<DataProcessed>.Update
                 .Set(it => it.CountPopulation, 0);
-                collectionOldDataprocess.UpdateOne(it => it._id == item, def);
+                collectionOldDataprocess.UpdateOne(it => it._id == item.id, def);
                 Console.WriteLine($"Round : {count} update done!");
             }
             // collectionOldDataprocess.UpdateMany(it => it.SampleType == "u" && it.IsHouseHold == 0, def);
@@ -112,24 +112,35 @@ namespace Test
             }
         }
 
-        // 3.ครัวเรือนที่มีน้ำประปาคุณภาพดี -> IsHouseHoldGoodPlumbing
+        // 3.ครัวเรือนที่มีน้ำประปาคุณภาพดี -> IsHouseHoldGoodPlumbing (do)
         public static void ResolveIsHouseHoldGoodPlumbing()
         {
             Console.WriteLine("Start ResolveIsHouseHoldGoodPlumbing");
             Console.WriteLine("Quering.....");
 
-            var dataBuilding = collectionOldDataprocess.Aggregate()
-            .Match(it => it.SampleType == "b" && it.IsHouseHold != 0)
+            var data = collectionOldDataprocess.Aggregate()
+            .Match(it => it.SampleType == "b" || it.SampleType == "u")
             .Project(it => new
             {
                 Id = it._id,
+                SampleType = it.SampleType,
+                Area_Code = it.Area_Code,
+                IsHouseHold = it.IsHouseHold,
+                IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
+            })
+            .ToList();
+
+            var dataBuilding = data.Where(it => it.SampleType == "b" && it.IsHouseHold != 0)
+            .Select(it => new
+            {
+                Id = it.Id,
                 Area_Code = it.Area_Code,
                 IsHouseHold = it.IsHouseHold
             })
             .ToList();
-            var dataUnit = collectionOldDataprocess.Aggregate()
-            .Match(it => it.SampleType == "u" && it.IsHouseHold == 1)
-            .Project(it => new DataUnit
+
+            var dataUnit = data.Where(it => it.SampleType == "u" && it.IsHouseHold == 1)
+            .Select(it => new DataUnit
             {
                 AreaCode = it.Area_Code,
                 IsHouseHold = it.IsHouseHold,
@@ -277,7 +288,7 @@ namespace Test
             Console.WriteLine("All Update Done!");
         }
 
-        // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000
+        // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000 (do)
         public static void ResolveCountPopulationOver20000()
         {
             Console.WriteLine("Start RunResolveCountPopulation");
@@ -340,10 +351,137 @@ namespace Test
                 });
             });
         }
+       
+        // 11.จำนวนประชากรวัยทำงาน -> countWorkingAge
+        public static void ResolvecountWorkingAge()
+        {
+            Console.WriteLine("Start ResolvecountWorkingAge");
+            Console.WriteLine("Querying......................................");
+            var data = collectionOldDataprocess.Aggregate()
+            .Project(it => new
+            {
+                EA = it.EA,
+                CountWorkingAge = it.CountWorkingAge,
+                CountPopulation = it.CountPopulation
+            })
+            .ToList();
 
-        //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
-        //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
-        public static void ResolveAvgWaterHeightCm()
+            Console.WriteLine($"data : {data.Count}");
+
+            var listEA = data.Where(it => it.EA != "")
+            .GroupBy(it => it.EA)
+            .Select(it => new
+            {
+                Ea = it.Key,
+                SumCountWorkingAge = it.Sum(s => s.CountWorkingAge),
+                SumCountPopulation = it.Sum(s => s.CountPopulation)
+            })
+            .ToList();
+
+            Console.WriteLine($"listEA : {listEA.Count}");
+
+            var eaHasProblem = listEA.Where(it => it.SumCountWorkingAge == 0 && it.SumCountPopulation > 0).ToList();
+            Console.WriteLine($"eaHasProblem : {eaHasProblem.Count}");
+
+            var dataEAHasProblem = collectionResultDataEA.Aggregate()
+            .Match(it => it.CountPopulation > 0 && it.CountWorkingAge == 0)
+            .ToList();
+            Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
+
+            var dataPercentRegion = listEA.Except(eaHasProblem)
+            .GroupBy(it => it.Ea.Substring(0, 1))
+            .Select(it =>
+            {
+                var SumCountWorkingAgeRegion = it.Sum(s => s.SumCountWorkingAge);
+                var SumCountPopulationRegion = it.Sum(s => s.SumCountPopulation);
+                return new
+                {
+                    Region = it.Key,
+                    percentRegion = SumCountWorkingAgeRegion * 100 / SumCountPopulationRegion
+                };
+            })
+            .ToList();
+
+            Console.WriteLine($"eaNotProblem : {dataPercentRegion.Count}");
+
+            var count = 0;
+            eaHasProblem.ForEach(it =>
+            {
+                count++;
+                System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
+                var newCountWorkingAge = Math.Round(dataPercentRegion
+                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1)).percentRegion.Value * it.SumCountPopulation.Value / 100);
+                var def = Builders<ResultDataEA>.Update
+                .Set(x => x.CountWorkingAge, newCountWorkingAge);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
+                Console.WriteLine($"Update done.");
+            });
+            Console.WriteLine($"All Update done.");
+        }
+
+        // 15.พื้นที่ชลประทาน -> FieldCommunity 
+        public static void ResolveFieldCommunity()
+        {
+            Console.WriteLine("Start ResolveFieldCommunity");
+            Console.WriteLine("Querying......................................");
+            var data = collectionOldDataprocess.Aggregate()
+            .Project(it => new
+            {
+                EA = it.EA,
+                FieldCommunity = it.FieldCommunity
+            })
+            .ToList();
+            Console.WriteLine($"data : {data.Count}");
+
+            var listEA = data.Where(it => it.EA != "")
+            .GroupBy(it => it.EA)
+            .Select(it => new
+            {
+                EA = it.Key,
+                SumFieldCommunity = it.Sum(s => s.FieldCommunity)
+            })
+            .ToList();
+            Console.WriteLine($"listEA : {listEA.Count}");
+
+            var eaProblem = listEA.Where(it => it.SumFieldCommunity >= 300).ToList();
+            Console.WriteLine($"eaProblem : {eaProblem.Count}");
+
+            var dataEAHasProblem = collectionResultDataEA.Aggregate()
+            .Match(it => it.FieldCommunity >= 300)
+            .ToList();
+            Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
+
+            var avgReg = listEA.Where(it => !eaProblem.Any(i => i.EA == it.EA))
+            .GroupBy(it => it.EA.Substring(0, 1))
+            .Select(it =>
+             {
+                 var sumFieldCommunity = it.Sum(s => s.SumFieldCommunity);
+                 var totalFieldCommunity = it.Count();
+                 return new
+                 {
+                     Region = it.Key,
+                     avg = sumFieldCommunity.Value / totalFieldCommunity
+                 };
+             })
+             .ToList();
+            Console.WriteLine($"avgReg : {avgReg.Count}");
+            var count = 0;
+            eaProblem.ForEach(it =>
+            {
+                count++;
+                System.Console.WriteLine($"Round {count} / {eaProblem.Count}");
+                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.EA.Substring(0, 1)).avg;
+                var def = Builders<ResultDataEA>.Update
+                .Set(x => x.FieldCommunity, dataAvg);
+                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
+                Console.WriteLine($"Update done.");
+            });
+            Console.WriteLine($"All Update done.");
+        }
+
+        //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (do)
+        //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm (do)
+        public static void ResolveAvgWaterHeightCmAndTimeWaterHeightCm()
         {
             Console.WriteLine("Start ResolveAvgWaterHeightCm");
             var def = Builders<DataProcessed>.Update
@@ -355,7 +493,106 @@ namespace Test
             Console.WriteLine("update done");
         }
 
-        //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources
+        // 18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing)
+        public static void ResolveHasntPlumbing()
+        {
+            Console.WriteLine($"Start ResolveHasntPlumbing");
+            Console.WriteLine($"Querying..................");
+            var dataWrong = collectionOldDataprocess.Aggregate()
+            .Match(it => it.IsHouseHold == 0
+            && it.IsAgriculture == 0
+            && it.IsAllFactorial == 0
+            && it.IsAllCommercial == 0
+            && it.HasntPlumbing > 0)
+            .ToList();
+            Console.WriteLine($"dataWrong : {dataWrong.Count}");
+            var listIdWrongWillUpdate = dataWrong.Select(it => it._id).ToList();
+            Console.WriteLine($"data hasn't G that HasntPlumbing greater than 0 : {listIdWrongWillUpdate.Count}");
+            var skip = 0;
+            var countUpdate = 0;
+            while (skip <= listIdWrongWillUpdate.Count)
+            {
+                var listUpate = listIdWrongWillUpdate.Skip(skip).Take(1000).ToList();
+                var def = Builders<DataProcessed>.Update
+                .Set(it => it.HasntPlumbing, 0);
+                collectionOldDataprocess.UpdateMany(it => listUpate.Contains(it._id), def);
+                skip += 1000;
+                countUpdate += listUpate.Count;
+                Console.WriteLine($"count data already update : {countUpdate} / {listIdWrongWillUpdate.Count}");
+            }
+            Console.WriteLine($"All Update Done!");
+        }
+
+        // 18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing)
+        public static void ResolveNewHasntPlumbing()
+        {
+            Console.WriteLine("Start ResolveNewHasntPlumbing");
+
+            var data = collectionOldDataprocess.Aggregate()
+            .Match(it => it.IsHouseHold != 0 ||
+            it.IsAgriculture != 0 ||
+            it.IsAllFactorial != 0 ||
+            it.IsAllCommercial != 0)
+            .Project(it => new
+            {
+                Id = it._id,
+                Area_Code = it.Area_Code,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            Console.WriteLine($"data {data.Count}");
+
+            var dataHasntPlumbing0 = data.Where(it => it.HasntPlumbing == 0)
+            .Select(it => it.Id)
+            .ToList();
+
+            Console.WriteLine($"dataHasntPlumbing0 {dataHasntPlumbing0.Count}");
+
+            Console.WriteLine($"start Updata Case HasntPlumbing == 0");
+
+            var defHasntPlumbing0 = Builders<DataProcessed>.Update
+            .Set(it => it.HasntPlumbing, 12);
+            collectionOldDataprocess.UpdateMany(it => dataHasntPlumbing0.Contains(it._id), defHasntPlumbing0);
+
+            Console.WriteLine($"Updata Case HasntPlumbing == 0 Done!");
+
+            var dataHasntPlumbingbetween0To6 = data.Where(it => it.HasntPlumbing > 0 && it.HasntPlumbing < 6)
+             .Select(it => new
+             {
+                 Id = it.Id,
+                 Area_Code = it.Area_Code
+             })
+             .ToList();
+
+            Console.WriteLine($"dataHasntPlumbingbetween0To6 : {dataHasntPlumbingbetween0To6.Count}");
+
+            var avgAreaCode = data.Where(it => it.HasntPlumbing >= 6)
+             .GroupBy(it => it.Area_Code)
+             .Select(it => new
+             {
+                 Area_Code = it.Key,
+                 Avg = it.Sum(i => i.HasntPlumbing) / it.Count()
+             })
+             .ToList();
+
+            Console.WriteLine($"avgAreaCode : {avgAreaCode.Count}");
+
+            var count = 0;
+            dataHasntPlumbingbetween0To6.ForEach(it =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {dataHasntPlumbingbetween0To6.Count}");
+                var avg = avgAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code).Avg;
+                var def = Builders<DataProcessed>.Update
+                .Set(i => i.HasntPlumbing, avg);
+                collectionOldDataprocess.UpdateOne(i => i._id == it.Id, def);
+                Console.WriteLine($"{it.Id} update done");
+            });
+            Console.WriteLine("All Update Done!");
+        }
+
+        //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do)
         public static void ResolveWaterSources()
         {
             var def = Builders<DataProcessed>.Update
@@ -457,7 +694,8 @@ namespace Test
                             CountCommunity = 1,
                             IsCommunityWaterManagementHasWaterTreatment = 0,
                             CountCommunityHasDisaster = 0,
-                            CommunityNatureDisaster = 0
+                            CommunityNatureDisaster = 0,
+                            IsAdditionalCom = true
                         });
                     }
 
@@ -510,36 +748,6 @@ namespace Test
             System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster == 0 => {test3.Count}");
             System.Console.WriteLine($"data CountCommunityHasDisaster == 0 && CommunityNatureDisaster == 0 => {test5.Count}");
             System.Console.WriteLine($"data Ea == null => {test4.Count}");
-        }
-
-        // 18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing)
-        public static void ResolveHasntPlumbing()
-        {
-            Console.WriteLine($"Start ResolveHasntPlumbing");
-            Console.WriteLine($"Querying..................");
-            var dataWrong = collectionOldDataprocess.Aggregate()
-            .Match(it => it.IsHouseHold == 0
-            && it.IsAgriculture == 0
-            && it.IsAllFactorial == 0
-            && it.IsAllCommercial == 0
-            && it.HasntPlumbing > 0)
-            .ToList();
-            Console.WriteLine($"dataWrong : {dataWrong.Count}");
-            var listIdWrongWillUpdate = dataWrong.Select(it => it._id).ToList();
-            Console.WriteLine($"data hasn't G that HasntPlumbing greater than 0 : {listIdWrongWillUpdate.Count}");
-            var skip = 0;
-            var countUpdate = 0;
-            while (skip <= listIdWrongWillUpdate.Count)
-            {
-                var listUpate = listIdWrongWillUpdate.Skip(skip).Take(1000).ToList();
-                var def = Builders<DataProcessed>.Update
-                .Set(it => it.HasntPlumbing, 0);
-                collectionOldDataprocess.UpdateMany(it => listUpate.Contains(it._id), def);
-                skip += 1000;
-                countUpdate += listUpate.Count;
-                Console.WriteLine($"count data already update : {countUpdate} / {listIdWrongWillUpdate.Count}");
-            }
-            Console.WriteLine($"All Update Done!");
         }
 
         public static double AmountCountCommunityHasDisaster(List<CommunityUse> listCom, string area, double differnt)
@@ -614,15 +822,8 @@ namespace Test
             }
         }
 
-        public static void checkCountPopulationWrong()
-        {
-            var checker = new CheckResolve();
-            // checker.checkResolveIsHouseHold();
-            // checker.checkBuilding();
-            // checker.checkIsHouseHoldDistrictCountrySide();
-            checker.CheckArea();
-        }
 
+        // ------------------------------------------------------Not use in resolve Data----------------------------------------------------------------------------->
         // done
         public static void InsertAmountCommunity()
         {
@@ -789,133 +990,6 @@ namespace Test
             Console.WriteLine("Update Done!");
         }
 
-        // 11.จำนวนประชากรวัยทำงาน -> countWorkingAge
-        public static void ResolvecountWorkingAge()
-        {
-            Console.WriteLine("Start ResolvecountWorkingAge");
-            Console.WriteLine("Querying......................................");
-            var data = collectionOldDataprocess.Aggregate()
-            .Project(it => new
-            {
-                EA = it.EA,
-                CountWorkingAge = it.CountWorkingAge,
-                CountPopulation = it.CountPopulation
-            })
-            .ToList();
-
-            Console.WriteLine($"data : {data.Count}");
-
-            var listEA = data.Where(it => it.EA != "")
-            .GroupBy(it => it.EA)
-            .Select(it => new
-            {
-                Ea = it.Key,
-                SumCountWorkingAge = it.Sum(s => s.CountWorkingAge),
-                SumCountPopulation = it.Sum(s => s.CountPopulation)
-            })
-            .ToList();
-
-            Console.WriteLine($"listEA : {listEA.Count}");
-
-            var eaHasProblem = listEA.Where(it => it.SumCountWorkingAge == 0 && it.SumCountPopulation > 0).ToList();
-            Console.WriteLine($"eaHasProblem : {eaHasProblem.Count}");
-
-            var dataEAHasProblem = collectionResultDataEA.Aggregate()
-            .Match(it => it.CountPopulation > 0 && it.CountWorkingAge == 0)
-            .ToList();
-            Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
-
-            var dataPercentRegion = listEA.Except(eaHasProblem)
-            .GroupBy(it => it.Ea.Substring(0, 1))
-            .Select(it =>
-            {
-                var SumCountWorkingAgeRegion = it.Sum(s => s.SumCountWorkingAge);
-                var SumCountPopulationRegion = it.Sum(s => s.SumCountPopulation);
-                return new
-                {
-                    Region = it.Key,
-                    percentRegion = SumCountWorkingAgeRegion * 100 / SumCountPopulationRegion
-                };
-            })
-            .ToList();
-
-            Console.WriteLine($"eaNotProblem : {dataPercentRegion.Count}");
-
-            var count = 0;
-            eaHasProblem.ForEach(it =>
-            {
-                count++;
-                System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
-                var newCountWorkingAge = Math.Round(dataPercentRegion
-                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1)).percentRegion.Value * it.SumCountPopulation.Value / 100);
-                var def = Builders<ResultDataEA>.Update
-                .Set(x => x.CountWorkingAge, newCountWorkingAge);
-                collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
-                Console.WriteLine($"Update done.");
-            });
-            Console.WriteLine($"All Update done.");
-        }
-
-        // 15.พื้นที่ชลประทาน -> FieldCommunity 
-        public static void ResolveFieldCommunity()
-        {
-            Console.WriteLine("Start ResolveFieldCommunity");
-            Console.WriteLine("Querying......................................");
-            var data = collectionOldDataprocess.Aggregate()
-            .Project(it => new
-            {
-                EA = it.EA,
-                FieldCommunity = it.FieldCommunity
-            })
-            .ToList();
-            Console.WriteLine($"data : {data.Count}");
-
-            var listEA = data.Where(it => it.EA != "")
-            .GroupBy(it => it.EA)
-            .Select(it => new
-            {
-                EA = it.Key,
-                SumFieldCommunity = it.Sum(s => s.FieldCommunity)
-            })
-            .ToList();
-            Console.WriteLine($"listEA : {listEA.Count}");
-
-            var eaProblem = listEA.Where(it => it.SumFieldCommunity >= 300).ToList();
-            Console.WriteLine($"eaProblem : {eaProblem.Count}");
-
-            var dataEAHasProblem = collectionResultDataEA.Aggregate()
-            .Match(it => it.FieldCommunity >= 300)
-            .ToList();
-            Console.WriteLine($"dataEAHasProblem : {dataEAHasProblem.Count}");
-
-            var avgReg = listEA.Where(it => !eaProblem.Any(i => i.EA == it.EA))
-            .GroupBy(it => it.EA.Substring(0, 1))
-            .Select(it =>
-             {
-                 var sumFieldCommunity = it.Sum(s => s.SumFieldCommunity);
-                 var totalFieldCommunity = it.Count();
-                 return new
-                 {
-                     Region = it.Key,
-                     avg = sumFieldCommunity.Value / totalFieldCommunity
-                 };
-             })
-             .ToList();
-            Console.WriteLine($"avgReg : {avgReg.Count}");
-            var count = 0;
-            eaProblem.ForEach(it =>
-            {
-                count++;
-                System.Console.WriteLine($"Round {count} / {eaProblem.Count}");
-                var dataAvg = avgReg.FirstOrDefault(i => i.Region == it.EA.Substring(0, 1)).avg;
-                var def = Builders<ResultDataEA>.Update
-                .Set(x => x.FieldCommunity, dataAvg);
-                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
-                Console.WriteLine($"Update done.");
-            });
-            Console.WriteLine($"All Update done.");
-        }
-
         // resolve add filed info EA 
         public static void GetDataAndLookUpForAddAnAddressInfomationInResultDataEa()
         {
@@ -1028,74 +1102,6 @@ namespace Test
                         .Set(data => data.TAM_NAME, dataInfo.TAM_NAME);
                 collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
                 Console.WriteLine($"area {it.Area_Code} Update Done!");
-            });
-            Console.WriteLine("All Update Done!");
-        }
-
-        public static void ResolveNewHasntPlumbing()
-        {
-            Console.WriteLine("Start ResolveNewHasntPlumbing");
-
-            var data = collectionOldDataprocess.Aggregate()
-            .Match(it => it.IsHouseHold != 0 ||
-            it.IsAgriculture != 0 ||
-            it.IsAllFactorial != 0 ||
-            it.IsAllCommercial != 0)
-            .Project(it => new
-            {
-                Id = it._id,
-                Area_Code = it.Area_Code,
-                HasntPlumbing = it.HasntPlumbing
-            })
-            .ToList();
-
-            Console.WriteLine($"data {data.Count}");
-
-            var dataHasntPlumbing0 = data.Where(it => it.HasntPlumbing == 0)
-            .Select(it => it.Id)
-            .ToList();
-
-            Console.WriteLine($"dataHasntPlumbing0 {dataHasntPlumbing0.Count}");
-
-            Console.WriteLine($"start Updata Case HasntPlumbing == 0");
-
-            var defHasntPlumbing0 = Builders<DataProcessed>.Update
-            .Set(it => it.HasntPlumbing, 12);
-            collectionOldDataprocess.UpdateMany(it => dataHasntPlumbing0.Contains(it._id), defHasntPlumbing0);
-
-            Console.WriteLine($"Updata Case HasntPlumbing == 0 Done!");
-
-            var dataHasntPlumbingbetween0To6 = data.Where(it => it.HasntPlumbing > 0 && it.HasntPlumbing < 6)
-             .Select(it => new
-             {
-                 Id = it.Id,
-                 Area_Code = it.Area_Code
-             })
-             .ToList();
-
-            Console.WriteLine($"dataHasntPlumbingbetween0To6 : {dataHasntPlumbingbetween0To6.Count}");
-
-            var avgAreaCode = data.Where(it => it.HasntPlumbing >= 6)
-             .GroupBy(it => it.Area_Code)
-             .Select(it => new
-             {
-                 Area_Code = it.Key,
-                 Avg = it.Sum(i => i.HasntPlumbing) / it.Count()
-             })
-             .ToList();
-
-            Console.WriteLine($"avgAreaCode : {avgAreaCode.Count}");
-
-            var count = 0;
-            dataHasntPlumbingbetween0To6.ForEach(it =>
-            {
-                count++;
-                Console.WriteLine($"Round : {count} / {dataHasntPlumbingbetween0To6.Count}");
-                var avg = avgAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code).Avg;
-                var def = Builders<DataProcessed>.Update
-                .Set(i => i.HasntPlumbing, avg);
-                collectionOldDataprocess.UpdateOne(i => i._id == it.Id, def);
-                Console.WriteLine($"{it.Id} update done");
             });
             Console.WriteLine("All Update Done!");
         }

@@ -13,8 +13,56 @@ namespace Test
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
-            collectionOldDataprocess = database.GetCollection<DataProcessed>("oldDataProcess");
+            collectionOldDataprocess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
+        }
+
+        // 2.ครัวเรือนทั้งหมด -> IsHouseHold
+        public void checkResolveIsHouseHold()
+        {
+            Console.WriteLine("checkResolveIsHouseHold");
+            var data = collectionOldDataprocess.Aggregate()
+            .Match(it => it.SampleType == "u" && it.IsHouseHold == 0)
+            .Project(it => new
+            {
+                Id = it._id,
+                countPopulation = it.CountPopulation
+            })
+            .ToList();
+            var dataError = data.Where(it => it.countPopulation > 0).ToList();
+            Console.WriteLine($"unit IsHouseHold = 0 that have countPopulation > 0 : {dataError.Count}");
+        }
+        // 18.ระยะเวลาที่มีน้ำประปาใช้ (HasntPlumbing)
+        public void checkResolveHasntPlumbing()
+        {
+            Console.WriteLine("checkResolveHasntPlumbing");
+
+            Console.WriteLine("check dataWithout G but has HasntPlumbing > 0");
+            var dataWithoutG = collectionOldDataprocess.Aggregate()
+            .Match(it => it.IsHouseHold == 0
+            && it.IsAgriculture == 0
+            && it.IsAllFactorial == 0
+            && it.IsAllCommercial == 0
+            && it.HasntPlumbing > 0)
+            .ToList();
+            Console.WriteLine($"dataWithoutG has HasntPlumbing > 0 : {dataWithoutG.Count}");
+
+            Console.WriteLine("check dataWith G that Problem");
+            var dataWithG = collectionOldDataprocess.Aggregate()
+            .Match(it => it.IsHouseHold != 0 ||
+            it.IsAgriculture != 0 ||
+            it.IsAllFactorial != 0 ||
+            it.IsAllCommercial != 0)
+            .Project(it => new
+            {
+                Id = it._id,
+                Area_Code = it.Area_Code,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            var dataWithGError = dataWithG.Where(it => it.HasntPlumbing == 0 || (it.HasntPlumbing > 0 && it.HasntPlumbing < 6)).ToList();
+            Console.WriteLine($"dataWith G has proplem: {dataWithGError.Count}");
         }
 
         public void checkCountPopulation()
@@ -37,21 +85,6 @@ namespace Test
             Console.WriteLine($"countPopulaiton < countWorkingAge that not building{dataNotB.Count}");
             Console.WriteLine($"not builiding that countPopulaiton < countWorkingAge {dataWrong2.Count}");
             Console.WriteLine($"data that countPopulation over 20000{dataWrong3.Count}");
-        }
-
-        public void checkResolveIsHouseHold()
-        {
-            var data = collectionOldDataprocess.Aggregate()
-            .Match(it => it.SampleType == "u" && it.IsHouseHold == 0)
-            .Project(it => new
-            {
-                Id = it._id,
-                countPopulation = it.CountPopulation
-            })
-            .ToList()
-            .Where(it => it.countPopulation > 0)
-            .ToList();
-            Console.WriteLine($"unit IsHouseHold = 0 that have countPopulation > 0 : {data.Count}");
         }
 
         public void checkBuilding()

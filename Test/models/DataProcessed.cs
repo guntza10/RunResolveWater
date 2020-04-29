@@ -29,6 +29,7 @@ namespace Test.models
         public string TAM { get; set; }
         [JsonProperty("TAM_NAME")]
         public string TAM_NAME { get; set; }
+
         #region GroundWater
         /// <summary>
         /// จำนวนบ่อบาดาลทั้งหมดในตำบล
@@ -115,29 +116,29 @@ namespace Test.models
         /// </summary>
         public double? Farm { get; set; }
 
-        /// <summary>
-        /// ปริมาณน้ำซื้อที่ใช้เพื่อการเกษตร
-        /// </summary>
-        /// <value></value>
-        public double? CubicMeterBuyingForAgriculture { get; set; }
+        // /// <summary>
+        // /// ปริมาณน้ำซื้อที่ใช้เพื่อการเกษตร
+        // /// </summary>
+        // /// <value></value>
+        // public double? CubicMeterBuyingForAgriculture { get; set; }
 
-        /// <summary>
-        /// ปริมาณน้ำซื้อที่ใช้เพื่อการบริการ
-        /// </summary>
-        /// <value></value>
-        public double? CubicMeterBuyingForService { get; set; }
+        // /// <summary>
+        // /// ปริมาณน้ำซื้อที่ใช้เพื่อการบริการ
+        // /// </summary>
+        // /// <value></value>
+        // public double? CubicMeterBuyingForService { get; set; }
 
-        /// <summary>
-        /// ปริมาณน้ำซื้อที่ใช้เพื่อการอุตสาหกรรม
-        /// </summary>
-        /// /// <value></value>
-        public double? CubicMeterBuyingForProduct { get; set; }
+        // /// <summary>
+        // /// ปริมาณน้ำซื้อที่ใช้เพื่อการอุตสาหกรรม
+        // /// </summary>
+        // /// /// <value></value>
+        // public double? CubicMeterBuyingForProduct { get; set; }
 
-        /// <summary>
-        /// ปริมาณน้ำซื้อที่ใช้เพื่อการอุปโภคบริโภค
-        /// </summary>
-        /// <value></value>
-        public double? CubicMeterBuyingForDrink { get; set; }
+        // /// <summary>
+        // /// ปริมาณน้ำซื้อที่ใช้เพื่อการอุปโภคบริโภค
+        // /// </summary>
+        // /// <value></value>
+        // public double? CubicMeterBuyingForDrink { get; set; }
         #endregion
 
         #region Plumbing
@@ -784,60 +785,108 @@ namespace Test.models
         /// </summary>
         public double? PeopleInFloodedArea { get; set; }
 
+        public double? CubicMeterGroundWaterForAgricultureGroundWater { get; set; }
+        public double? CubicMeterGroundWaterForAgricultureBuying { get; set; }
+
         /// <summary>
         /// 26.ปริมาณการใช้น้ำบาดาลเพื่อการเกษตร(น้ำบาดาล น้ำซื้อ)
         /// </summary>
         public double? CubicMeterGroundWaterForAgriculture { get; set; }
+
+        public double? CubicMeterGroundWaterForServiceGroundWater { get; set; }
+        public double? CubicMeterGroundWaterForServiceBuying { get; set; }
 
         /// <summary>
         /// 27.ปริมาณการใช้น้ำบาดาลเพื่อการบริการ(น้ำบาดาล น้ำซื้อ)
         /// </summary>
         public double? CubicMeterGroundWaterForService { get; set; }
 
+        public double? CubicMeterGroundWaterForProductGroundWater { get; set; }
+        public double? CubicMeterGroundWaterForProductBuying { get; set; }
+
         /// <summary>
         /// 28.ปริมาณการใช้น้ำบาดาลเพื่อการอุตสาหกรรม(น้ำบาดาล น้ำซื้อ)
         /// </summary>
         public double? CubicMeterGroundWaterForProduct { get; set; }
+
+        public double? CubicMeterGroundWaterForDrinkGroundWater { get; set; }
+        public double? CubicMeterGroundWaterForDrinkBuying { get; set; }
 
         /// <summary>
         /// 29.ปริมาณการใช้น้ำบาดาลเพื่อการอุปโภคบริโภค(น้ำบาดาล น้ำซื้อ)
         /// </summary>
         public double? CubicMeterGroundWaterForDrink { get; set; }
 
+        public double? CubicMeterPlumbingForAgricultureMWA { get; set; }
+        public double? CubicMeterPlumbingForAgriculturePWA { get; set; }
+        public double? CubicMeterPlumbingForAgricultureOther { get; set; }
+
         /// <summary>
         /// 30.ปริมาณการใช้น้ำประปาเพื่อการเกษตร
         /// </summary>
         public double? CubicMeterPlumbingForAgriculture { get; set; }
+
+        public double? CubicMeterPlumbingForServiceMWA { get; set; }
+        public double? CubicMeterPlumbingForServicePWA { get; set; }
+        public double? CubicMeterPlumbingForServiceOther { get; set; }
 
         /// <summary>
         /// 31.ปริมาณการใช้น้ำประปาเพื่อการบริการ
         /// </summary>
         public double? CubicMeterPlumbingForService { get; set; }
 
+        public double? CubicMeterPlumbingForProductMWA { get; set; }
+        public double? CubicMeterPlumbingForProductPWA { get; set; }
+        public double? CubicMeterPlumbingForProductOther { get; set; }
+
         /// <summary>
         /// 32.ปริมาณการใช้น้ำประปาเพื่อการอุตสาหกรรม
         /// </summary>
         public double? CubicMeterPlumbingForProduct { get; set; }
+
+        public double? CubicMeterPlumbingForDrinkMWA { get; set; }
+        public double? CubicMeterPlumbingForDrinkPWA { get; set; }
+        public double? CubicMeterPlumbingForDrinkOther { get; set; }
 
         /// <summary>
         /// 33.ปริมาณการใช้น้ำประปาเพื่อการอุปโภคบริโภค 
         /// </summary>
         public double? CubicMeterPlumbingForDrink { get; set; }
 
+        public double? CubicMeterSurfaceForAgriculturePool { get; set; }
+        public double? CubicMeterSurfaceForAgricultureRiver { get; set; }
+        public double? CubicMeterSurfaceForAgricultureIrrigation { get; set; }
+        public double? CubicMeterSurfaceForAgricultureRain { get; set; }
+
         /// <summary>
         /// 34.ปริมาณการใช้น้ำผิวดินเพื่อการเกษตร (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
         public double? CubicMeterSurfaceForAgriculture { get; set; }
+
+        public double? CubicMeterSurfaceForServicePool { get; set; }
+        public double? CubicMeterSurfaceForServiceRiver { get; set; }
+        public double? CubicMeterSurfaceForServiceIrrigation { get; set; }
+        public double? CubicMeterSurfaceForServiceRain { get; set; }
 
         /// <summary>
         /// 35.ปริมาณการใช้น้ำผิวดินเพื่อการบริการ (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
         public double? CubicMeterSurfaceForService { get; set; }
 
+        public double? CubicMeterSurfaceForProductPool { get; set; }
+        public double? CubicMeterSurfaceForProductRiver { get; set; }
+        public double? CubicMeterSurfaceForProductIrrigation { get; set; }
+        public double? CubicMeterSurfaceForProductRain { get; set; }
+
         /// <summary>
         /// 36.ปริมาณการใช้น้ำผิวดินเพื่อการอุตสาหกรรม (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
         public double? CubicMeterSurfaceForProduct { get; set; }
+
+        public double? CubicMeterSurfaceForDrinkPool { get; set; }
+        public double? CubicMeterSurfaceForDrinkRiver { get; set; }
+        public double? CubicMeterSurfaceForDrinkIrrigation { get; set; }
+        public double? CubicMeterSurfaceForDrinkRain { get; set; }
 
         /// <summary>
         /// 37.ปริมาณการใช้น้ำผิวดินเพื่อการอุปโภคบริโภค (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
@@ -933,15 +982,7 @@ namespace Test.models
         /// ค่าปรับแต่ง 38.ปริมาณน้ำบาดาลที่พัฒนามาใช้ (ปริมาณน้ำจากรายการ 26-29)
         /// </summary>
         public string AdjustedCubicMeterGroundWaterForUse { get; set; }
-
-        /// <summary>
-        /// จำนวนประชากรทั้งหมดจาก Residential
-        /// </summary>
-        public double? ResidentialPersonCount { get; set; }
-
-        /// <summary>
-        /// จำนวนประชากรทั้งหมดจาก Population
-        /// </summary>
-        public double? PopulationPersonCount { get; set; }
+        public string Road { get; set; }
+        public bool IsAdditionalCom { get; set; }
     }
 }
