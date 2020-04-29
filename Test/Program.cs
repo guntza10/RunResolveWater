@@ -42,7 +42,7 @@ namespace Test
             // ResolveWaterSources();
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
-            // ResolveCountCommunity()
+            // ResolveCountCommunity();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
             // ResolveCountGroundWater();
