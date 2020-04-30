@@ -14,6 +14,7 @@ namespace Test
     class Program
     {
         private static IMongoCollection<DataProcessed> collectionOldDataprocess { get; set; }
+        private static IMongoCollection<DataProcessed> collectionNewDataProcess { get; set; }
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
@@ -24,6 +25,7 @@ namespace Test
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataprocess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
@@ -43,6 +45,7 @@ namespace Test
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
             // ResolveCountCommunity();
+            ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
             // ResolveCountGroundWater();
@@ -351,7 +354,7 @@ namespace Test
                 });
             });
         }
-       
+
         // 11.จำนวนประชากรวัยทำงาน -> countWorkingAge
         public static void ResolvecountWorkingAge()
         {
@@ -819,6 +822,49 @@ namespace Test
                .ToList();
                 var percentDataAmpHasDisaster = dataAmpHasDisaster.FirstOrDefault() ?? 0.0;
                 return Math.Round(count * percentDataAmpHasDisaster / 100);
+            }
+        }
+
+        // 20.สถานที่ราชการที่มีน้ำประปาใช้ -> IsGovernmentUsage
+        // 21.สถานที่ราชการที่มีน้ำประปาที่มีคุณภาพมาตรฐาน -> IsGovernmentWaterQuality
+        public static void ResolveIsGovernmentUsageAndIsGovernmentWaterQuality()
+        {
+            var listGovernment = collectionNewDataProcess.Find(it => it.IsGovernment == 1).ToList();
+            Console.WriteLine($"List Government done : {listGovernment.Count}");
+
+            var eaGroup = listGovernment.GroupBy(it => it.EA).ToList();
+            Console.WriteLine($"EA Group complete : {eaGroup.Count}");
+
+            foreach (var ea in eaGroup)
+            {
+                Console.WriteLine($"Process in EA : {ea.Key}");
+
+                var roadGroup = ea.GroupBy(it => it.Road).ToList();
+                Console.WriteLine($"Road Group complete : {roadGroup.Count}");
+
+                foreach (var road in roadGroup)
+                {
+                    Console.WriteLine($"road in process : {road.Key}");
+                    var validationWaterUsage = road.Any(it => it.IsGovernmentUsage == 1);
+                    var validationWaterQuality = road.Any(it => it.IsGovernmentWaterQuality == 1);
+                    if (validationWaterUsage)
+                    {
+                        var listWrites = new List<WriteModel<DataProcessed>>();
+                        var filterDefinition = Builders<DataProcessed>.Filter
+                                .Where(it => it.EA == ea.Key && it.Road == road.Key);
+                        var updateDefinitionUsage = Builders<DataProcessed>.Update;
+                        var updateDefinition = Builders<DataProcessed>.Update.Set(it => it.IsGovernmentUsage, 1);
+
+                        if (validationWaterUsage && validationWaterQuality)
+                        {
+                            updateDefinition.Set(it => it.IsGovernmentWaterQuality, 1);
+                        }
+                        Console.WriteLine(updateDefinition.ToString());
+                        listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinition));
+                        //collectionNewDataProcess.BulkWrite(listWrites);
+                        Console.WriteLine($"Update {road.Key} Complete");
+                    }
+                }
             }
         }
 
