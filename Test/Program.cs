@@ -13,7 +13,7 @@ namespace Test
 {
     class Program
     {
-        private static IMongoCollection<DataProcessed> collectionOldDataprocess { get; set; }
+        private static IMongoCollection<DataProcessed> collectionOldDataProcess { get; set; }
         private static IMongoCollection<DataProcessed> collectionNewDataProcess { get; set; }
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
@@ -24,11 +24,11 @@ namespace Test
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
-            collectionOldDataprocess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
+            collectionOldDataProcess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
             collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcessDebug");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
-            collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
-            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
+            collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEABKKClean");
+            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCodeBKK");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
             collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
             // check error 
@@ -45,19 +45,23 @@ namespace Test
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
             // ResolveCountCommunity();
-            ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
+            // ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
             // ResolveCountGroundWater();
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
+
+            // ResolveCountGroundWaterAndWaterSourcesEA();
+            // ResolveCountGroundWaterAndWaterSourcesAreaCode();
+            GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
         public static void ResolveIsHouseHold()
         {
             Console.WriteLine("Start ResolveIsHouseHold");
-            var data = collectionOldDataprocess.Aggregate()
+            var data = collectionNewDataProcess.Aggregate()
              .Match(it => it.SampleType == "u" && it.IsHouseHold == 0 && it.CountPopulation > 0)
              .Project(it => new
              {
@@ -71,10 +75,10 @@ namespace Test
                 Console.WriteLine($"Round : {count} / {data.Count}");
                 var def = Builders<DataProcessed>.Update
                 .Set(it => it.CountPopulation, 0);
-                collectionOldDataprocess.UpdateOne(it => it._id == item.id, def);
+                collectionNewDataProcess.UpdateOne(it => it._id == item.id, def);
                 Console.WriteLine($"Round : {count} update done!");
             }
-            // collectionOldDataprocess.UpdateMany(it => it.SampleType == "u" && it.IsHouseHold == 0, def);
+            // collectionNewDataProcess.UpdateMany(it => it.SampleType == "u" && it.IsHouseHold == 0, def);
             Console.WriteLine("all update done");
         }
 
@@ -121,7 +125,7 @@ namespace Test
             Console.WriteLine("Start ResolveIsHouseHoldGoodPlumbing");
             Console.WriteLine("Quering.....");
 
-            var data = collectionOldDataprocess.Aggregate()
+            var data = collectionNewDataProcess.Aggregate()
             .Match(it => it.SampleType == "b" || it.SampleType == "u")
             .Project(it => new
             {
@@ -184,7 +188,7 @@ namespace Test
 
                     var def = Builders<DataProcessed>.Update
                     .Set(x => x.IsHouseHoldGoodPlumbing, newIsHouseHoldGoodPlumbing);
-                    collectionOldDataprocess.UpdateOne(x => x._id == it.Id, def);
+                    collectionNewDataProcess.UpdateOne(x => x._id == it.Id, def);
                     Console.WriteLine($"update done!");
                 });
                 Console.WriteLine($"count building already update : {countTotalBuildingAlreadyUpdate} / {dataBuilding.Count}");
@@ -198,7 +202,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolveIsHouseHoldHasPlumbingDistrictAndIsHouseHoldHasPlumbingCountryside");
             Console.WriteLine("Querying.......................................................................");
-            var dataUpdate = collectionOldDataprocess.Aggregate()
+            var dataUpdate = collectionNewDataProcess.Aggregate()
             .Match(it => it.SampleType == "b" && it.IsHouseHold != 0)
             .Project(it => new
             {
@@ -220,7 +224,7 @@ namespace Test
                 var def = Builders<DataProcessed>.Update
                .Set(it => it.IsHouseHoldHasPlumbingDistrict, IsHouseHoldHasPlumbingDistrict)
                .Set(it => it.IsHouseHoldHasPlumbingCountryside, IsHouseHoldHasPlumbingCountryside);
-                collectionOldDataprocess.UpdateOne(it => it._id == data._id, def);
+                collectionNewDataProcess.UpdateOne(it => it._id == data._id, def);
                 Console.WriteLine($"update done!");
             }
             Console.WriteLine($"All Update Done!");
@@ -231,7 +235,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolveCountGroundWater");
             Console.WriteLine("Querying.....................");
-            var listCom = collectionOldDataprocess.Aggregate()
+            var listCom = collectionNewDataProcess.Aggregate()
             .Match(it => it.SampleType == "c")
             .ToList();
 
@@ -297,7 +301,7 @@ namespace Test
             Console.WriteLine("Start RunResolveCountPopulation");
             Console.WriteLine("Quering.......");
 
-            var data = collectionOldDataprocess.Aggregate()
+            var data = collectionNewDataProcess.Aggregate()
              .Match(it => it.EA != "" && (it.SampleType == "b" || it.SampleType == "u"))
              .Project(it => new
              {
@@ -349,7 +353,7 @@ namespace Test
                     Console.WriteLine($"newCountPopulation : {newCountPopulation}");
                     var def = Builders<DataProcessed>.Update
                     .Set(i => i.CountPopulation, newCountPopulation);
-                    collectionOldDataprocess.UpdateOne(i => i._id == x.Id, def);
+                    collectionNewDataProcess.UpdateOne(i => i._id == x.Id, def);
                     Console.WriteLine($"Update done!");
                 });
             });
@@ -360,7 +364,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolvecountWorkingAge");
             Console.WriteLine("Querying......................................");
-            var data = collectionOldDataprocess.Aggregate()
+            var data = collectionNewDataProcess.Aggregate()
             .Project(it => new
             {
                 EA = it.EA,
@@ -427,7 +431,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolveFieldCommunity");
             Console.WriteLine("Querying......................................");
-            var data = collectionOldDataprocess.Aggregate()
+            var data = collectionNewDataProcess.Aggregate()
             .Project(it => new
             {
                 EA = it.EA,
@@ -491,8 +495,8 @@ namespace Test
             .Set(it => it.AvgWaterHeightCm, 0)
             .Set(it => it.TimeWaterHeightCm, 0);
             Console.WriteLine("Updating.......");
-            // collectionOldDataprocess.UpdateMany(it => it.EA != "" || it.Area_Code != null && it.AvgWaterHeightCm == 0 || it.TimeWaterHeightCm == 0, def);
-            collectionOldDataprocess.UpdateMany(it => it.AvgWaterHeightCm == 0 || it.TimeWaterHeightCm == 0, def);
+            // collectionNewDataProcess.UpdateMany(it => it.EA != "" || it.Area_Code != null && it.AvgWaterHeightCm == 0 || it.TimeWaterHeightCm == 0, def);
+            collectionNewDataProcess.UpdateMany(it => it.AvgWaterHeightCm == 0 || it.TimeWaterHeightCm == 0, def);
             Console.WriteLine("update done");
         }
 
@@ -501,7 +505,7 @@ namespace Test
         {
             Console.WriteLine($"Start ResolveHasntPlumbing");
             Console.WriteLine($"Querying..................");
-            var dataWrong = collectionOldDataprocess.Aggregate()
+            var dataWrong = collectionNewDataProcess.Aggregate()
             .Match(it => it.IsHouseHold == 0
             && it.IsAgriculture == 0
             && it.IsAllFactorial == 0
@@ -518,7 +522,7 @@ namespace Test
                 var listUpate = listIdWrongWillUpdate.Skip(skip).Take(1000).ToList();
                 var def = Builders<DataProcessed>.Update
                 .Set(it => it.HasntPlumbing, 0);
-                collectionOldDataprocess.UpdateMany(it => listUpate.Contains(it._id), def);
+                collectionNewDataProcess.UpdateMany(it => listUpate.Contains(it._id), def);
                 skip += 1000;
                 countUpdate += listUpate.Count;
                 Console.WriteLine($"count data already update : {countUpdate} / {listIdWrongWillUpdate.Count}");
@@ -531,7 +535,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolveNewHasntPlumbing");
 
-            var data = collectionOldDataprocess.Aggregate()
+            var data = collectionNewDataProcess.Aggregate()
             .Match(it => it.IsHouseHold != 0 ||
             it.IsAgriculture != 0 ||
             it.IsAllFactorial != 0 ||
@@ -556,7 +560,7 @@ namespace Test
 
             var defHasntPlumbing0 = Builders<DataProcessed>.Update
             .Set(it => it.HasntPlumbing, 12);
-            collectionOldDataprocess.UpdateMany(it => dataHasntPlumbing0.Contains(it._id), defHasntPlumbing0);
+            collectionNewDataProcess.UpdateMany(it => dataHasntPlumbing0.Contains(it._id), defHasntPlumbing0);
 
             Console.WriteLine($"Updata Case HasntPlumbing == 0 Done!");
 
@@ -589,7 +593,7 @@ namespace Test
                 var avg = avgAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code).Avg;
                 var def = Builders<DataProcessed>.Update
                 .Set(i => i.HasntPlumbing, avg);
-                collectionOldDataprocess.UpdateOne(i => i._id == it.Id, def);
+                collectionNewDataProcess.UpdateOne(i => i._id == it.Id, def);
                 Console.WriteLine($"{it.Id} update done");
             });
             Console.WriteLine("All Update Done!");
@@ -600,8 +604,8 @@ namespace Test
         {
             var def = Builders<DataProcessed>.Update
             .Set(it => it.WaterSources, 0);
-            // collectionOldDataprocess.UpdateMany(it => it.EA != null || it.Area_Code != null && it.WaterSources < 1260 && it.SampleType == "c", def);
-            collectionOldDataprocess.UpdateMany(it => it.SampleType == "c" && it.WaterSources < 1260, def);
+            // collectionNewDataProcess.UpdateMany(it => it.EA != null || it.Area_Code != null && it.WaterSources < 1260 && it.SampleType == "c", def);
+            collectionNewDataProcess.UpdateMany(it => it.SampleType == "c" && it.WaterSources < 1260, def);
             Console.WriteLine("update done");
         }
 
@@ -614,7 +618,7 @@ namespace Test
             Console.WriteLine("Start ResolveCountCommunity");
             Console.WriteLine("Quering....................");
 
-            var listCom = collectionOldDataprocess.Aggregate()
+            var listCom = collectionNewDataProcess.Aggregate()
             .Match(it => it.SampleType == "c")
             .Project(it => new CommunityUse
             {
@@ -637,7 +641,7 @@ namespace Test
 
             System.Console.WriteLine($"Qry listAmountCommu Done = {listAmountCommu.Count}");
 
-            var listEACommu = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var listEACommu = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
             .Group(it => it.Area_Code, x => new
             {
                 areaCode = x.Key,
@@ -721,7 +725,7 @@ namespace Test
                         .ForEach(it => it.CommunityNatureDisaster = 1);
                     }
                     System.Console.WriteLine($"Set CommunityNatureDisaster done.");
-                    collectionOldDataprocess.InsertMany(dataProcessUpdate);
+                    collectionNewDataProcess.InsertMany(dataProcessUpdate);
                     System.Console.WriteLine($"{area.areaCode} Insert done!");
 
                     var getDataProcess = dataProcessUpdate.Select(it => new JsonModel
@@ -927,7 +931,7 @@ namespace Test
 
             Console.WriteLine($"listEAUpdate : {listEaUpdate.Count}");
 
-            var data = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var data = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
             .Project(it => new
             {
                 EA = it.EA,
@@ -994,7 +998,7 @@ namespace Test
             .ToList();
             Console.WriteLine($"listAreaCodeUpdate : {listAreaCodeUpdate.Count}");
 
-            var data = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var data = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
             .Match(it => it.Area_Code != "")
             .Project(it => new
             {
@@ -1175,7 +1179,7 @@ namespace Test
 
             Console.WriteLine($"listEAUpdate : {listEAUpdate.Count}");
 
-            var data = collectionOldDataprocess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var data = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
             .Project(it => new
             {
                 EA = it.EA,
@@ -1300,7 +1304,7 @@ namespace Test
 
             Console.WriteLine($"dataEA : {dataEA.Count}");
 
-            var eaDataProcess = collectionOldDataprocess.Aggregate()
+            var eaDataProcess = collectionNewDataProcess.Aggregate()
             .Project(it => new
             {
                 EA = it.EA
@@ -1332,7 +1336,7 @@ namespace Test
                 .Set(it => it.TAM, eaInfo.TAM)
                 .Set(it => it.TAM_NAME, eaInfo.TAM_NAME);
 
-                collectionOldDataprocess.UpdateMany(it => it.EA == data.EA, def);
+                collectionNewDataProcess.UpdateMany(it => it.EA == data.EA, def);
                 Console.WriteLine("Update Done!");
 
             });
@@ -1342,7 +1346,7 @@ namespace Test
         public static void InsertEaApproved()
         {
             Console.WriteLine("Start Insert EaApproved");
-            var dataProcess = collectionOldDataprocess.Aggregate()
+            var dataProcess = collectionNewDataProcess.Aggregate()
             .Project(it => new
             {
                 EA = it.EA
