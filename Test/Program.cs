@@ -25,7 +25,7 @@ namespace Test
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataprocess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
-            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcessDebug");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultDataEA");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
@@ -834,17 +834,20 @@ namespace Test
 
             var eaGroup = listGovernment.GroupBy(it => it.EA).ToList();
             Console.WriteLine($"EA Group complete : {eaGroup.Count}");
-
+            var countEA = 0;
             foreach (var ea in eaGroup)
             {
+                countEA++;
                 Console.WriteLine($"Process in EA : {ea.Key}");
-
+                Console.WriteLine($"EA round : {countEA}/{eaGroup.Count}");
                 var roadGroup = ea.GroupBy(it => it.Road).ToList();
                 Console.WriteLine($"Road Group complete : {roadGroup.Count}");
+                var countRoad = 0;
 
                 foreach (var road in roadGroup)
                 {
-                    Console.WriteLine($"road in process : {road.Key}");
+                    countRoad++;
+                    Console.WriteLine($"road round : {countRoad}/{roadGroup.Count}");
                     var validationWaterUsage = road.Any(it => it.IsGovernmentUsage == 1);
                     var validationWaterQuality = road.Any(it => it.IsGovernmentWaterQuality == 1);
                     if (validationWaterUsage)
@@ -852,17 +855,24 @@ namespace Test
                         var listWrites = new List<WriteModel<DataProcessed>>();
                         var filterDefinition = Builders<DataProcessed>.Filter
                                 .Where(it => it.EA == ea.Key && it.Road == road.Key);
-                        var updateDefinitionUsage = Builders<DataProcessed>.Update;
-                        var updateDefinition = Builders<DataProcessed>.Update.Set(it => it.IsGovernmentUsage, 1);
 
                         if (validationWaterUsage && validationWaterQuality)
                         {
-                            updateDefinition.Set(it => it.IsGovernmentWaterQuality, 1);
+                            var updateDefinitionAll = Builders<DataProcessed>.Update
+                                .Set(it => it.IsGovernmentUsage, 1)
+                                .Set(it => it.IsGovernmentWaterQuality, 1);
+                            listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinitionAll));
+                            Console.WriteLine("Update WaterUsage and WaterQuality");
                         }
-                        Console.WriteLine(updateDefinition.ToString());
-                        listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinition));
-                        //collectionNewDataProcess.BulkWrite(listWrites);
-                        Console.WriteLine($"Update {road.Key} Complete");
+                        else
+                        {
+                            var updateDefinitionOnlyUsage = Builders<DataProcessed>.Update
+                                .Set(it => it.IsGovernmentUsage, 1);
+                            listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinitionOnlyUsage));
+                            Console.WriteLine("Update Only WaterUsage");
+                        }
+                        collectionNewDataProcess.BulkWrite(listWrites);
+                        Console.WriteLine("Update data Complete");
                     }
                 }
             }
