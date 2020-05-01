@@ -1,5 +1,5 @@
 // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do)
-db.NewDataProcessBKK.updateMany(
+db.NewDataProcessDebug.updateMany(
   {
     SampleType: "u",
     IsHouseHold: 0,
@@ -12,9 +12,410 @@ db.NewDataProcessBKK.updateMany(
   }
 );
 
-// เพิ่ม field EAinfo
-db.NewDataProcessBKK.aggregate([{}]);
+// create result data EA
+db.NewDataProcessDebug.aggregate(
+  [
+    {
+      $group: {
+        _id: "$EA",
+        IsAgriculture: {
+          $sum: "$IsAgriculture",
+        },
+        IsHouseHold: {
+          $sum: "$IsHouseHold",
+        },
+        IsHouseHoldGoodPlumbing: {
+          $sum: "$IsHouseHoldGoodPlumbing",
+        },
+        IsAgricultureHasIrrigationField: {
+          $sum: "$IsAgricultureHasIrrigationField",
+        },
+        IsHouseHoldHasPlumbingDistrict: {
+          $sum: "$IsHouseHoldHasPlumbingDistrict",
+        },
+        IsHouseHoldHasPlumbingCountryside: {
+          $sum: "$IsHouseHoldHasPlumbingCountryside",
+        },
+        IsFactorialWaterQuality: {
+          $sum: "$IsFactorialWaterQuality",
+        },
+        IsCommercialWaterQuality: {
+          $sum: "$IsCommercialWaterQuality",
+        },
+        CountPopulation: {
+          $sum: "$CountPopulation",
+        },
+        CountWorkingAge: {
+          $sum: "$CountWorkingAge",
+        },
+        IsFactorial: {
+          $sum: "$IsFactorial",
+        },
+        IsFactorialWaterTreatment: {
+          $sum: "$IsFactorialWaterTreatment",
+        },
+        IsCommunityWaterManagementHasWaterTreatment: {
+          $sum: "$IsCommunityWaterManagementHasWaterTreatment",
+        },
+        FieldCommunity: {
+          $sum: "$FieldCommunity",
+        },
+        AvgWaterHeightCm: {
+          $avg: "$AvgWaterHeightCm",
+        },
+        TimeWaterHeightCm: {
+          $avg: "$TimeWaterHeightCm",
+        },
+        HasntPlumbing: {
+          $avg: "$HasntPlumbing",
+        },
+        IsGovernment: {
+          $sum: "$IsGovernment",
+        },
+        IsGovernmentUsage: {
+          $sum: "$IsGovernmentUsage",
+        },
+        IsGovernmentWaterQuality: {
+          $sum: "$IsGovernmentWaterQuality",
+        },
+        CommunityNatureDisaster: {
+          $sum: "$CommunityNatureDisaster",
+        },
+        IndustryHasWasteWaterTreatment: {
+          $sum: "$IndustryHasWasteWaterTreatment",
+        },
+        PeopleInFloodedArea: {
+          $sum: "$PeopleInFloodedArea",
+        },
+        CountCommunity: {
+          $sum: "$CountCommunity",
+        },
+        CountCommunityHasDisaster: {
+          $sum: "$CountCommunityHasDisaster",
+        },
+        IsAllHouseHoldCountryside: {
+          $sum: "$IsAllHouseHoldCountryside",
+        },
+        IsAllHouseHoldDistrict: {
+          $sum: "$IsAllHouseHoldDistrict",
+        },
+        IsAllFactorial: {
+          $sum: "$IsAllFactorial",
+        },
+        IsAllCommercial: {
+          $sum: "$IsAllCommercial",
+        },
+      },
+    },
+    {
+      $project: {
+        IsAgriculture: 1,
+        IsHouseHold: 1,
+        IsHouseHoldGoodPlumbing: 1,
+        IsAgricultureHasIrrigationField: 1,
+        IsHouseHoldHasPlumbingDistrict: 1,
+        IsHouseHoldHasPlumbingCountryside: 1,
+        IsFactorialWaterQuality: 1,
+        IsCommercialWaterQuality: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        IsFactorial: 1,
+        IsFactorialWaterTreatment: 1,
+        IsCommunityWaterManagementHasWaterTreatment: 1,
+        FieldCommunity: 1,
+        AvgWaterHeightCm: 1,
+        TimeWaterHeightCm: 1,
+        HasntPlumbing: 1,
+        IsGovernment: 1,
+        IsGovernmentUsage: 1,
+        IsGovernmentWaterQuality: 1,
+        CommunityNatureDisaster: 1,
+        IndustryHasWasteWaterTreatment: 1,
+        PeopleInFloodedArea: 1,
+        CountCommunity: 1,
+        CountCommunityHasDisaster: 1,
+        IsAllHouseHoldCountryside: 1,
+        IsAllHouseHoldDistrict: 1,
+        IsAllFactorial: 1,
+        IsAllCommercial: 1,
+        CountGroundWaterUnit: {
+          $toInt: 0,
+        },
+        CountGroundWaterCom: {
+          $toInt: 0,
+        },
+        WaterSourcesUnit: {
+          $toInt: 0,
+        },
+        WaterSourcesCom: {
+          $toInt: 0,
+        },
+      },
+    },
+    {
+      $out: "ResultNewDataEABKK",
+    }
+  ],
+  {
+    allowDiskUse: true,
+  }
+);
 
+// add field ResultNewDataEA
+db.ResultNewDataEABKK.aggregate(
+  [
+    {
+      $lookup: {
+        from: "ea",
+        localField: "_id",
+        foreignField: "_id",
+        as: "dataEAInfo",
+      },
+    },
+    {
+      $unwind: {
+        path: "$dataEAInfo",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        REG: {
+          $ifNull: ["$dataEAInfo.REG", ""],
+        },
+        REG_NAME: {
+          $ifNull: ["$dataEAInfo.REG_NAME", ""],
+        },
+        CWT: {
+          $ifNull: ["$dataEAInfo.CWT", ""],
+        },
+        CWT_NAME: {
+          $ifNull: ["$dataEAInfo.CWT_NAME", ""],
+        },
+        AMP: {
+          $ifNull: ["$dataEAInfo.AMP", ""],
+        },
+        AMP_NAME: {
+          $ifNull: ["$dataEAInfo.AMP_NAME", ""],
+        },
+        TAM: {
+          $ifNull: ["$dataEAInfo.TAM", ""],
+        },
+        TAM_NAME: {
+          $ifNull: ["$dataEAInfo.TAM_NAME", ""],
+        },
+        MUN: {
+          $ifNull: ["$dataEAInfo.MUN", ""],
+        },
+        MUN_NAME: {
+          $ifNull: ["$dataEAInfo.MUN_NAME", ""],
+        },
+        TAO: {
+          $ifNull: ["$dataEAInfo.TAO", ""],
+        },
+        TAO_NAME: {
+          $ifNull: ["$dataEAInfo.TAO_NAME", ""],
+        },
+        VIL: {
+          $ifNull: ["$dataEAInfo.VIL", ""],
+        },
+        VIL_NAME: {
+          $ifNull: ["$dataEAInfo.VIL_NAME", ""],
+        },
+        IsAgriculture: 1,
+        IsHouseHold: 1,
+        IsHouseHoldGoodPlumbing: 1,
+        IsAgricultureHasIrrigationField: 1,
+        IsHouseHoldHasPlumbingDistrict: 1,
+        IsHouseHoldHasPlumbingCountryside: 1,
+        IsFactorialWaterQuality: 1,
+        IsCommercialWaterQuality: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        IsFactorial: 1,
+        IsFactorialWaterTreatment: 1,
+        IsCommunityWaterManagementHasWaterTreatment: 1,
+        FieldCommunity: 1,
+        AvgWaterHeightCm: 1,
+        TimeWaterHeightCm: 1,
+        HasntPlumbing: 1,
+        IsGovernment: 1,
+        IsGovernmentUsage: 1,
+        IsGovernmentWaterQuality: 1,
+        CommunityNatureDisaster: 1,
+        IndustryHasWasteWaterTreatment: 1,
+        PeopleInFloodedArea: 1,
+        CountCommunity: 1,
+        CountCommunityHasDisaster: 1,
+        IsAllHouseHoldCountryside: 1,
+        IsAllHouseHoldDistrict: 1,
+        IsAllFactorial: 1,
+        IsAllCommercial: 1,
+        CountGroundWaterUnit: 1,
+        CountGroundWaterCom: 1,
+        WaterSourcesUnit: 1,
+        WaterSourcesCom: 1,
+      },
+    },
+    {
+      $out: "ResultNewDataEABKKClean",
+    }
+  ],
+  {
+    allowDiskUse: true,
+  }
+);
+
+// create result data areacode
+db.NewDataProcessDebug.aggregate([
+  {
+    $group: {
+      _id: "$Area_Code",
+      CubicMeterGroundWaterForAgriculture: {
+        $sum: "$CubicMeterGroundWaterForAgriculture",
+      },
+      CubicMeterGroundWaterForService: {
+        $sum: "$CubicMeterGroundWaterForService",
+      },
+      CubicMeterGroundWaterForProduct: {
+        $sum: "$CubicMeterGroundWaterForProduct",
+      },
+      CubicMeterGroundWaterForDrink: {
+        $sum: "$CubicMeterGroundWaterForDrink",
+      },
+      CubicMeterPlumbingForAgriculture: {
+        $sum: "$CubicMeterPlumbingForAgriculture",
+      },
+      CubicMeterPlumbingForService: {
+        $sum: "$CubicMeterPlumbingForService",
+      },
+      CubicMeterPlumbingForProduct: {
+        $sum: "$CubicMeterPlumbingForProduct",
+      },
+      CubicMeterPlumbingForDrink: {
+        $sum: "$CubicMeterPlumbingForDrink",
+      },
+      CubicMeterSurfaceForAgriculture: {
+        $sum: "$CubicMeterSurfaceForAgriculture",
+      },
+      CubicMeterSurfaceForService: {
+        $sum: "$CubicMeterSurfaceForService",
+      },
+      CubicMeterSurfaceForProduct: {
+        $sum: "$CubicMeterSurfaceForProduct",
+      },
+      CubicMeterSurfaceForDrink: {
+        $sum: "$CubicMeterSurfaceForDrink",
+      },
+      CubicMeterGroundWaterForUse: {
+        $sum: "$CubicMeterGroundWaterForUse",
+      },
+    },
+  },
+  {
+    $project: {
+      CubicMeterGroundWaterForAgriculture: 1,
+      CubicMeterGroundWaterForService: 1,
+      CubicMeterGroundWaterForProduct: 1,
+      CubicMeterGroundWaterForDrink: 1,
+      CubicMeterPlumbingForAgriculture: 1,
+      CubicMeterPlumbingForService: 1,
+      CubicMeterPlumbingForProduct: 1,
+      CubicMeterPlumbingForDrink: 1,
+      CubicMeterSurfaceForAgriculture: 1,
+      CubicMeterSurfaceForService: 1,
+      CubicMeterSurfaceForProduct: 1,
+      CubicMeterSurfaceForDrink: 1,
+      CubicMeterGroundWaterForUse: 1,
+      CountGroundWaterUnit: {
+        $toInt: 0,
+      },
+      CountGroundWaterCom: {
+        $toInt: 0,
+      },
+      WaterSourcesUnit: {
+        $toInt: 0,
+      },
+      WaterSourcesCom: {
+        $toInt: 0,
+      },
+    },
+  },
+  { $out: "ResultNewDataAreaCodeBKK" }
+]);
+
+// add field ResultNewDataAreaCode
+db.ResultNewDataAreaCodeBKK.aggregate(
+  [
+    {
+      $lookup: {
+        from: "ea",
+        localField: "_id",
+        foreignField: "Area_Code",
+        as: "dataEAInfo",
+      },
+    },
+    {
+      $unwind: {
+        path: "$dataEAInfo",
+        preserveNullAndEmptyArrays: true,
+      },
+    },
+    {
+      $project: {
+        REG: {
+          $ifNull: ["$dataEAInfo.REG", ""],
+        },
+        REG_NAME: {
+          $ifNull: ["$dataEAInfo.REG_NAME", ""],
+        },
+        CWT: {
+          $ifNull: ["$dataEAInfo.CWT", ""],
+        },
+        CWT_NAME: {
+          $ifNull: ["$dataEAInfo.CWT_NAME", ""],
+        },
+        AMP: {
+          $ifNull: ["$dataEAInfo.AMP", ""],
+        },
+        AMP_NAME: {
+          $ifNull: ["$dataEAInfo.AMP_NAME", ""],
+        },
+        TAM: {
+          $ifNull: ["$dataEAInfo.TAM", ""],
+        },
+        TAM_NAME: {
+          $ifNull: ["$dataEAInfo.TAM_NAME", ""],
+        },
+        CubicMeterGroundWaterForAgriculture: 1,
+        CubicMeterGroundWaterForService: 1,
+        CubicMeterGroundWaterForProduct: 1,
+        CubicMeterGroundWaterForDrink: 1,
+        CubicMeterPlumbingForAgriculture: 1,
+        CubicMeterPlumbingForService: 1,
+        CubicMeterPlumbingForProduct: 1,
+        CubicMeterPlumbingForDrink: 1,
+        CubicMeterSurfaceForAgriculture: 1,
+        CubicMeterSurfaceForService: 1,
+        CubicMeterSurfaceForProduct: 1,
+        CubicMeterSurfaceForDrink: 1,
+        CubicMeterGroundWaterForUse: 1,
+        CountGroundWaterUnit: 1,
+        CountGroundWaterCom: 1,
+        WaterSourcesUnit: 1,
+        WaterSourcesCom: 1,
+      },
+    },
+    {
+      $out: "ResultNewDataAreaCodeBKKClean",
+    }
+  ],
+  {
+    allowDiskUse: true,
+  }
+);
+
+// add field EaInfo
 db.NewDataProcessBKK.aggregate(
   [
     {
