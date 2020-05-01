@@ -12,6 +12,33 @@ db.NewDataProcessDebug.updateMany(
   }
 );
 
+//16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
+//17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
+db.NewDataProcessDebug.updateMany([
+  {
+    $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }],
+  },
+  {
+    $set: {
+      AvgWaterHeightCm: 0,
+      TimeWaterHeightCm: 0,
+    },
+  }
+]);
+
+//23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) -> 
+db.NewDataProcessDebug.updateMany([
+  {
+    SampleType : "c",
+    WaterSources : {$lt : 1260}
+  },
+  {
+    $set: {
+      WaterSources: 0
+    },
+  }
+]);
+
 // create result data EA
 db.NewDataProcessDebug.aggregate(
   [
@@ -154,7 +181,7 @@ db.NewDataProcessDebug.aggregate(
     },
     {
       $out: "ResultNewDataEABKK",
-    }
+    },
   ],
   {
     allowDiskUse: true,
@@ -259,7 +286,7 @@ db.ResultNewDataEABKK.aggregate(
     },
     {
       $out: "ResultNewDataEABKKClean",
-    }
+    },
   ],
   {
     allowDiskUse: true,
@@ -408,7 +435,7 @@ db.ResultNewDataAreaCodeBKK.aggregate(
     },
     {
       $out: "ResultNewDataAreaCodeBKKClean",
-    }
+    },
   ],
   {
     allowDiskUse: true,
@@ -680,7 +707,7 @@ db.NewDataProcessBKK.aggregate(
     },
     {
       $out: "NewDataProcessBKKClean",
-    }
+    },
   ],
   {
     allowDiskUse: true,
