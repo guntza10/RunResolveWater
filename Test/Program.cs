@@ -37,11 +37,11 @@ namespace Test
             // checkResolve.checkResolveHasntPlumbing();
 
             // run resolve dataProcess (ระดับ record)
-            // ResolveIsHouseHold();
+            // ResolveIsHouseHold(); Mongo
             // ResolveIsHouseHoldGoodPlumbing();
             // ResolveCountPopulationOver20000();
-            // ResolveAvgWaterHeightCmAndTimeWaterHeightCm();
-            // ResolveWaterSources();
+            // ResolveAvgWaterHeightCmAndTimeWaterHeightCm(); Mongo
+            // ResolveWaterSources(); Mongo
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
             // ResolveCountCommunity();
@@ -54,7 +54,7 @@ namespace Test
 
             // ResolveCountGroundWaterAndWaterSourcesEA();
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
-            GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
+            // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -486,7 +486,7 @@ namespace Test
             Console.WriteLine($"All Update done.");
         }
 
-        //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (do)
+        //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (do) -> ใช้ Mongo จะเร็วกว่า
         //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm (do)
         public static void ResolveAvgWaterHeightCmAndTimeWaterHeightCm()
         {
@@ -599,7 +599,7 @@ namespace Test
             Console.WriteLine("All Update Done!");
         }
 
-        //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do)
+        //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) -> ใช้ mongo
         public static void ResolveWaterSources()
         {
             var def = Builders<DataProcessed>.Update
