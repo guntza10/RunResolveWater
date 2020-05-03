@@ -25,10 +25,10 @@ namespace Test
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataProcess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
-            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcessDebug");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
-            collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEABKKClean");
-            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCodeBKK");
+            collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
+            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCodeClean");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
             collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
             // check error 

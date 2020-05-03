@@ -1,5 +1,5 @@
 // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do)
-db.NewDataProcessDebug.updateMany(
+db.NewDataProcess.updateMany(
   {
     SampleType: "u",
     IsHouseHold: 0,
@@ -14,7 +14,7 @@ db.NewDataProcessDebug.updateMany(
 
 //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
 //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
-db.NewDataProcessDebug.updateMany([
+db.NewDataProcess.updateMany([
   {
     $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }],
   },
@@ -27,7 +27,7 @@ db.NewDataProcessDebug.updateMany([
 ]);
 
 //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) -> 
-db.NewDataProcessDebug.updateMany([
+db.NewDataProcess.updateMany([
   {
     SampleType : "c",
     WaterSources : {$lt : 1260}
@@ -40,7 +40,7 @@ db.NewDataProcessDebug.updateMany([
 ]);
 
 // create result data EA
-db.NewDataProcessDebug.aggregate(
+db.NewDataProcess.aggregate(
   [
     {
       $group: {
@@ -180,8 +180,8 @@ db.NewDataProcessDebug.aggregate(
       },
     },
     {
-      $out: "ResultNewDataEABKK",
-    },
+      $out: "ResultNewDataEA",
+    }
   ],
   {
     allowDiskUse: true,
@@ -189,7 +189,7 @@ db.NewDataProcessDebug.aggregate(
 );
 
 // add field ResultNewDataEA
-db.ResultNewDataEABKK.aggregate(
+db.ResultNewDataEA.aggregate(
   [
     {
       $lookup: {
@@ -285,8 +285,8 @@ db.ResultNewDataEABKK.aggregate(
       },
     },
     {
-      $out: "ResultNewDataEABKKClean",
-    },
+      $out: "ResultNewDataEAClean",
+    }
   ],
   {
     allowDiskUse: true,
@@ -294,7 +294,7 @@ db.ResultNewDataEABKK.aggregate(
 );
 
 // create result data areacode
-db.NewDataProcessDebug.aggregate([
+db.NewDataProcess.aggregate([
   {
     $group: {
       _id: "$Area_Code",
@@ -368,11 +368,11 @@ db.NewDataProcessDebug.aggregate([
       },
     },
   },
-  { $out: "ResultNewDataAreaCodeBKK" }
+  { $out: "ResultNewDataAreaCode" }
 ]);
 
 // add field ResultNewDataAreaCode
-db.ResultNewDataAreaCodeBKK.aggregate(
+db.ResultNewDataAreaCode.aggregate(
   [
     {
       $lookup: {
@@ -434,8 +434,8 @@ db.ResultNewDataAreaCodeBKK.aggregate(
       },
     },
     {
-      $out: "ResultNewDataAreaCodeBKKClean",
-    },
+      $out: "ResultNewDataAreaCodeClean",
+    }
   ],
   {
     allowDiskUse: true,
@@ -443,7 +443,7 @@ db.ResultNewDataAreaCodeBKK.aggregate(
 );
 
 // add field EaInfo
-db.NewDataProcessBKK.aggregate(
+db.NewDataProcess.aggregate(
   [
     {
       $lookup: {
