@@ -713,3 +713,24 @@ db.NewDataProcess.aggregate(
     allowDiskUse: true,
   }
 );
+
+db.NewDataProcess.aggregate([
+  {
+    $match : {
+      $or : [
+        {
+          $and : [{ AvgWaterHeightCm: 0 },{ TimeWaterHeightCm: 1 }]
+        },
+        {
+           $and : [{ AvgWaterHeightCm: 1 },{ TimeWaterHeightCm: 0 }]
+        }
+      ]
+    }
+  },
+  {
+    $count : "countError"
+  },
+  {
+    $out : "checkResolveAvgWaterHeightCmAndTimeWaterHeightCm"
+  }
+])

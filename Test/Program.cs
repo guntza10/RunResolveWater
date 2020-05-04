@@ -44,7 +44,7 @@ namespace Test
             // ResolveWaterSources(); Mongo
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
-            // ResolveCountCommunity();
+            ResolveCountCommunity();
             // ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
@@ -641,8 +641,17 @@ namespace Test
 
             System.Console.WriteLine($"Qry listAmountCommu Done = {listAmountCommu.Count}");
 
-            var listEACommu = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
-            .Group(it => it.Area_Code, x => new
+            var dataArea = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            .Project(it => new
+            {
+                Area_Code = it.Area_Code,
+                EA = it.EA,
+                SampleType = it.SampleType
+            })
+            .ToList();
+
+            var listEACommu = dataArea.GroupBy(it => it.Area_Code)
+            .Select(x => new
             {
                 areaCode = x.Key,
                 listData = x.Select(it => new
