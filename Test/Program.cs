@@ -31,10 +31,11 @@ namespace Test
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCodeClean");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
             collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
-            // check error 
+            // // check error 
             // var checkResolve = new CheckResolve();
             // checkResolve.checkResolveIsHouseHold();
             // checkResolve.checkResolveHasntPlumbing();
+            // checkResolve.CheckTest();
 
             // run resolve dataProcess (ระดับ record)
             // ResolveIsHouseHold(); Mongo
@@ -44,7 +45,7 @@ namespace Test
             // ResolveWaterSources(); Mongo
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
-            ResolveCountCommunity();
+            // ResolveCountCommunity();
             // ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน

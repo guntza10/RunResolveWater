@@ -9,12 +9,14 @@ namespace Test
     {
         private static IMongoCollection<DataProcessed> collectionOldDataprocess { get; set; }
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
+        private static IMongoCollection<DataProcessed> collectionNewDataProcess { get; set; }
         public CheckResolve()
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataprocess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold
@@ -177,6 +179,34 @@ namespace Test
 
             Console.WriteLine($"dataAreaCom : {dataAreaCom.Count}");
             Console.WriteLine($"dataCheck : {dataCheck.Count}");
+        }
+
+        public void CheckTest()
+        {
+            var totalData = collectionNewDataProcess.Aggregate()
+             .Project(it => new
+             {
+                 EA = it.EA,
+                 SampleType = it.SampleType,
+                 CountGroundWater = it.CountGroundWater,
+                 WaterSources = it.WaterSources
+             })
+             .ToList();
+
+            var data = totalData.Where(it => it.EA == "21702082005003");
+
+            var dataUnit = data.Where(i => i.SampleType == "u").ToList();
+            var dataCom = data.Where(i => i.SampleType == "c").ToList();
+
+            var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
+            var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
+            var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
+            var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
+
+            Console.WriteLine($"countGroundWaterUnit :{countGroundWaterUnit}");
+            Console.WriteLine($"countGroundWaterCom :{countGroundWaterCom}");
+            Console.WriteLine($"waterSourcesUnit :{waterSourcesUnit}");
+            Console.WriteLine($"waterSourcesCom :{waterSourcesCom}");
         }
     }
 }
