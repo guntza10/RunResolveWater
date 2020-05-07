@@ -18,8 +18,13 @@ namespace Test
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
-        static IMongoCollection<EaInfomation> collectionEaData { get; set; }
-        static IMongoCollection<EaApproved> collectionEaApproved { get; set; }
+        private static IMongoCollection<ContainerEnlisted> collectionContainerEnlisted { get; set; }
+        private static IMongoCollection<EaInfomation> collectionEaData { get; set; }
+        private static IMongoCollection<EaApproved> collectionEaApproved { get; set; }
+        private static IMongoCollection<ContainerNotFound> collectionContainerNotFound { get; set; }
+        private static IMongoCollection<IndexInZip> collectionIndexInZip { get; set; }
+        private static IMongoCollection<SurveyData> collectionSurvey { get; set; }
+        private static IMongoCollection<Zip> collectionZip { get; set; }
         static void Main(string[] args)
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
@@ -31,6 +36,11 @@ namespace Test
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCodeClean");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
             collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
+            collectionContainerEnlisted = database.GetCollection<ContainerEnlisted>("containerEnlisted");
+            collectionContainerNotFound = database.GetCollection<ContainerNotFound>("containerNotFound");
+            collectionIndexInZip = database.GetCollection<IndexInZip>("IndexInZipFile");
+            collectionSurvey = database.GetCollection<SurveyData>("Survey");
+            collectionZip = database.GetCollection<Zip>("Zip");
             // // check error 
             // var checkResolve = new CheckResolve();
             // checkResolve.checkResolveIsHouseHold();
@@ -56,6 +66,8 @@ namespace Test
             // ResolveCountGroundWaterAndWaterSourcesEA();
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
+
+            // SetContainerNameForBlobNameNotFound();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1385,6 +1397,107 @@ namespace Test
                 Console.WriteLine($"total insert already : {countDataInsert} / {eaApproved.Count}");
             }
             Console.WriteLine("EaApproved Insert Done!");
+        }
+
+        public static void CreateBlobNotFound()
+        {
+            var listBlobNotFound = collectionContainerEnlisted.Aggregate()
+             .Match(it => it.IsFound == false)
+             .Project(it => new
+             {
+                 ListBlob = it.ListBlob
+             })
+             .ToList();
+
+            Console.WriteLine($"listBlobNotFound : {listBlobNotFound.Count}");
+
+            var dataWillInsert = listBlobNotFound.Select(it => it.ListBlob).ToList();
+
+            var count = 0;
+            var countInsert = 0;
+            dataWillInsert.ForEach(data =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {dataWillInsert.Count}");
+                var finalDataInsert = data.Select(it => new ContainerNotFound
+                {
+                    Id = it.Remove(it.IndexOf(".txt")),
+                    ContainerName = ""
+                })
+                .ToList();
+
+                collectionContainerNotFound.InsertMany(finalDataInsert);
+                countInsert += finalDataInsert.Count;
+                Console.WriteLine($"data insert already {countInsert}");
+            });
+        }
+
+        public static void SetContainerNameForBlobNameNotFound()
+        {
+            var zips = collectionZip.Find(it => true).ToList();
+
+            Console.WriteLine($"zips : {zips.Count}");
+
+            var dataNotFound = collectionContainerNotFound.Aggregate()
+           .Project(it => new
+           {
+               BlobName = it.Id
+           })
+           .ToList();
+
+            var listDataNotFound = dataNotFound.Select(it => it.BlobName).ToList();
+
+            Console.WriteLine($"listDataNotFound : {listDataNotFound.Count}");
+
+            var countZip = 0;
+
+            foreach (var data in zips.OrderByDescending(it => it.Id))
+            {
+                countZip++;
+                Console.WriteLine($"Round Zip : {countZip} / {zips.Count}");
+
+                var dataZip = collectionIndexInZip.Aggregate()
+                .Match(it => it.ZipName == data.Id)
+                .Project(it => new
+                {
+                    ContainerName = it.ContainerName,
+                    listBlob = it.Filelist
+                })
+                .ToList();
+
+                Console.WriteLine($"count data Zip {data.Id} : {dataZip.Count}");
+
+                var count = 0;
+                dataZip.ForEach(data2 =>
+                {
+                    count++;
+                    Console.WriteLine($"round data zip : {count} / {dataZip.Count} , round zip : {countZip}, now zip = {data.Id}");
+                    var blobInZip = listDataNotFound.Intersect(data2.listBlob).ToList();
+
+                    if (blobInZip.Any())
+                    {
+                        Console.WriteLine($"{data2.ContainerName} is found!");
+
+                        var def = Builders<ContainerNotFound>.Update
+                        .Set(it => it.ContainerName, data2.ContainerName);
+
+                        collectionContainerNotFound.UpdateMany(it => blobInZip.Contains(it.Id), def);
+
+                        listDataNotFound = listDataNotFound.Except(blobInZip).ToList();
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{data2.ContainerName} is not found!");
+                    }
+                    Console.WriteLine($"listDataNotFound left for update : {listDataNotFound.Count} / {dataNotFound.Count}");
+                });
+
+                if (!listDataNotFound.Any())
+                {
+                    break;
+                }
+            }
+            Console.WriteLine("Update All Done!");
         }
     }
 }
