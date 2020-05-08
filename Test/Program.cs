@@ -67,7 +67,10 @@ namespace Test
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
 
-            SetContainerNameForBlobNameNotFound();
+            // SetContainerNameForBlobNameNotFound();
+            // CheckHasntPlumbing();
+            // ResolveHasntPlumbingForResultDataEA();
+            // CheckHasntPlumbingForEA();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1499,6 +1502,127 @@ namespace Test
             }
             Console.WriteLine("Update All Done!");
         }
+
+        public static void CheckHasntPlumbing()
+        {
+            var data = collectionNewDataProcess.Aggregate()
+            .Project(it => new
+            {
+                IsHouseHold = it.IsHouseHold,
+                IsAgriculture = it.IsAgriculture,
+                IsAllFactorial = it.IsAllFactorial,
+                IsAllCommercial = it.IsAllCommercial,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            var dataNotG = data.Where(it => it.IsHouseHold == 0
+            && it.IsAgriculture == 0
+            && it.IsAllFactorial == 0
+            && it.IsAllCommercial == 0)
+            .ToList();
+            Console.WriteLine($"dataNotG : {dataNotG.Count}");
+
+            var dataNotGWrong = dataNotG.Where(it => it.HasntPlumbing > 0).ToList();
+            var dataNotCorrect = dataNotG.Where(it => it.HasntPlumbing == 0).ToList();
+            Console.WriteLine($"dataNotGWrong : {dataNotGWrong.Count}");
+            Console.WriteLine($"dataNotCorrect : {dataNotCorrect.Count}");
+
+            var dataSomeG = data.Where(it => it.IsHouseHold != 0 ||
+            it.IsAgriculture != 0 ||
+            it.IsAllFactorial != 0 ||
+            it.IsAllCommercial != 0)
+            .ToList();
+            Console.WriteLine($"dataSomeG : {dataSomeG.Count}");
+
+            var dataSomeGHasntPlumbing0 = dataSomeG.Where(it => it.HasntPlumbing == 0).ToList();
+            var dataSomeGHasntPlumbing0Resolve = dataSomeG.Where(it => it.HasntPlumbing == 12).ToList();
+            Console.WriteLine($"dataSomeGHasntPlumbing0 : {dataSomeGHasntPlumbing0.Count}");
+            Console.WriteLine($"dataSomeGHasntPlumbing0Resolve : {dataSomeGHasntPlumbing0Resolve.Count}");
+
+            var dataSomeGHasntPlumbing0between6 = dataSomeG.Where(it => it.HasntPlumbing > 0 && it.HasntPlumbing < 6).ToList();
+            var dataSomeGHasntPlumbing0between6Resolve = dataSomeG.Where(it => it.HasntPlumbing > 6 && it.HasntPlumbing < 12).ToList();
+            Console.WriteLine($"dataSomeGHasntPlumbing0between6 : {dataSomeGHasntPlumbing0between6.Count}");
+            Console.WriteLine($"dataSomeGHasntPlumbing0between6Resolve : {dataSomeGHasntPlumbing0between6Resolve.Count}");
+        }
+
+        public static void ResolveHasntPlumbingForResultDataEA()
+        {
+            var dataProcess = collectionNewDataProcess.Aggregate()
+            .Match(it => it.HasntPlumbing != 0 && it.IsAdditionalCom == false)
+            .Project(it => new
+            {
+                EA = it.EA,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            Console.WriteLine($"dataProcess : {dataProcess.Count}");
+
+            var dataEA = dataProcess.GroupBy(it => it.EA)
+            .Select(it => new
+            {
+                EA = it.Key,
+                Avg = it.Sum(x => x.HasntPlumbing) / it.Count()
+            })
+            .ToList();
+
+            Console.WriteLine($"dataEA : {dataEA.Count}");
+
+            var dataResultEA = collectionResultDataEA.Aggregate()
+            .Project(it => new
+            {
+                EA = it.Id
+            })
+            .ToList();
+
+            Console.WriteLine($"dataResultEA : {dataResultEA.Count}");
+
+            var count = 0;
+
+            dataResultEA.ForEach(data =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {dataResultEA.Count}");
+
+                var dataMatch = dataEA.FirstOrDefault(it => it.EA == data.EA);
+
+                var def = Builders<ResultDataEA>.Update
+                .Set(it => it.HasntPlumbing, dataMatch?.Avg ?? 0);
+                collectionResultDataEA.UpdateOne(it => it.Id == data.EA, def);
+            });
+
+            Console.WriteLine("Update All Done!");
+        }
+
+        public static void CheckHasntPlumbingForEA()
+        {
+            var dataResultEA = collectionResultDataEA.Aggregate()
+            .Project(it => new
+            {
+                EA = it.Id,
+                HasntPlumbing = it.HasntPlumbing
+            })
+            .ToList();
+
+            Console.WriteLine($"dataResultEA : {dataResultEA.Count}");
+
+            var hasntPlumbing0 = dataResultEA.Where(it => it.HasntPlumbing == 0).ToList();
+            Console.WriteLine($"hasntPlumbing0: {hasntPlumbing0.Count}");
+    
+            var hasntPlumbing0between6 = dataResultEA.Where(it => it.HasntPlumbing > 0 && it.HasntPlumbing < 6).ToList();
+            Console.WriteLine($"hasntPlumbing0between6: {hasntPlumbing0between6.Count}");
+      
+            var hasntPlumbing6between12 = dataResultEA.Where(it => it.HasntPlumbing > 6 && it.HasntPlumbing < 12).ToList();
+            Console.WriteLine($"hasntPlumbing6between12: {hasntPlumbing6between12.Count}");
+  
+            var hasntPlumbing12 = dataResultEA.Where(it => it.HasntPlumbing == 12).ToList();
+            Console.WriteLine($"hasntPlumbing12: {hasntPlumbing12.Count}");
+    
+            var total = hasntPlumbing0.Count + hasntPlumbing0between6.Count + hasntPlumbing6between12.Count + hasntPlumbing12.Count;
+            Console.WriteLine($"dataResultEA: {dataResultEA.Count}");
+            Console.WriteLine($"total: {total}");
+        }
     }
 }
 enum WeekDays
@@ -1544,3 +1668,6 @@ enum WeekDays
 //         Console.WriteLine(showLamp);
 //     }
 // }
+
+
+
