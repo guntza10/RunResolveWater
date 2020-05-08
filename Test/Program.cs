@@ -33,7 +33,7 @@ namespace Test
             collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
-            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCodeClean");
+            collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCode");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
             collectionEaApproved = database.GetCollection<EaApproved>("EaApproved");
             collectionContainerEnlisted = database.GetCollection<ContainerEnlisted>("containerEnlisted");
@@ -67,7 +67,7 @@ namespace Test
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
 
-            // SetContainerNameForBlobNameNotFound();
+            SetContainerNameForBlobNameNotFound();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
