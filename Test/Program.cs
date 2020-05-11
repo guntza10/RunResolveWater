@@ -71,6 +71,8 @@ namespace Test
             // CheckHasntPlumbing();
             // ResolveHasntPlumbingForResultDataEA();
             // CheckHasntPlumbingForEA();
+
+            // UpdateContainerForMissing();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1609,19 +1611,46 @@ namespace Test
 
             var hasntPlumbing0 = dataResultEA.Where(it => it.HasntPlumbing == 0).ToList();
             Console.WriteLine($"hasntPlumbing0: {hasntPlumbing0.Count}");
-    
+
             var hasntPlumbing0between6 = dataResultEA.Where(it => it.HasntPlumbing > 0 && it.HasntPlumbing < 6).ToList();
             Console.WriteLine($"hasntPlumbing0between6: {hasntPlumbing0between6.Count}");
-      
+
             var hasntPlumbing6between12 = dataResultEA.Where(it => it.HasntPlumbing > 6 && it.HasntPlumbing < 12).ToList();
             Console.WriteLine($"hasntPlumbing6between12: {hasntPlumbing6between12.Count}");
-  
+
             var hasntPlumbing12 = dataResultEA.Where(it => it.HasntPlumbing == 12).ToList();
             Console.WriteLine($"hasntPlumbing12: {hasntPlumbing12.Count}");
-    
+
             var total = hasntPlumbing0.Count + hasntPlumbing0between6.Count + hasntPlumbing6between12.Count + hasntPlumbing12.Count;
             Console.WriteLine($"dataResultEA: {dataResultEA.Count}");
             Console.WriteLine($"total: {total}");
+        }
+
+        public static void UpdateContainerForMissing()
+        {
+            var containerNotFound = collectionContainerNotFound.Aggregate()
+            .Match(it => it.ContainerName != "")
+            .ToList();
+
+            var groupContainer = containerNotFound.GroupBy(it => it.ContainerName)
+            .Select(it => new
+            {
+                Container = it.Key,
+                listBlob = it.Select(i => i.Id.Split(".").FirstOrDefault()).ToList()
+            })
+            .ToList();
+
+            groupContainer.ForEach(data =>
+            {
+                var listWrites = new List<WriteModel<SurveyData>>();
+                var filterDefinition = Builders<SurveyData>.Filter.Where(it => data.listBlob.Contains(it.SampleId));
+                var updateDefinition = Builders<SurveyData>.Update
+                .Set(it => it.ContainerName, data.Container);
+
+                listWrites.Add(new UpdateManyModel<SurveyData>(filterDefinition, updateDefinition));
+
+                collectionSurvey.BulkWrite(listWrites);
+            });
         }
     }
 }
