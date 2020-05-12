@@ -73,6 +73,8 @@ namespace Test
             // CheckHasntPlumbingForEA();
 
             // UpdateContainerForMissing();
+            var manageMl = new ManageDataMl();
+            manageMl.CreateCollectionT();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
