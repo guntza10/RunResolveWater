@@ -80,6 +80,7 @@ namespace Test
             //manageMl.CreateCollectionT();
 
             //SetTagLocationSampleID()
+            FindDataMissing();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1722,6 +1723,94 @@ namespace Test
                     Console.WriteLine($"{dataInsert.BlobName} Is Insert !");
                 }
             }
+        }
+        private static void FindDataMissing()
+        {
+            Console.WriteLine("FindDataMissing Processing.....");
+
+            var roundProcess = 0;
+            var skipSize = 0;
+            var limitSize = 100000;
+            var countFound = 0;
+            var countNotFound = 0;
+
+            Console.WriteLine("Query data ......");
+            var missingData = collectionContainerNotFound.Aggregate()
+                .Match(it => it.ContainerName == "")
+                .Project(it => new
+                {
+                    SampleId = it.Id
+                })
+                .ToList();
+            Console.WriteLine("Query data missing complete");
+            while (skipSize < missingData.Count)
+            {
+                roundProcess++;
+                Console.WriteLine($"Round {roundProcess}");
+                var misstingSampleID = missingData.Select(it => it.SampleId
+                .Split(".")
+                .FirstOrDefault())
+                    .Skip(skipSize)
+                    .Take(limitSize)
+                    .ToList();
+                Console.WriteLine("Sort data complete");
+                // error out size
+                var dataMatchInSurvey = collectionSurvey.Aggregate()
+                        .Match(it => misstingSampleID.Contains(it.SampleId))
+                        .Project(it => new
+                        {
+                            containerName = it.ContainerName
+                        })
+                        .ToList();
+                var currentContainer = dataMatchInSurvey.Select(it => it.containerName).Distinct().ToList();
+                var countContainerProcess = 0;
+
+                foreach (var container in currentContainer)
+                {
+                    countContainerProcess++;
+                       var finddatainIndex = collectionIndexInZip.Aggregate()
+                        .Match(it => it.ContainerName == container)
+                        .Project(it => new
+                        {
+                            containerName = it.ContainerName,
+                            ZipName = it.ZipName
+                        })
+                        .FirstOrDefault();
+                    if (finddatainIndex != null)
+                    {
+                        Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is Found !");
+                        countFound++;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is not Found !");
+                        countNotFound++;
+                    }
+                }
+                Console.WriteLine("Match data complete");
+                skipSize += 100000;
+            }
+            Console.WriteLine("Fetch data done !");
+            Console.WriteLine($"Data found : {countFound}");
+            Console.WriteLine($"Data not found : {countNotFound}");
+
+            //backup code 
+            //var dataMatchInSurvey = collectionSurvey.Aggregate()
+            //           .Match(it => misstingSampleID.Contains(it.SampleId))
+            //           .Project(it => new
+            //           {
+            //               SampleId = it.SampleId,
+            //               containerName = it.ContainerName,
+            //               userID = it.UserId
+            //           })
+            //           .ToList();
+            //Console.WriteLine("Match data complete");
+            //foreach (var item in dataMatchInSurvey)
+            //{
+            //    countProcess++;
+            //    Console.WriteLine($"{countProcess}/{missingData.Count} : {item.SampleId} Found at : {item.containerName} , Upload by {item.userID}");
+            //}
+            //skipSize += 100000;
         }
     }
 }
