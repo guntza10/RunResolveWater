@@ -25,6 +25,8 @@ namespace Test
         private static IMongoCollection<IndexInZip> collectionIndexInZip { get; set; }
         private static IMongoCollection<SurveyData> collectionSurvey { get; set; }
         private static IMongoCollection<Zip> collectionZip { get; set; }
+        public static IMongoCollection<LocationSampleID> collectionLocationSampleID { get; set; }
+
         static void Main(string[] args)
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
@@ -41,6 +43,7 @@ namespace Test
             collectionIndexInZip = database.GetCollection<IndexInZip>("IndexInZipFile");
             collectionSurvey = database.GetCollection<SurveyData>("Survey");
             collectionZip = database.GetCollection<Zip>("Zip");
+            collectionLocationSampleID = database.GetCollection<LocationSampleID>("LocationSampleID");
             // // check error 
             // var checkResolve = new CheckResolve();
             // checkResolve.checkResolveIsHouseHold();
@@ -75,6 +78,8 @@ namespace Test
             // UpdateContainerForMissing();
             var manageMl = new ManageDataMl();
             manageMl.CreateCollectionT();
+
+            //SetTagLocationSampleID()
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1653,6 +1658,66 @@ namespace Test
 
                 collectionSurvey.BulkWrite(listWrites);
             });
+        }
+
+        private static void SetTagLocationSampleID()
+        {
+            Console.WriteLine("SetTagLocationSampleID Process....");
+            var SurveyData = collectionSurvey.Aggregate()
+                .Match(it => it.Enlisted == true)
+                .ToList();
+            Console.WriteLine("Query data success");
+            var groupDataSurvey = SurveyData.GroupBy(it => it.ContainerName).ToList();
+            SurveyData.Clear();
+            var countProcess = 0;
+            var countContainer = 0;
+            foreach (var data in groupDataSurvey)
+            {
+                countContainer++;
+                   var IndexZip = collectionIndexInZip.Aggregate()
+                        .Match(it => it.ContainerName == data.Key)
+                        .Project(it => new
+                        {
+                            zip = it.ZipName
+                        })
+                        .ToList()
+                        .OrderByDescending(it => it.zip)
+                        .FirstOrDefault()?.zip;
+                var currentZipName = (!String.IsNullOrEmpty(IndexZip)) ? IndexZip : "";
+                foreach (var surveyCurrent in data)
+                {
+                    countProcess++;
+                    Console.WriteLine($"Container : {countContainer}/{groupDataSurvey.Count}, Blob : {countProcess}/{data.Count()} \n Now Process : {surveyCurrent.ContainerName}, BlobFile : {surveyCurrent.SampleId}");
+                    var dataInsert = new LocationSampleID()
+                    {
+                        _id = surveyCurrent._id,
+                        SampleId = surveyCurrent.SampleId,
+                        SampleType = surveyCurrent.SampleType,
+                        Name = surveyCurrent.Name,
+                        BuildingId = surveyCurrent.BuildingId,
+                        Province = surveyCurrent.Province,
+                        UserId = surveyCurrent.UserId,
+                        EA = surveyCurrent.EA,
+                        SrcUserId = surveyCurrent.SrcUserId,
+                        SrcEA = surveyCurrent.SrcEA,
+                        ContainerName = surveyCurrent.ContainerName,
+                        BlobName = surveyCurrent.BlobName,
+                        LastUpdate = surveyCurrent.LastUpdate,
+                        Status = surveyCurrent.Status,
+                        Accesses = surveyCurrent.Accesses,
+                        Enlisted = surveyCurrent.Enlisted,
+                        HasWarning = surveyCurrent.HasWarning,
+                        HasWarningWater = surveyCurrent.HasWarningWater,
+                        HasWarningMsg = surveyCurrent.HasWarningMsg,
+                        ResolutionId = surveyCurrent.ResolutionId,
+                        DeletionDateTime = surveyCurrent.DeletionDateTime,
+                        CreationDateTime = surveyCurrent.CreationDateTime,
+                        ZipLocation = currentZipName
+                    };
+                    collectionLocationSampleID.InsertOne(dataInsert);
+                    Console.WriteLine($"{dataInsert.BlobName} Is Insert !");
+                }
+            }
         }
     }
 }

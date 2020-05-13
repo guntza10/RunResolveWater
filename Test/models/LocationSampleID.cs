@@ -1,9 +1,11 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace Test.models
 {
-    public class SurveyData
+    public class LocationSampleID
     {
         public string _id { get; set; }
         public string SampleId { get; set; }
