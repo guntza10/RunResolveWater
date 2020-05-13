@@ -75,9 +75,9 @@ namespace Test
             // ResolveHasntPlumbingForResultDataEA();
             // CheckHasntPlumbingForEA();
 
-            // UpdateContainerForMissing();
-            var manageMl = new ManageDataMl();
-            manageMl.CreateCollectionT();
+            //UpdateContainerForMissing();
+            //var manageMl = new ManageDataMl();
+            //manageMl.CreateCollectionT();
 
             //SetTagLocationSampleID()
         }
@@ -1635,6 +1635,7 @@ namespace Test
 
         public static void UpdateContainerForMissing()
         {
+            Console.WriteLine("UpdateContainerForMissing Process.....");
             var containerNotFound = collectionContainerNotFound.Aggregate()
             .Match(it => it.ContainerName != "")
             .ToList();
@@ -1646,11 +1647,13 @@ namespace Test
                 listBlob = it.Select(i => i.Id.Split(".").FirstOrDefault()).ToList()
             })
             .ToList();
-
+            var countContainer = 0;
             groupContainer.ForEach(data =>
             {
+                countContainer++;
+                Console.WriteLine($"Round {countContainer}/{groupContainer.Count} : Now Container {data.Container}");
                 var listWrites = new List<WriteModel<SurveyData>>();
-                var filterDefinition = Builders<SurveyData>.Filter.Where(it => data.listBlob.Contains(it.SampleId));
+                var filterDefinition = Builders<SurveyData>.Filter.Where(it => it.ContainerName == data.Container && data.listBlob.Contains(it.SampleId));
                 var updateDefinition = Builders<SurveyData>.Update
                 .Set(it => it.ContainerName, data.Container);
 
@@ -1658,6 +1661,7 @@ namespace Test
 
                 collectionSurvey.BulkWrite(listWrites);
             });
+            Console.WriteLine("All Update done !!");
         }
 
         private static void SetTagLocationSampleID()
