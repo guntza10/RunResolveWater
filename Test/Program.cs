@@ -80,7 +80,8 @@ namespace Test
             //manageMl.CreateCollectionT();
 
             //SetTagLocationSampleID()
-            FindDataMissing();
+            // FindDataMissing();
+            FindAmoutEA();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1679,15 +1680,15 @@ namespace Test
             foreach (var data in groupDataSurvey)
             {
                 countContainer++;
-                   var IndexZip = collectionIndexInZip.Aggregate()
-                        .Match(it => it.ContainerName == data.Key)
-                        .Project(it => new
-                        {
-                            zip = it.ZipName
-                        })
-                        .ToList()
-                        .OrderByDescending(it => it.zip)
-                        .FirstOrDefault()?.zip;
+                var IndexZip = collectionIndexInZip.Aggregate()
+                     .Match(it => it.ContainerName == data.Key)
+                     .Project(it => new
+                     {
+                         zip = it.ZipName
+                     })
+                     .ToList()
+                     .OrderByDescending(it => it.zip)
+                     .FirstOrDefault()?.zip;
                 var currentZipName = (!String.IsNullOrEmpty(IndexZip)) ? IndexZip : "";
                 foreach (var surveyCurrent in data)
                 {
@@ -1724,6 +1725,7 @@ namespace Test
                 }
             }
         }
+
         private static void FindDataMissing()
         {
             Console.WriteLine("FindDataMissing Processing.....");
@@ -1768,14 +1770,14 @@ namespace Test
                 foreach (var container in currentContainer)
                 {
                     countContainerProcess++;
-                       var finddatainIndex = collectionIndexInZip.Aggregate()
-                        .Match(it => it.ContainerName == container)
-                        .Project(it => new
-                        {
-                            containerName = it.ContainerName,
-                            ZipName = it.ZipName
-                        })
-                        .FirstOrDefault();
+                    var finddatainIndex = collectionIndexInZip.Aggregate()
+                     .Match(it => it.ContainerName == container)
+                     .Project(it => new
+                     {
+                         containerName = it.ContainerName,
+                         ZipName = it.ZipName
+                     })
+                     .FirstOrDefault();
                     if (finddatainIndex != null)
                     {
                         Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is Found !");
@@ -1811,6 +1813,46 @@ namespace Test
             //    Console.WriteLine($"{countProcess}/{missingData.Count} : {item.SampleId} Found at : {item.containerName} , Upload by {item.userID}");
             //}
             //skipSize += 100000;
+        }
+
+        public static void FindAmoutEA()
+        {
+            var data = collectionContainerNotFound.Aggregate()
+             .Match(it => it.ContainerName != "")
+             .Project(it => new
+             {
+                 blobName = it.Id
+             })
+             .ToList();
+
+            var listBlobFounded = data.Select(it => it.blobName.Split(".").FirstOrDefault()).ToList();
+
+            var countRoundBlob = 0;
+            var countFounded = 0;
+            var listEA = new List<string>();
+            listBlobFounded.ForEach(blob =>
+            {
+                countRoundBlob++;
+                Console.WriteLine($"Round : {countRoundBlob} / {listBlobFounded.Count}");
+
+                var eaOfBlob = collectionSurvey.Aggregate()
+                .Match(it => it.SampleId == blob && it.Enlisted == true)
+                .Project(it => new
+                {
+                    EA = it.EA
+                })
+                .FirstOrDefault();
+
+                if (eaOfBlob != null)
+                {
+                    countFounded++;
+                    listEA.Add(eaOfBlob?.EA);
+                }
+            });
+
+            var finalEA = listEA.Distinct().ToList();
+            Console.WriteLine($"Total EA : {finalEA.Count}");
+            Console.WriteLine($"countFounded : {countFounded}");
         }
     }
 }
