@@ -1817,6 +1817,7 @@ namespace Test
 
         public static void FindAmoutEA()
         {
+            Console.WriteLine("FindAmoutEA Process...");
             var data = collectionContainerNotFound.Aggregate()
              .Match(it => it.ContainerName != "")
              .Project(it => new
@@ -1847,6 +1848,7 @@ namespace Test
                 {
                     countFounded++;
                     listEA.Add(eaOfBlob?.EA);
+                    Console.WriteLine($"{eaOfBlob.EA} is found !");
                 }
             });
 
