@@ -1970,7 +1970,7 @@ db.NewDataProcess.aggregate([
   }
 ]);
 
-//Test
+// create DataCanComputeCubicMeterPlumbingForDrinkForML
 db.NewDataProcess.aggregate([
   {
     $match: {
@@ -1978,12 +1978,126 @@ db.NewDataProcess.aggregate([
     }
   },
   {
-    $limit: 100
-  },
-  {
     $project: {
         SampleId: 1,
+        SampleType: 1,
         EA: 1,
+        Area_Code: 1,
+        REG: 1,
+        REG_NAME: 1,
+        CWT: 1,
+        CWT_NAME: 1,
+        AMP: 1,
+        AMP_NAME: 1,
+        TAM: 1,
+        TAM_NAME: 1,
+        Status: 1,
+        Count: 1,
+        CubicMeterPerMonth: 1,
+        WaterBill: 1,
+        PumpCount: 1,
+        PumpAuto: 1,
+        TurbidWater: 1,
+        SaltWater: 1,
+        Smell: 1,
+        FilmOfOil: 1,
+        FogWater: 1,
+        HardWater: 1,
+        Agriculture: 1,
+        Service: 1,
+        Product: 1,
+        Drink: 1,
+        Plant: 1,
+        Farm: 1,
+        DoingMWA: 1,
+        CubicMeterPerMonthMWA: 1,
+        WaterBillMWA: 1,
+        TurbidWaterMWA: 1,
+        SaltWaterMWA: 1,
+        SmellMWA: 1,
+        FilmOfOilMWA: 1,
+        FogWaterMWA: 1,
+        HardWaterMWA: 1,
+        AgricultureMWA: 1,
+        ServiceMWA: 1,
+        ProductMWA: 1,
+        DrinkMWA: 1,
+        PlantMWA: 1,
+        DoingPWA: 1,
+        CubicMeterPerMonthPWA: 1,
+        WaterBillPWA: 1,
+        TurbidWaterPWA: 1,
+        SaltWaterPWA: 1,
+        SmellPWA: 1,
+        FilmOfOilPWA: 1,
+        FogWaterPWA: 1,
+        HardWaterPWA: 1,
+        AgriculturePWA: 1,
+        ServicePWA: 1,
+        ProductPWA: 1,
+        DrinkPWA: 1,
+        PlantPWA: 1,
+        DoingOther: 1,
+        CubicMeterPerMonthOther: 1,
+        WaterBillOther: 1,
+        TurbidWaterOther: 1,
+        SaltWaterOther: 1,
+        SmellOther: 1,
+        FilmOfOilOther: 1,
+        FogWaterOther: 1,
+        HardWaterOther: 1,
+        AgricultureOther: 1,
+        ServiceOther: 1,
+        ProductOther: 1,
+        DrinkOther: 1,
+        PlantOther: 1,
+        MeterRentalFee: 1,
+        PlumbingPrice: 1,
+        PoolCount: 1,
+        WaterResourceCount: 1,
+        CubicMeterPerMonthPool: 1,
+        PumpCountPool: 1,
+        PumpAutoPool: 1,
+        SaltWaterPool: 1,
+        SmellPool: 1,
+        FilmOfOilPool: 1,
+        FogWaterPool: 1,
+        AgriculturePool: 1,
+        ServicePool: 1,
+        ProductPool: 1,
+        DrinkPool: 1,
+        PlantPool: 1,
+        FarmPool: 1,
+        CubicMeterPerMonthIrrigation: 1,
+        PumpCountIrrigation: 1,
+        PumpAutoIrrigation: 1,
+        SaltWaterIrrigation: 1,
+        SmellIrrigation: 1,
+        FilmOfOilIrrigation: 1,
+        FogWaterIrrigation: 1,
+        AgricultureIrrigation: 1,
+        ServiceIrrigation: 1,
+        ProductIrrigation: 1,
+        DrinkIrrigation: 1,
+        PlantIrrigation: 1,
+        FarmIrrigation: 1,
+        PumpCountRiver: 1,
+        PumpAutoRiver: 1,
+        SaltWaterRiver: 1,
+        SmellRiver: 1,
+        FilmOfOilRiver: 1,
+        FogWaterRiver: 1,
+        AgricultureRiver: 1,
+        ServiceRiver: 1,
+        ProductRiver: 1,
+        DrinkRiver: 1,
+        PlantRiver: 1,
+        FarmRiver: 1,
+        AgricultureRain: 1,
+        ServiceRain: 1,
+        ProductRain: 1,
+        DrinkRain: 1,
+        PlantRain: 1,
         CanComputeCubicMeterGroundWaterForAgriculture: 1,
         CanComputeCubicMeterGroundWaterForService: 1,
         CanComputeCubicMeterGroundWaterForProduct: 1,
@@ -1998,7 +2112,365 @@ db.NewDataProcess.aggregate([
         CanComputeCubicMeterSurfaceForDrink: 1,
         CanComputeCubicMeterGroundWaterForUse: 1,
         CanComputeCubicMeterForDrink: 1,
-        CubicMeterGroundWaterForAgricultureGroundWater: {
+        IsAgriculture: 1,
+        IsHouseHold: 1,
+        IsHouseHoldGoodPlumbing: 1,
+        IsAgricultureHasIrrigationField: 1,
+        IsHouseHoldHasPlumbingDistrict: 1,
+        IsHouseHoldHasPlumbingCountryside: 1,
+        IsFactorialWaterQuality: 1,
+        IsCommercialWaterQuality: 1,
+        CountGroundWater: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        IsFactorial: 1,
+        IsFactorialWaterTreatment: 1,
+        IsCommunityWaterManagementHasWaterTreatment: 1,
+        FieldCommunity: 1,
+        AvgWaterHeightCm: 1,
+        TimeWaterHeightCm: 1,
+        HasntPlumbing: 1,
+        IsGovernment: 1,
+        IsGovernmentUsage: 1,
+        IsGovernmentWaterQuality: 1,
+        CommunityNatureDisaster: 1,
+        WaterSources: 1,
+        IndustryHasWasteWaterTreatment: 1,
+        PeopleInFloodedArea: 1,
+        CubicMeterGroundWaterForAgricultureGroundWater: 1,
+        CubicMeterGroundWaterForAgricultureBuying: 1,
+        CubicMeterGroundWaterForAgriculture: 1,
+        CubicMeterGroundWaterForServiceGroundWater: 1,
+        CubicMeterGroundWaterForServiceBuying: 1,
+        CubicMeterGroundWaterForService: 1,
+        CubicMeterGroundWaterForProductGroundWater: 1,
+        CubicMeterGroundWaterForProductBuying: 1,
+        CubicMeterGroundWaterForProduct: 1,
+        CubicMeterGroundWaterForDrinkGroundWater: 1,
+        CubicMeterGroundWaterForDrinkBuying: 1,
+        CubicMeterGroundWaterForDrink: 1,
+        CubicMeterPlumbingForAgricultureMWA: 1,
+        CubicMeterPlumbingForAgriculturePWA: 1,
+        CubicMeterPlumbingForAgricultureOther: 1,
+        CubicMeterPlumbingForAgriculture: 1,
+        CubicMeterPlumbingForServiceMWA: 1,
+        CubicMeterPlumbingForServicePWA: 1,
+        CubicMeterPlumbingForServiceOther: 1,
+        CubicMeterPlumbingForService: 1,
+        CubicMeterPlumbingForProductMWA: 1,
+        CubicMeterPlumbingForProductPWA: 1,
+        CubicMeterPlumbingForProductOther: 1,
+        CubicMeterPlumbingForProduct: 1,
+        CubicMeterPlumbingForDrinkMWA: 1,
+        CubicMeterPlumbingForDrinkPWA: 1,
+        CubicMeterPlumbingForDrinkOther: 1,
+        CubicMeterPlumbingForDrink: 1,
+        CubicMeterSurfaceForAgriculturePool: 1,
+        CubicMeterSurfaceForAgricultureRiver: 1,
+        CubicMeterSurfaceForAgricultureIrrigation: 1,
+        CubicMeterSurfaceForAgricultureRain: 1,
+        CubicMeterSurfaceForAgriculture: 1,
+        CubicMeterSurfaceForServicePool: 1,
+        CubicMeterSurfaceForServiceRiver: 1,
+        CubicMeterSurfaceForServiceIrrigation: 1,
+        CubicMeterSurfaceForServiceRain: 1,
+        CubicMeterSurfaceForService: 1,
+        CubicMeterSurfaceForProductPool: 1,
+        CubicMeterSurfaceForProductRiver: 1,
+        CubicMeterSurfaceForProductIrrigation: 1,
+        CubicMeterSurfaceForProductRain: 1,
+        CubicMeterSurfaceForProduct: 1,
+        CubicMeterSurfaceForDrinkPool:  1,
+        CubicMeterSurfaceForDrinkRiver:  1,
+        CubicMeterSurfaceForDrinkIrrigation:  1,
+        CubicMeterSurfaceForDrinkRain:  1,
+        CubicMeterSurfaceForDrink:  1,
+        CubicMeterGroundWaterForUse: 1,
+        CountCommunity: 1,
+        CountCommunityHasDisaster: 1,
+        IsAllHouseHoldCountryside: 1,
+        IsAllHouseHoldDistrict: 1,
+        IsAllFactorial: 1,
+        IsAllCommercial: 1,
+        CubicMeterForDrink: 1,
+        Duplicate: 1,
+        AdjustedCubicMeterGroundWaterForAgriculture: 1,
+        AdjustedCubicMeterGroundWaterForService: 1,
+        AdjustedCubicMeterGroundWaterForProduct: 1,
+        AdjustedCubicMeterGroundWaterForDrink: 1,
+        AdjustedCubicMeterSurfaceForAgriculture: 1,
+        AdjustedCubicMeterSurfaceForService: 1,
+        AdjustedCubicMeterSurfaceForProduct: 1,
+        AdjustedCubicMeterSurfaceForDrink: 1,
+        AdjustedCubicMeterGroundWaterForUse: 1,
+        Road: 1,
+        IsAdditionalCom: 1
+    }
+  },
+  {
+    $out: "DataCanComputeCubicMeterPlumbingForDrinkForML"
+  }
+]);
+
+// create DataCanComputeCubicMeterSurfaceForProductForML
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      CanComputeCubicMeterSurfaceForProduct: "True"
+    }
+  },
+  {
+    $project: {
+        SampleId: 1,
+        SampleType: 1,
+        EA: 1,
+        Area_Code: 1,
+        REG: 1,
+        REG_NAME: 1,
+        CWT: 1,
+        CWT_NAME: 1,
+        AMP: 1,
+        AMP_NAME: 1,
+        TAM: 1,
+        TAM_NAME: 1,
+        Status: 1,
+        Count: 1,
+        CubicMeterPerMonth: 1,
+        WaterBill: 1,
+        PumpCount: 1,
+        PumpAuto: 1,
+        TurbidWater: 1,
+        SaltWater: 1,
+        Smell: 1,
+        FilmOfOil: 1,
+        FogWater: 1,
+        HardWater: 1,
+        Agriculture: 1,
+        Service: 1,
+        Product: 1,
+        Drink: 1,
+        Plant: 1,
+        Farm: 1,
+        DoingMWA: 1,
+        CubicMeterPerMonthMWA: 1,
+        WaterBillMWA: 1,
+        TurbidWaterMWA: 1,
+        SaltWaterMWA: 1,
+        SmellMWA: 1,
+        FilmOfOilMWA: 1,
+        FogWaterMWA: 1,
+        HardWaterMWA: 1,
+        AgricultureMWA: 1,
+        ServiceMWA: 1,
+        ProductMWA: 1,
+        DrinkMWA: 1,
+        PlantMWA: 1,
+        DoingPWA: 1,
+        CubicMeterPerMonthPWA: 1,
+        WaterBillPWA: 1,
+        TurbidWaterPWA: 1,
+        SaltWaterPWA: 1,
+        SmellPWA: 1,
+        FilmOfOilPWA: 1,
+        FogWaterPWA: 1,
+        HardWaterPWA: 1,
+        AgriculturePWA: 1,
+        ServicePWA: 1,
+        ProductPWA: 1,
+        DrinkPWA: 1,
+        PlantPWA: 1,
+        DoingOther: 1,
+        CubicMeterPerMonthOther: 1,
+        WaterBillOther: 1,
+        TurbidWaterOther: 1,
+        SaltWaterOther: 1,
+        SmellOther: 1,
+        FilmOfOilOther: 1,
+        FogWaterOther: 1,
+        HardWaterOther: 1,
+        AgricultureOther: 1,
+        ServiceOther: 1,
+        ProductOther: 1,
+        DrinkOther: 1,
+        PlantOther: 1,
+        MeterRentalFee: 1,
+        PlumbingPrice: 1,
+        PoolCount: 1,
+        WaterResourceCount: 1,
+        CubicMeterPerMonthPool: 1,
+        PumpCountPool: 1,
+        PumpAutoPool: 1,
+        SaltWaterPool: 1,
+        SmellPool: 1,
+        FilmOfOilPool: 1,
+        FogWaterPool: 1,
+        AgriculturePool: 1,
+        ServicePool: 1,
+        ProductPool: 1,
+        DrinkPool: 1,
+        PlantPool: 1,
+        FarmPool: 1,
+        CubicMeterPerMonthIrrigation: 1,
+        PumpCountIrrigation: 1,
+        PumpAutoIrrigation: 1,
+        SaltWaterIrrigation: 1,
+        SmellIrrigation: 1,
+        FilmOfOilIrrigation: 1,
+        FogWaterIrrigation: 1,
+        AgricultureIrrigation: 1,
+        ServiceIrrigation: 1,
+        ProductIrrigation: 1,
+        DrinkIrrigation: 1,
+        PlantIrrigation: 1,
+        FarmIrrigation: 1,
+        PumpCountRiver: 1,
+        PumpAutoRiver: 1,
+        SaltWaterRiver: 1,
+        SmellRiver: 1,
+        FilmOfOilRiver: 1,
+        FogWaterRiver: 1,
+        AgricultureRiver: 1,
+        ServiceRiver: 1,
+        ProductRiver: 1,
+        DrinkRiver: 1,
+        PlantRiver: 1,
+        FarmRiver: 1,
+        AgricultureRain: 1,
+        ServiceRain: 1,
+        ProductRain: 1,
+        DrinkRain: 1,
+        PlantRain: 1,
+        CanComputeCubicMeterGroundWaterForAgriculture: 1,
+        CanComputeCubicMeterGroundWaterForService: 1,
+        CanComputeCubicMeterGroundWaterForProduct: 1,
+        CanComputeCubicMeterGroundWaterForDrink: 1,
+        CanComputeCubicMeterPlumbingForAgriculture: 1,
+        CanComputeCubicMeterPlumbingForService: 1,
+        CanComputeCubicMeterPlumbingForProduct: 1,
+        CanComputeCubicMeterPlumbingForDrink: 1, 
+        CanComputeCubicMeterSurfaceForAgriculture: 1,
+        CanComputeCubicMeterSurfaceForService: 1,
+        CanComputeCubicMeterSurfaceForProduct: 1,
+        CanComputeCubicMeterSurfaceForDrink: 1,
+        CanComputeCubicMeterGroundWaterForUse: 1,
+        CanComputeCubicMeterForDrink: 1,
+        IsAgriculture: 1,
+        IsHouseHold: 1,
+        IsHouseHoldGoodPlumbing: 1,
+        IsAgricultureHasIrrigationField: 1,
+        IsHouseHoldHasPlumbingDistrict: 1,
+        IsHouseHoldHasPlumbingCountryside: 1,
+        IsFactorialWaterQuality: 1,
+        IsCommercialWaterQuality: 1,
+        CountGroundWater: 1,
+        CountPopulation: 1,
+        CountWorkingAge: 1,
+        IsFactorial: 1,
+        IsFactorialWaterTreatment: 1,
+        IsCommunityWaterManagementHasWaterTreatment: 1,
+        FieldCommunity: 1,
+        AvgWaterHeightCm: 1,
+        TimeWaterHeightCm: 1,
+        HasntPlumbing: 1,
+        IsGovernment: 1,
+        IsGovernmentUsage: 1,
+        IsGovernmentWaterQuality: 1,
+        CommunityNatureDisaster: 1,
+        WaterSources: 1,
+        IndustryHasWasteWaterTreatment: 1,
+        PeopleInFloodedArea: 1,
+        CubicMeterGroundWaterForAgricultureGroundWater: 1,
+        CubicMeterGroundWaterForAgricultureBuying: 1,
+        CubicMeterGroundWaterForAgriculture: 1,
+        CubicMeterGroundWaterForServiceGroundWater: 1,
+        CubicMeterGroundWaterForServiceBuying: 1,
+        CubicMeterGroundWaterForService: 1,
+        CubicMeterGroundWaterForProductGroundWater: 1,
+        CubicMeterGroundWaterForProductBuying: 1,
+        CubicMeterGroundWaterForProduct: 1,
+        CubicMeterGroundWaterForDrinkGroundWater: 1,
+        CubicMeterGroundWaterForDrinkBuying: 1,
+        CubicMeterGroundWaterForDrink: 1,
+        CubicMeterPlumbingForAgricultureMWA: 1,
+        CubicMeterPlumbingForAgriculturePWA: 1,
+        CubicMeterPlumbingForAgricultureOther: 1,
+        CubicMeterPlumbingForAgriculture: 1,
+        CubicMeterPlumbingForServiceMWA: 1,
+        CubicMeterPlumbingForServicePWA: 1,
+        CubicMeterPlumbingForServiceOther: 1,
+        CubicMeterPlumbingForService: 1,
+        CubicMeterPlumbingForProductMWA: 1,
+        CubicMeterPlumbingForProductPWA: 1,
+        CubicMeterPlumbingForProductOther: 1,
+        CubicMeterPlumbingForProduct: 1,
+        CubicMeterPlumbingForDrinkMWA: 1,
+        CubicMeterPlumbingForDrinkPWA: 1,
+        CubicMeterPlumbingForDrinkOther: 1,
+        CubicMeterPlumbingForDrink: 1,
+        CubicMeterSurfaceForAgriculturePool: 1,
+        CubicMeterSurfaceForAgricultureRiver: 1,
+        CubicMeterSurfaceForAgricultureIrrigation: 1,
+        CubicMeterSurfaceForAgricultureRain: 1,
+        CubicMeterSurfaceForAgriculture: 1,
+        CubicMeterSurfaceForServicePool: 1,
+        CubicMeterSurfaceForServiceRiver: 1,
+        CubicMeterSurfaceForServiceIrrigation: 1,
+        CubicMeterSurfaceForServiceRain: 1,
+        CubicMeterSurfaceForService: 1,
+        CubicMeterSurfaceForProductPool: 1,
+        CubicMeterSurfaceForProductRiver: 1,
+        CubicMeterSurfaceForProductIrrigation: 1,
+        CubicMeterSurfaceForProductRain: 1,
+        CubicMeterSurfaceForProduct: 1,
+        CubicMeterSurfaceForDrinkPool:  1,
+        CubicMeterSurfaceForDrinkRiver:  1,
+        CubicMeterSurfaceForDrinkIrrigation:  1,
+        CubicMeterSurfaceForDrinkRain:  1,
+        CubicMeterSurfaceForDrink:  1,
+        CubicMeterGroundWaterForUse: 1,
+        CountCommunity: 1,
+        CountCommunityHasDisaster: 1,
+        IsAllHouseHoldCountryside: 1,
+        IsAllHouseHoldDistrict: 1,
+        IsAllFactorial: 1,
+        IsAllCommercial: 1,
+        CubicMeterForDrink: 1,
+        Duplicate: 1,
+        AdjustedCubicMeterGroundWaterForAgriculture: 1,
+        AdjustedCubicMeterGroundWaterForService: 1,
+        AdjustedCubicMeterGroundWaterForProduct: 1,
+        AdjustedCubicMeterGroundWaterForDrink: 1,
+        AdjustedCubicMeterSurfaceForAgriculture: 1,
+        AdjustedCubicMeterSurfaceForService: 1,
+        AdjustedCubicMeterSurfaceForProduct: 1,
+        AdjustedCubicMeterSurfaceForDrink: 1,
+        AdjustedCubicMeterGroundWaterForUse: 1,
+        Road: 1,
+        IsAdditionalCom: 1
+    }
+  },
+  {
+    $out: "DataCanComputeCubicMeterSurfaceForProductForML"
+  }
+]);
+
+// create test data for manage ML
+db.DataCanComputeCubicMeterPlumbingForDrinkForML.aggregate([
+  {
+    $limit : 20
+  },
+  {
+    $out : "TestData1"
+  }
+]);
+
+// base manage ML
+db.TestData1.updateMany(
+  {},
+  [
+    { 
+      $set: {
+       CubicMeterGroundWaterForAgricultureGroundWater: {
           $cond: {
             if: {
               $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
@@ -2006,7 +2478,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForAgricultureGroundWater"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForAgricultureBuying: {
           $cond: {
             if: {
@@ -2015,8 +2491,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForAgricultureBuying"
           }
-        },
-        CubicMeterGroundWaterForAgriculture: {
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterGroundWaterForAgriculture: {
           $cond: {
             if: {
               $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
@@ -2024,7 +2504,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForAgriculture"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForServiceGroundWater: {
           $cond: {
             if: {
@@ -2033,8 +2517,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForServiceGroundWater"
           }
-        },
-        CubicMeterGroundWaterForServiceBuying: {
+        }
+      }
+    },
+    {
+      $set: {
+       CubicMeterGroundWaterForServiceBuying: {
           $cond: {
             if: {
               $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
@@ -2042,8 +2530,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForServiceBuying"
           }
-        },
-        CubicMeterGroundWaterForService: {
+        }
+      }
+    },
+    {
+      $set: {
+       CubicMeterGroundWaterForService: {
           $cond: {
             if: {
               $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
@@ -2051,7 +2543,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForService"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForProductGroundWater: {
           $cond: {
             if: {
@@ -2060,7 +2556,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForProductGroundWater"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForProductBuying: {
           $cond: {
             if: {
@@ -2069,7 +2569,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForProductBuying"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForProduct: {
           $cond: {
             if: {
@@ -2078,7 +2582,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForProduct"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForDrinkGroundWater: {
           $cond: {
             if: {
@@ -2087,7 +2595,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForDrinkGroundWater"
           }
-        },
+        }  
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForDrinkBuying: {
           $cond: {
             if: {
@@ -2096,7 +2608,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForDrinkBuying"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterGroundWaterForDrink: {
           $cond: {
             if: {
@@ -2105,7 +2621,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterGroundWaterForDrink"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForAgricultureMWA: {
           $cond: {
             if: {
@@ -2114,8 +2634,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForAgricultureMWA"
           }
-        },
-        CubicMeterPlumbingForAgriculturePWA: {
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForAgriculturePWA: {
           $cond: {
             if: {
               $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
@@ -2123,7 +2647,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForAgriculturePWA"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForAgricultureOther: {
           $cond: {
             if: {
@@ -2132,8 +2660,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForAgricultureOther"
           }
-        },
-        CubicMeterPlumbingForAgriculture: {
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForAgriculture: {
           $cond: {
             if: {
               $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
@@ -2141,7 +2673,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForAgriculture"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForServiceMWA: {
           $cond: {
             if: {
@@ -2150,8 +2686,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForServiceMWA"
           }
-        },
-        CubicMeterPlumbingForServicePWA: {
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForServicePWA: {
           $cond: {
             if: {
               $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
@@ -2159,7 +2699,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForServicePWA"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForServiceOther: {
           $cond: {
             if: {
@@ -2168,7 +2712,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForServiceOther"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForService: {
           $cond: {
             if: {
@@ -2177,7 +2725,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForService"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForProductMWA: {
           $cond: {
             if: {
@@ -2186,7 +2738,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForProductMWA"
           }
-        },
+        } 
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForProductPWA: {
           $cond: {
             if: {
@@ -2195,7 +2751,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForProductPWA"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForProductOther: {
           $cond: {
             if: {
@@ -2204,7 +2764,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForProductOther"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterPlumbingForProduct: {
           $cond: {
             if: {
@@ -2213,11 +2777,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterPlumbingForProduct"
           }
-        },
-        CubicMeterPlumbingForDrinkMWA: 1,
-        CubicMeterPlumbingForDrinkPWA: 1,
-        CubicMeterPlumbingForDrinkOther: 1,
-        CubicMeterPlumbingForDrink: 1,
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterSurfaceForAgriculturePool: {
           $cond: {
             if: {
@@ -2226,7 +2790,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForAgriculturePool"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterSurfaceForAgricultureRiver: {
           $cond: {
             if: {
@@ -2235,7 +2803,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForAgricultureRiver"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterSurfaceForAgricultureIrrigation: {
           $cond: {
             if: {
@@ -2244,8 +2816,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForAgricultureIrrigation"
           }
-        },
-        CubicMeterSurfaceForAgricultureRain: {
+        } 
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForAgricultureRain: {
           $cond: {
             if: {
               $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
@@ -2253,7 +2829,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForAgricultureRain"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterSurfaceForAgriculture: {
           $cond: {
             if: {
@@ -2262,8 +2842,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForAgriculture"
           }
-        },
-        CubicMeterSurfaceForServicePool: {
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForServicePool: {
           $cond: {
             if: {
               $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
@@ -2271,7 +2855,11 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForServicePool"
           }
-        },
+        }
+      }
+    },
+    {
+      $set: {
         CubicMeterSurfaceForServiceRiver: {
           $cond: {
             if: {
@@ -2280,8 +2868,12 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForServiceRiver"
           }
-        },
-        CubicMeterSurfaceForServiceIrrigation: {
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForServiceIrrigation: {
           $cond: {
             if: {
               $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
@@ -2289,136 +2881,191 @@ db.NewDataProcess.aggregate([
             then: null,
             else: "$CubicMeterSurfaceForServiceIrrigation"
           }
-        },
-        // CubicMeterSurfaceForServiceRain: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForServiceRain"
-        //   }
-        // },
-        // CubicMeterSurfaceForService: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForService"
-        //   }
-        // },
-        // CubicMeterSurfaceForProductPool: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForProductPool"
-        //   }
-        // },
-        // CubicMeterSurfaceForProductRiver: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForProductRiver"
-        //   }
-        // },
-        // CubicMeterSurfaceForProductIrrigation: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForProductIrrigation"
-        //   }
-        // },
-        // CubicMeterSurfaceForProductRain: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForProductRain"
-        //   }
-        // },
-        // CubicMeterSurfaceForProduct: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForProduct"
-        //   }
-        // },
-        // CubicMeterSurfaceForDrinkPool:  {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForDrinkPool"
-        //   }
-        // },
-        // CubicMeterSurfaceForDrinkRiver:  {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForDrinkRiver"
-        //   }
-        // },
-        // CubicMeterSurfaceForDrinkIrrigation:  {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForDrinkIrrigation"
-        //   }
-        // },
-        // CubicMeterSurfaceForDrinkRain:  {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForDrinkRain"
-        //   }
-        // },
-        // CubicMeterSurfaceForDrink:  {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterSurfaceForDrink"
-        //   }
-        // },
-        // CubicMeterGroundWaterForUse: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterGroundWaterForUse"
-        //   }
-        // },
-        // CubicMeterForDrink: {
-        //   $cond: {
-        //     if: {
-        //       $or: [{ $eq: ["$CanComputeCubicMeterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterForDrink" , "NA"] }]
-        //     },
-        //     then: null,
-        //     else: "$CubicMeterForDrink"
-        //   }
-        // }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForServiceRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForService: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProductPool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductPool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProductRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForProductIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForProductRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProduct: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrinkPool:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkPool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForDrinkRiver:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForDrinkIrrigation:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrinkRain:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrink:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrink"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForUse: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForUse"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterForDrink: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterForDrink"
+          }
+        }
+      }
     }
-  },
-  {
-    $out: "TestForML"
-  }
-]);
+  ]
+);
+

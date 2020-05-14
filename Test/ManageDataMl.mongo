@@ -1,0 +1,1671 @@
+// update DataCanComputeCubicMeterPlumbingForDrinkForML
+db.DataCanComputeCubicMeterPlumbingForDrinkForML.updateMany(
+  {},
+  [
+    { 
+      $set: {
+       CubicMeterGroundWaterForAgricultureGroundWater: {
+          $cond: {
+            if: {
+              $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForAgricultureGroundWater"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForAgricultureBuying: {
+          $cond: {
+            if: {
+              $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForAgricultureBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterGroundWaterForAgriculture: {
+          $cond: {
+            if: {
+              $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForAgriculture"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForServiceGroundWater: {
+          $cond: {
+            if: {
+              $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForServiceGroundWater"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+       CubicMeterGroundWaterForServiceBuying: {
+          $cond: {
+            if: {
+              $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForServiceBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+       CubicMeterGroundWaterForService: {
+          $cond: {
+            if: {
+              $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForProductGroundWater: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForProductGroundWater"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForProductBuying: {
+          $cond: {
+            if: {
+              $or:[{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForProductBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForProduct: {
+          $cond: {
+            if: {
+              $or:[{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForDrinkGroundWater: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForDrinkGroundWater"
+          }
+        }  
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForDrinkBuying: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForDrinkBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForDrink: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForDrink"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForAgricultureMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgricultureMWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForAgriculturePWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgriculturePWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForAgricultureOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgricultureOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForAgriculture: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgriculture"
+          }
+        }
+      }
+    }
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForServiceMWA: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForServiceMWA"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterPlumbingForServicePWA: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForServicePWA"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForServiceOther: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForServiceOther"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForService: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForService"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForProductMWA: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForProductMWA"
+    //       }
+    //     } 
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForProductPWA: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForProductPWA"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForProductOther: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForProductOther"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterPlumbingForProduct: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterPlumbingForProduct"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForAgriculturePool: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForAgriculturePool"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForAgricultureRiver: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForAgricultureRiver"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForAgricultureIrrigation: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForAgricultureIrrigation"
+    //       }
+    //     } 
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForAgricultureRain: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForAgricultureRain"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForAgriculture: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForAgriculture"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForServicePool: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForServicePool"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForServiceRiver: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForServiceRiver"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForServiceIrrigation: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForServiceIrrigation"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForServiceRain: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForServiceRain"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForService: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForService"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForProductPool: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForProductPool"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForProductRiver: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForProductRiver"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForProductIrrigation: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForProductIrrigation"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForProductRain: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForProductRain"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForProduct: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForProduct"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForDrinkPool:  {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForDrinkPool"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForDrinkRiver:  {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForDrinkRiver"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterSurfaceForDrinkIrrigation:  {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForDrinkIrrigation"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForDrinkRain:  {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForDrinkRain"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //      CubicMeterSurfaceForDrink:  {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterSurfaceForDrink"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterGroundWaterForUse: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterGroundWaterForUse"
+    //       }
+    //     }
+    //   }
+    // },
+    // {
+    //   $set: {
+    //     CubicMeterForDrink: {
+    //       $cond: {
+    //         if: {
+    //           $or: [{ $eq: ["$CanComputeCubicMeterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterForDrink" , "NA"] }]
+    //         },
+    //         then: null,
+    //         else: "$CubicMeterForDrink"
+    //       }
+    //     }
+    //   }
+    // }
+  ]
+);
+db.DataCanComputeCubicMeterPlumbingForDrinkForML.updateMany(
+  {},
+  [
+    {
+      $set: {
+        CubicMeterPlumbingForServiceMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForServiceMWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForServicePWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForServicePWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForServiceOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForServiceOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForService: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProductMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProductMWA"
+          }
+        } 
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProductPWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProductPWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProductOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProductOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProduct: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgriculturePool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgriculturePool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgricultureRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgricultureRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgricultureIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgricultureIrrigation"
+          }
+        } 
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForAgricultureRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgricultureRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgriculture: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgriculture"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForServicePool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServicePool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForServiceRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForServiceIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForServiceRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForService: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProductPool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductPool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProductRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForProductIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForProductRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProduct: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrinkPool:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkPool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForDrinkRiver:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForDrinkIrrigation:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrinkRain:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrink:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrink"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForUse: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForUse"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterForDrink: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterForDrink"
+          }
+        }
+      }
+    }
+  ]
+);
+
+// update DataCanComputeCubicMeterSurfaceForProductForML
+db.DataCanComputeCubicMeterSurfaceForProductForML.updateMany(
+  {},
+  [
+    { 
+      $set: {
+       CubicMeterGroundWaterForAgricultureGroundWater: {
+          $cond: {
+            if: {
+              $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForAgricultureGroundWater"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForAgricultureBuying: {
+          $cond: {
+            if: {
+              $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForAgricultureBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterGroundWaterForAgriculture: {
+          $cond: {
+            if: {
+              $or: [ {$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "False"]},{$eq: ["$CanComputeCubicMeterGroundWaterForAgriculture" , "NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForAgriculture"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForServiceGroundWater: {
+          $cond: {
+            if: {
+              $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForServiceGroundWater"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+       CubicMeterGroundWaterForServiceBuying: {
+          $cond: {
+            if: {
+              $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForServiceBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+       CubicMeterGroundWaterForService: {
+          $cond: {
+            if: {
+              $or: [ { $eq: ["$CanComputeCubicMeterGroundWaterForService","False"] },{$eq: ["$CanComputeCubicMeterGroundWaterForService" ,"NA"]}]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForProductGroundWater: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForProductGroundWater"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForProductBuying: {
+          $cond: {
+            if: {
+              $or:[{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForProductBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForProduct: {
+          $cond: {
+            if: {
+              $or:[{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForDrinkGroundWater: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForDrinkGroundWater"
+          }
+        }  
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForDrinkBuying: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForDrinkBuying"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForDrink: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForDrink"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForAgricultureMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgricultureMWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForAgriculturePWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgriculturePWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForAgricultureOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgricultureOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForAgriculture: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForAgriculture"
+          }
+        }
+      }
+    }
+  ]
+);
+db.DataCanComputeCubicMeterSurfaceForProductForML.updateMany(
+  {},
+  [
+    {
+      $set: {
+        CubicMeterPlumbingForServiceMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForServiceMWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterPlumbingForServicePWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForServicePWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForServiceOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForServiceOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForService: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProductMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProductMWA"
+          }
+        } 
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProductPWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProductPWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProductOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProductOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForProduct: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgriculturePool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgriculturePool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgricultureRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgricultureRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgricultureIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgricultureIrrigation"
+          }
+        } 
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForAgricultureRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgricultureRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForAgriculture: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForAgriculture" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForAgriculture"
+          }
+        }
+      }
+    }
+  ]
+);
+db.DataCanComputeCubicMeterSurfaceForProductForML.updateMany(
+  {},
+  [
+    {
+      $set: {
+         CubicMeterSurfaceForServicePool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServicePool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForServiceRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForServiceIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForServiceRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForServiceRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForService: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForService" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForService"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProductPool: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductPool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProductRiver: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForProductIrrigation: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForProductRain: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProductRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForProduct: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForProduct" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForProduct"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrinkPool:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkPool"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForDrinkRiver:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkRiver"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterSurfaceForDrinkIrrigation:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkIrrigation"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrinkRain:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrinkRain"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+         CubicMeterSurfaceForDrink:  {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterSurfaceForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterSurfaceForDrink"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterGroundWaterForUse: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "False"] },{ $eq: ["$CanComputeCubicMeterGroundWaterForUse" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterGroundWaterForUse"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterForDrink: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterForDrink"
+          }
+        }
+      }
+    }
+  ]
+);
+db.DataCanComputeCubicMeterSurfaceForProductForML.updateMany(
+  {},
+  [
+    {
+      $set: {
+        CubicMeterPlumbingForDrinkMWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForDrinkMWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForDrinkPWA: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForDrinkPWA"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForDrinkOther: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForDrinkOther"
+          }
+        }
+      }
+    },
+    {
+      $set: {
+        CubicMeterPlumbingForDrink: {
+          $cond: {
+            if: {
+              $or: [{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "False"] },{ $eq: ["$CanComputeCubicMeterPlumbingForDrink" , "NA"] }]
+            },
+            then: null,
+            else: "$CubicMeterPlumbingForDrink"
+          }
+        }
+      }
+    }
+  ]
+);
