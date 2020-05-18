@@ -31,7 +31,7 @@ namespace Test
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
-            collectionOldDataProcess = database.GetCollection<DataProcessed>("NewDataProcessBKK");
+            collectionOldDataProcess = database.GetCollection<DataProcessed>("OldDataProcess");
             collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
@@ -81,7 +81,7 @@ namespace Test
 
             //SetTagLocationSampleID()
             // FindDataMissing();
-            FindAmoutEA();
+            InsertMissingData();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1815,46 +1815,53 @@ namespace Test
             //skipSize += 100000;
         }
 
-        public static void FindAmoutEA()
+        public static void InsertMissingData()
         {
-            Console.WriteLine("FindAmoutEA Process...");
+            Console.WriteLine("Start InsertMissingData");
+
             var data = collectionContainerNotFound.Aggregate()
-             .Match(it => it.ContainerName != "")
-             .Project(it => new
-             {
-                 blobName = it.Id
-             })
-             .ToList();
-
-            var listBlobFounded = data.Select(it => it.blobName.Split(".").FirstOrDefault()).ToList();
-
-            var countRoundBlob = 0;
-            var countFounded = 0;
-            var listEA = new List<string>();
-            listBlobFounded.ForEach(blob =>
+            .Match(it => it.ContainerName == "")
+            .Project(it => new
             {
-                countRoundBlob++;
-                Console.WriteLine($"Round : {countRoundBlob} / {listBlobFounded.Count}");
+                blobName = it.Id
+            })
+            .ToList();
 
-                var eaOfBlob = collectionSurvey.Aggregate()
-                .Match(it => it.SampleId == blob && it.Enlisted == true)
-                .Project(it => new
-                {
-                    EA = it.EA
-                })
-                .FirstOrDefault();
+            var listBlob = data.Select(it => it.blobName.Split(".").FirstOrDefault()).ToList();
 
-                if (eaOfBlob != null)
+            var count = 0;
+            // var countInsert = 0;
+            var countMatch = 0;
+            var countNotMatch = 0;
+            listBlob.ForEach(blob =>
+            {
+                count++;
+                Console.WriteLine($"Round : {count} / {listBlob.Count} , SampleId = {blob}");
+                var dataMissing = collectionOldDataProcess.Find(it => it.SampleId == blob).ToList();
+
+                // var countSampleId = 0;
+
+                if (dataMissing.Any())
                 {
-                    countFounded++;
-                    listEA.Add(eaOfBlob?.EA);
-                    Console.WriteLine($"{eaOfBlob.EA} is found !");
+                    countMatch++;
+                    // dataMissing.ForEach(missingData =>
+                    // {
+                    //     countSampleId++;
+                    //     Console.WriteLine($"insert : {countSampleId} / {dataMissing.Count}");
+                    //     collectionNewDataProcess.InsertOne(missingData);
+                    //     countInsert++;
+                    // });
+                }
+                else
+                {
+                    countNotMatch++;
                 }
             });
 
-            var finalEA = listEA.Distinct().ToList();
-            Console.WriteLine($"Total EA : {finalEA.Count}");
-            Console.WriteLine($"countFounded : {countFounded}");
+            // Console.WriteLine($"Count insert : {countInsert}");
+            Console.WriteLine($"countMatch : {countMatch}");
+            Console.WriteLine($"countNotMatch : {countNotMatch}");
+            Console.WriteLine("Add Missing Data Done!");
         }
     }
 }
