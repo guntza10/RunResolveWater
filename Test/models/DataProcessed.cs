@@ -1001,5 +1001,6 @@ namespace Test.models
         public string AdjustedCubicMeterGroundWaterForUse { get; set; }
         public string Road { get; set; }
         public bool IsAdditionalCom { get; set; }
+        public bool IsOldData { get; set; }
     }
 }
