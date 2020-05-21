@@ -1,0 +1,94 @@
+// // 2.ครัวเรือนทั้งหมด -> IsHouseHold (check)
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      SampleType: "u",
+      IsHouseHold: 0,
+      CountPopulation: { $gt: 0 }
+    }
+  },
+  {
+    $project: {
+      SampleId:1
+    }
+  },
+  {
+    $out: "CheckUpdateIsHouseHold"
+  }
+]);
+
+//16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (check1)
+//17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
+    }
+  },
+  {
+    $project: {
+      AvgWaterHeightCm:1,
+      TimeWaterHeightCm:1
+    }
+  },
+  {
+    $match: {
+      AvgWaterHeightCm: 1,
+      TimeWaterHeightCm: 0
+    }
+  },
+  {
+    $out: "CheckUpdateAvgAndTimeWaterHeightCm1"
+  }
+]);
+
+//16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (check2)
+//17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
+    }
+  },
+  {
+    $project: {
+      AvgWaterHeightCm:1,
+      TimeWaterHeightCm:1
+    }
+  },
+  {
+    $match: {
+      AvgWaterHeightCm: 0,
+      TimeWaterHeightCm: 1
+    }
+  },
+  {
+    $out: "CheckUpdateAvgAndTimeWaterHeightCm2"
+  }
+]);
+
+
+//23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (check) 
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      SampleType: "c",
+      WaterSources: { $lt: 1260 }
+    }
+  },
+  {
+    $project: {
+      WaterSources:1
+    }
+  },
+  {
+    $match: {
+      WaterSources: {
+        $gt: 0
+      }
+    }
+  },
+  {
+    $out: "CheckUpdateWaterSources"
+  }
+]);

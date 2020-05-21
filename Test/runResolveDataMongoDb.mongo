@@ -12,6 +12,24 @@ db.NewDataProcess.updateMany(
   }
 );
 
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      SampleType: "u",
+      IsHouseHold: 0,
+      CountPopulation: { $gt: 0 }
+    }
+  },
+  {
+    $project: {
+      SampleId:1
+    }
+  },
+  {
+    $out: "CheckUpdateIsHouseHold"
+  }
+]);
+
 //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
 //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
 db.NewDataProcess.updateMany([
@@ -26,6 +44,52 @@ db.NewDataProcess.updateMany([
   }
 ]);
 
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
+    }
+  },
+  {
+    $project: {
+      AvgWaterHeightCm:1,
+      TimeWaterHeightCm:1
+    }
+  },
+  {
+    $match: {
+      AvgWaterHeightCm: 1,
+      TimeWaterHeightCm: 0
+    }
+  },
+  {
+    $out: "CheckUpdateAvgAndTimeWaterHeightCm1"
+  }
+]);
+
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
+    }
+  },
+  {
+    $project: {
+      AvgWaterHeightCm:1,
+      TimeWaterHeightCm:1
+    }
+  },
+  {
+    $match: {
+      AvgWaterHeightCm: 0,
+      TimeWaterHeightCm: 1
+    }
+  },
+  {
+    $out: "CheckUpdateAvgAndTimeWaterHeightCm2"
+  }
+]);
+
 //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) ->
 db.NewDataProcess.updateMany([
   {
@@ -36,6 +100,30 @@ db.NewDataProcess.updateMany([
     $set: {
       WaterSources: 0,
     }
+  }
+]);
+
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      SampleType: "c",
+      WaterSources: { $lt: 1260 }
+    }
+  },
+  {
+    $project: {
+      WaterSources:1
+    }
+  },
+  {
+    $match: {
+      WaterSources: {
+        $gt: 0
+      }
+    }
+  },
+  {
+    $out: "CheckUpdateWaterSources"
   }
 ]);
 
@@ -3069,3 +3157,87 @@ db.TestData1.updateMany(
   ]
 );
 
+// Test merge
+db.NewDataProcess.aggregate([
+  {
+    $limit: 50
+  },
+  {
+    $project: {
+      SampleId: 1,
+      EA: 1,
+      REG:1,
+      CWT:1,
+      AMP:1,
+      TAM:1
+    }
+  },
+  {
+    $out: "TestMerge1"
+  }
+]);
+
+db.NewDataProcess.aggregate([
+  {
+    $match: {
+      REG: "2"
+    }
+  },
+  {
+    $limit: 50
+  },
+  {
+    $project: {
+      SampleId: 1,
+      EA: 1,
+      REG:1,
+      CWT:1,
+      AMP:1,
+      TAM:1
+    }
+  },
+  {
+    $out: "TestMerge2"
+  }
+]);
+
+db.TestMerge2.aggregate([
+  {
+    $merge: "TestMerge1"
+  }
+]);
+
+db.TestMerge1.deleteMany(
+  {
+    REG: "2"
+  }
+);
+
+// merge newDataProcess with dataMissing
+db.dataMissing.aggregate([
+  {
+    $merge: "NewDataProcess"
+  }
+]);
+
+db.NewDataProcess.deleteMany(
+{
+  IsOldData: true
+}
+);
+
+db.dataMissing.aggregate([
+  {
+    $match: {
+      IsOldData: true
+    }
+  },
+  {
+    $project: {
+      SampleId:1
+    }
+  },
+  {
+    $out: "IsOldDataTrue"
+  }
+])
