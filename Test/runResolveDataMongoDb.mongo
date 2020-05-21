@@ -1,3 +1,17 @@
+// add field IsAdditionalCom
+db.NewData.updateMany(
+{},
+[
+  {
+    $set: {
+      IsAdditionalCom : {
+        $toBool: false
+      }
+    }
+  }
+]
+);
+
 // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do)
 db.NewDataProcess.updateMany(
   {

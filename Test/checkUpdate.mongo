@@ -92,3 +92,33 @@ db.NewDataProcess.aggregate([
     $out: "CheckUpdateWaterSources"
   }
 ]);
+
+db.NewData.aggregate([
+  {
+    $limit: 50
+  },
+  {
+    "$out": "TestNewData"
+  }
+]);
+
+// test add field
+db.TestNewData.updateMany(
+{},
+[
+  {
+    $set: {
+      IsAdditionalCom : {
+        $toBool: false
+      }
+    }
+  },
+  {
+    $set: {
+      IsOldData : {
+        $toBool: false
+      }
+    }
+  }
+]
+);

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Newtonsoft.Json;
 using NSOWater.HotMigration.Models;
@@ -15,6 +16,7 @@ namespace Test
     {
         private static IMongoCollection<DataProcessed> collectionOldDataProcess { get; set; }
         private static IMongoCollection<DataProcessed> collectionNewDataProcess { get; set; }
+        private static IMongoCollection<DataProcessed> collectionNewData { get; set; }
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
@@ -31,8 +33,9 @@ namespace Test
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
+            collectionNewData = database.GetCollection<DataProcessed>("NewData");
             collectionOldDataProcess = database.GetCollection<DataProcessed>("OldDataProcess");
-            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewDataProcess");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCode");
@@ -81,7 +84,7 @@ namespace Test
 
             //SetTagLocationSampleID()
             // FindDataMissing();
-            InsertMissingData();
+            // InsertMissingData();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -700,7 +703,7 @@ namespace Test
             .ToList();
 
             System.Console.WriteLine($"Qry resultDataArea = {groupArea.Count}");
-            var total = new List<JsonModel>();
+            // var total = new List<JsonModel>();
             var round = 0;
             foreach (var area in groupArea)
             {
@@ -728,7 +731,7 @@ namespace Test
                     {
                         dataProcessUpdate.Add(new DataProcessed
                         {
-                            _id = Guid.NewGuid().ToString(),
+                            _id = ObjectId.GenerateNewId(),
                             Area_Code = area.areaCode,
                             EA = (listSampleTypeEa.FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false) != null) ? listSampleTypeEa
                             .FirstOrDefault(it => it.EA_Code != "" && it.SampleTypeExist == false).EA_Code :
@@ -764,33 +767,34 @@ namespace Test
                     collectionNewDataProcess.InsertMany(dataProcessUpdate);
                     System.Console.WriteLine($"{area.areaCode} Insert done!");
 
-                    var getDataProcess = dataProcessUpdate.Select(it => new JsonModel
-                    {
-                        Id = it._id,
-                        Area_Code = it.Area_Code,
-                        EA = it.EA,
-                        SampleType = it.SampleType,
-                        CountCommunity = it.CountCommunity,
-                        IsCommunityWaterManagementHasWaterTreatment = it.IsCommunityWaterManagementHasWaterTreatment,
-                        CountCommunityHasDisaster = it.CountCommunityHasDisaster,
-                        CommunityNatureDisaster = it.CommunityNatureDisaster
-                    })
-                    .ToList();
-                    total.AddRange(getDataProcess);
+                    // var getDataProcess = dataProcessUpdate.Select(it => new JsonModel
+                    // {
+                    //     Id = it._id,
+                    //     Area_Code = it.Area_Code,
+                    //     EA = it.EA,
+                    //     SampleType = it.SampleType,
+                    //     CountCommunity = it.CountCommunity,
+                    //     IsCommunityWaterManagementHasWaterTreatment = it.IsCommunityWaterManagementHasWaterTreatment,
+                    //     CountCommunityHasDisaster = it.CountCommunityHasDisaster,
+                    //     CommunityNatureDisaster = it.CommunityNatureDisaster
+                    // })
+                    // .ToList();
+                    // total.AddRange(getDataProcess);
                 }
             }
-            var test = total.Where(it => it.CountCommunityHasDisaster != 0 || it.CommunityNatureDisaster != 0).ToList();
-            var test2 = total.Where(it => it.CountCommunityHasDisaster != 0 && it.CommunityNatureDisaster != 0).ToList();
-            var test3 = total.Where(it => it.CountCommunityHasDisaster != 0 && it.CommunityNatureDisaster == 0).ToList();
-            var test5 = total.Where(it => it.CountCommunityHasDisaster == 0 && it.CommunityNatureDisaster == 0).ToList();
-            var test4 = total.Where(it => it.EA == "" || it.EA == null).ToList();
+            Console.WriteLine("ResolveCountCommunity Done!");
+            // var test = total.Where(it => it.CountCommunityHasDisaster != 0 || it.CommunityNatureDisaster != 0).ToList();
+            // var test2 = total.Where(it => it.CountCommunityHasDisaster != 0 && it.CommunityNatureDisaster != 0).ToList();
+            // var test3 = total.Where(it => it.CountCommunityHasDisaster != 0 && it.CommunityNatureDisaster == 0).ToList();
+            // var test5 = total.Where(it => it.CountCommunityHasDisaster == 0 && it.CommunityNatureDisaster == 0).ToList();
+            // var test4 = total.Where(it => it.EA == "" || it.EA == null).ToList();
 
-            System.Console.WriteLine($"Total Data Insert = {total.Count}");
-            System.Console.WriteLine($"data CountCommunityHasDisaster != 0 || CommunityNatureDisaster != 0 => {test.Count}");
-            System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster != 0 => {test2.Count}");
-            System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster == 0 => {test3.Count}");
-            System.Console.WriteLine($"data CountCommunityHasDisaster == 0 && CommunityNatureDisaster == 0 => {test5.Count}");
-            System.Console.WriteLine($"data Ea == null => {test4.Count}");
+            // System.Console.WriteLine($"Total Data Insert = {total.Count}");
+            // System.Console.WriteLine($"data CountCommunityHasDisaster != 0 || CommunityNatureDisaster != 0 => {test.Count}");
+            // System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster != 0 => {test2.Count}");
+            // System.Console.WriteLine($"data CountCommunityHasDisaster != 0 && CommunityNatureDisaster == 0 => {test3.Count}");
+            // System.Console.WriteLine($"data CountCommunityHasDisaster == 0 && CommunityNatureDisaster == 0 => {test5.Count}");
+            // System.Console.WriteLine($"data Ea == null => {test4.Count}");
         }
 
         public static double AmountCountCommunityHasDisaster(List<CommunityUse> listCom, string area, double differnt)
@@ -1863,6 +1867,7 @@ namespace Test
             Console.WriteLine($"countNotMatch : {countNotMatch}");
             Console.WriteLine("Add Missing Data Done!");
         }
+
     }
 }
 enum WeekDays

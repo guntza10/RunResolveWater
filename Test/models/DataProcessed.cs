@@ -7,7 +7,7 @@ namespace Test.models
     public class DataProcessed
     {
         [BsonId]
-        public string _id { get; set; }
+        public ObjectId _id { get; set; }
         public string SampleId { get; set; }
         public string SampleType { get; set; }
         public string EA { get; set; }
@@ -1001,6 +1001,6 @@ namespace Test.models
         public string AdjustedCubicMeterGroundWaterForUse { get; set; }
         public string Road { get; set; }
         public bool IsAdditionalCom { get; set; }
-        public bool IsOldData { get; set; }
+        // public bool IsOldData { get; set; }
     }
 }
