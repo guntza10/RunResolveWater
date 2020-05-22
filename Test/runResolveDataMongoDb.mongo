@@ -13,7 +13,7 @@ db.NewData.updateMany(
 );
 
 // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do)
-db.NewDataProcess.updateMany(
+db.NewData.updateMany(
   {
     SampleType: "u",
     IsHouseHold: 0,
@@ -26,7 +26,7 @@ db.NewDataProcess.updateMany(
   }
 );
 
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       SampleType: "u",
@@ -46,7 +46,7 @@ db.NewDataProcess.aggregate([
 
 //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
 //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
-db.NewDataProcess.updateMany([
+db.NewData.updateMany(
   {
     $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }],
   },
@@ -56,9 +56,9 @@ db.NewDataProcess.updateMany([
       TimeWaterHeightCm: 0,
     }
   }
-]);
+);
 
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
@@ -81,7 +81,7 @@ db.NewDataProcess.aggregate([
   }
 ]);
 
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
@@ -105,7 +105,7 @@ db.NewDataProcess.aggregate([
 ]);
 
 //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) ->
-db.NewDataProcess.updateMany([
+db.NewData.updateMany(
   {
     SampleType: "c",
     WaterSources: { $lt: 1260 },
@@ -115,9 +115,9 @@ db.NewDataProcess.updateMany([
       WaterSources: 0,
     }
   }
-]);
+);
 
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       SampleType: "c",
@@ -142,7 +142,7 @@ db.NewDataProcess.aggregate([
 ]);
 
 // create result data EA
-db.NewDataProcess.aggregate(
+db.NewData.aggregate(
   [
     {
       $group: {
@@ -396,7 +396,7 @@ db.ResultNewDataEA.aggregate(
 );
 
 // create result data areacode
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $group: {
       _id: "$Area_Code",
@@ -545,7 +545,7 @@ db.ResultNewDataAreaCode.aggregate(
 );
 
 // add field EaInfo
-db.NewDataProcess.aggregate(
+db.NewData.aggregate(
   [
     {
       $lookup: {
@@ -808,7 +808,7 @@ db.NewDataProcess.aggregate(
       },
     },
     {
-      $out: "NewDataProcessBKKClean",
+      $out: "NewDataBKKClean",
     }
   ],
   {
@@ -816,7 +816,7 @@ db.NewDataProcess.aggregate(
   }
 );
 
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       $or: [
@@ -854,7 +854,7 @@ db.IndexInZipFile.aggregate([
 ]);
 
 // Manage Data For Machine Learning
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       CanComputeCubicMeterPlumbingForDrink: "True",
@@ -1463,7 +1463,7 @@ db.NewDataProcess.aggregate([
   }
 ]);
 
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       CanComputeCubicMeterPlumbingForDrink: "True"
@@ -2073,7 +2073,7 @@ db.NewDataProcess.aggregate([
 ]);
 
 // create DataCanComputeCubicMeterPlumbingForDrinkForML
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       CanComputeCubicMeterPlumbingForDrink: "True"
@@ -2315,7 +2315,7 @@ db.NewDataProcess.aggregate([
 ]);
 
 // create DataCanComputeCubicMeterSurfaceForProductForML
-db.NewDataProcess.aggregate([
+db.NewData.aggregate([
   {
     $match: {
       CanComputeCubicMeterSurfaceForProduct: "True"

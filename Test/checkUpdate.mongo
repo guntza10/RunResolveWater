@@ -1,5 +1,20 @@
-// // 2.ครัวเรือนทั้งหมด -> IsHouseHold (check)
-db.NewDataProcess.aggregate([
+// check add fiel IsAdditionalCom
+db.NewData.aggregate([
+  {
+    "$match": {
+      IsAdditionalCom: false
+    }
+  },
+  {
+    "$count": "count"
+  },
+  {
+    "$out": "checkAddIsAdditionalCom"
+  }
+]);
+
+// 2.ครัวเรือนทั้งหมด -> IsHouseHold (check)
+db.NewData.aggregate([
   {
     $match: {
       SampleType: "u",

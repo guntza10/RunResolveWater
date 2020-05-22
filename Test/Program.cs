@@ -16,7 +16,6 @@ namespace Test
     {
         private static IMongoCollection<DataProcessed> collectionOldDataProcess { get; set; }
         private static IMongoCollection<DataProcessed> collectionNewDataProcess { get; set; }
-        private static IMongoCollection<DataProcessed> collectionNewData { get; set; }
         private static IMongoCollection<AmountCommunity> collectionAmountCommunity { get; set; }
         private static IMongoCollection<ResultDataEA> collectionResultDataEA { get; set; }
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
@@ -33,7 +32,6 @@ namespace Test
         {
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
-            collectionNewData = database.GetCollection<DataProcessed>("NewData");
             collectionOldDataProcess = database.GetCollection<DataProcessed>("OldDataProcess");
             collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
@@ -47,12 +45,7 @@ namespace Test
             collectionSurvey = database.GetCollection<SurveyData>("Survey");
             collectionZip = database.GetCollection<Zip>("Zip");
             collectionLocationSampleID = database.GetCollection<LocationSampleID>("LocationSampleID");
-            // // check error 
-            // var checkResolve = new CheckResolve();
-            // checkResolve.checkResolveIsHouseHold();
-            // checkResolve.checkResolveHasntPlumbing();
-            // checkResolve.CheckTest();
-
+           
             // run resolve dataProcess (ระดับ record)
             // ResolveIsHouseHold(); Mongo
             // ResolveIsHouseHoldGoodPlumbing();
@@ -61,30 +54,17 @@ namespace Test
             // ResolveWaterSources(); Mongo
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
-            // ResolveCountCommunity();
+            ResolveCountCommunity();
             // ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
-            // ResolveCountGroundWater();
+            // ResolveCountGroundWater(); 
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
-
             // ResolveCountGroundWaterAndWaterSourcesEA();
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
-
-            // SetContainerNameForBlobNameNotFound();
-            // CheckHasntPlumbing();
             // ResolveHasntPlumbingForResultDataEA();
-            // CheckHasntPlumbingForEA();
-
-            //UpdateContainerForMissing();
-            //var manageMl = new ManageDataMl();
-            //manageMl.CreateCollectionT();
-
-            //SetTagLocationSampleID()
-            // FindDataMissing();
-            // InsertMissingData();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
