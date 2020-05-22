@@ -45,7 +45,7 @@ namespace Test
             collectionSurvey = database.GetCollection<SurveyData>("Survey");
             collectionZip = database.GetCollection<Zip>("Zip");
             collectionLocationSampleID = database.GetCollection<LocationSampleID>("LocationSampleID");
-           
+
             // run resolve dataProcess (ระดับ record)
             // ResolveIsHouseHold(); Mongo
             // ResolveIsHouseHoldGoodPlumbing();
@@ -628,11 +628,21 @@ namespace Test
             Console.WriteLine("Start ResolveCountCommunity");
             Console.WriteLine("Quering....................");
 
-            var listCom = collectionNewDataProcess.Aggregate()
-            .Match(it => it.SampleType == "c")
-            .Project(it => new CommunityUse
+            var data = collectionNewDataProcess.Aggregate()
+            .Project(it => new
             {
+                SampleType = it.SampleType,
                 areaCode = it.Area_Code,
+                CountCommunityHasDisaster = it.CountCommunityHasDisaster,
+                CountCommunity = it.CountCommunity,
+                CommunityNatureDisaster = it.CommunityNatureDisaster
+            })
+            .ToList();
+
+            var listCom = data.Where(it => it.SampleType == "c")
+            .Select(it => new CommunityUse
+            {
+                areaCode = it.areaCode,
                 CountCommunityHasDisaster = it.CountCommunityHasDisaster,
                 CountCommunity = it.CountCommunity,
                 CommunityNatureDisaster = it.CommunityNatureDisaster
