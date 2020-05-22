@@ -54,7 +54,7 @@ namespace Test
             // ResolveWaterSources(); Mongo
             // ResolveHasntPlumbing();
             // ResolveNewHasntPlumbing();
-            ResolveCountCommunity();
+            // ResolveCountCommunity();
             // ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
@@ -385,7 +385,7 @@ namespace Test
 
             Console.WriteLine($"data : {data.Count}");
 
-            var listEA = data.Where(it => it.EA != "")
+            var listEA = data.Where(it => !string.IsNullOrEmpty(it.EA))
             .GroupBy(it => it.EA)
             .Select(it => new
             {
@@ -450,7 +450,7 @@ namespace Test
             .ToList();
             Console.WriteLine($"data : {data.Count}");
 
-            var listEA = data.Where(it => it.EA != "")
+            var listEA = data.Where(it => !string.IsNullOrEmpty(it.EA))
             .GroupBy(it => it.EA)
             .Select(it => new
             {
@@ -973,7 +973,7 @@ namespace Test
 
             Console.WriteLine($"data : {data.Count}");
 
-            var dataEA = data.GroupBy(it => it.EA)
+            var dataEA = data.Where(it => !string.IsNullOrEmpty(it.EA)).GroupBy(it => it.EA)
             .Select(it => new
             {
                 EA = it.Key,
@@ -984,7 +984,6 @@ namespace Test
                     WaterSources = i.WaterSources
                 })
             })
-            .Where(it => it.EA != "")
             .ToList();
 
             Console.WriteLine($"dataEA : {dataEA.Count}");
@@ -1040,7 +1039,7 @@ namespace Test
             .ToList();
             Console.WriteLine($"data : {data.Count}");
 
-            var dataAreaCode = data.GroupBy(it => it.Area_Code)
+            var dataAreaCode = data.Where(it => !string.IsNullOrEmpty(it.Area_Code)).GroupBy(it => it.Area_Code)
             .Select(it => new
             {
                 Area_Code = it.Key,
