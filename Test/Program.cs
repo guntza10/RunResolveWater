@@ -628,7 +628,7 @@ namespace Test
             Console.WriteLine("Start ResolveCountCommunity");
             Console.WriteLine("Quering....................");
 
-            var data = collectionNewDataProcess.Aggregate()
+            var data = collectionNewDataProcess.Find(it => it.SampleType == "c")
             .Project(it => new
             {
                 SampleType = it.SampleType,

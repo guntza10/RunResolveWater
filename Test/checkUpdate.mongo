@@ -137,3 +137,50 @@ db.TestNewData.updateMany(
   }
 ]
 );
+
+db.NewData.aggregate([
+  {
+    "$match": {
+      SampleType: "c"
+    }
+  },
+  {
+    "$count": "count"
+  },
+  {
+    "$out": "countCom"
+  }
+]);
+
+db.NewData.aggregate([
+  {
+    "$match": {
+      SampleType: "u"
+    }
+  },
+  {
+    "$count": "count"
+  },
+  {
+    "$out": "countUnit"
+  }
+]);
+
+db.NewData.aggregate([
+  {
+    "$match": {
+      SampleType: "b"
+    }
+  },
+  {
+    "$count": "count"
+  },
+  {
+    "$out": "countBuilding"
+  }
+]);
+
+db.NewData.find(
+{
+  "SampleType": "c"
+})
