@@ -61,10 +61,10 @@ namespace Test
             // ResolveCountGroundWater(); 
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
-            // ResolveCountGroundWaterAndWaterSourcesEA();
+            ResolveCountGroundWaterAndWaterSourcesEA();
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
-            // ResolveHasntPlumbingForResultDataEA();
+            ResolveHasntPlumbingForResultDataEA();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -1563,7 +1563,8 @@ namespace Test
 
             Console.WriteLine($"dataProcess : {dataProcess.Count}");
 
-            var dataEA = dataProcess.GroupBy(it => it.EA)
+            var dataEA = dataProcess.Where(it => !string.IsNullOrEmpty(it.EA))
+            .GroupBy(it => it.EA)
             .Select(it => new
             {
                 EA = it.Key,
