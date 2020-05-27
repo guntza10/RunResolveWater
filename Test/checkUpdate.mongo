@@ -1,5 +1,5 @@
 // check add fiel IsAdditionalCom
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     "$match": {
       IsAdditionalCom: false
@@ -14,7 +14,7 @@ db.NewData.aggregate([
 ]);
 
 // 2.ครัวเรือนทั้งหมด -> IsHouseHold (check)
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       SampleType: "u",
@@ -34,7 +34,7 @@ db.NewData.aggregate([
 
 //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (check1)
 //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
-db.NewDataProcess.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
@@ -59,7 +59,7 @@ db.NewDataProcess.aggregate([
 
 //16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm (check2)
 //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
-db.NewDataProcess.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
@@ -84,7 +84,7 @@ db.NewDataProcess.aggregate([
 
 
 //23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (check) 
-db.NewDataProcess.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       SampleType: "c",
@@ -108,7 +108,7 @@ db.NewDataProcess.aggregate([
   }
 ]);
 
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     $limit: 50
   },
