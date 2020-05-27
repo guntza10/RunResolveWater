@@ -33,7 +33,7 @@ namespace Test
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataProcess = database.GetCollection<DataProcessed>("OldDataProcess");
-            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData0526");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCode");
@@ -61,10 +61,10 @@ namespace Test
             // ResolveCountGroundWater(); 
             // ResolvecountWorkingAge();
             // ResolveFieldCommunity();
-            ResolveCountGroundWaterAndWaterSourcesEA();
+            // ResolveCountGroundWaterAndWaterSourcesEA();
             // ResolveCountGroundWaterAndWaterSourcesAreaCode();
             // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
-            ResolveHasntPlumbingForResultDataEA();
+            // ResolveHasntPlumbingForResultDataEA();
         }
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
@@ -243,66 +243,55 @@ namespace Test
         //  9.จำนวนบ่อน้ำบาดาล (สน.2) -> CountGroundWater
         public static void ResolveCountGroundWater()
         {
-            Console.WriteLine("Start ResolveCountGroundWater");
-            Console.WriteLine("Querying.....................");
+            Console.WriteLine("Start ResolveCountGroundWater New Version");
             var listCom = collectionNewDataProcess.Aggregate()
-            .Match(it => it.SampleType == "c")
+            .Match(it => it.SampleType == "c" && it.IsAdditionalCom == false)
+            .Project(it => new
+            {
+                EA = it.EA,
+                Area_Code = it.Area_Code,
+                CountGroundWater = it.CountGroundWater,
+                IsAdditionalCom = it.IsAdditionalCom
+            })
             .ToList();
 
-            Console.WriteLine($"listCom : {listCom.Count}");
-
-            var dataEACountGroundWaterOver100 = listCom
-            .GroupBy(it => it.EA)
-            .Select(it => new
+            var dataGroupEAHasProblem = listCom.GroupBy(it => it.EA)
+            .Select(x => new
             {
-                EA = it.Key,
-                AreaCode = it.FirstOrDefault().Area_Code,
-                sumCountGroundWater = it.Sum(i => i.CountGroundWater)
+                EA = x.Key,
+                Area_Code = x.FirstOrDefault().Area_Code,
+                sumCountGroundWater = x.Sum(i => i.CountGroundWater)
             })
             .Where(it => it.sumCountGroundWater > 100)
             .ToList();
 
-            Console.WriteLine($"dataEACountGroundWaterOver100 : {dataEACountGroundWaterOver100.Count}");
+            var eaProblem = dataGroupEAHasProblem.Select(it => it.EA).ToList();
 
-            var dataEACountGroundWaterComOver100 = collectionResultDataEA.Aggregate()
-            .Match(it => it.CountGroundWaterCom > 100)
-            .Project(it => new
-            {
-                EA = it.Id
-            })
-            .ToList();
-            Console.WriteLine($"dataEACountGroundWaterComOver100 : {dataEACountGroundWaterComOver100.Count}");
-
-            var dataAvgCountGroundWater = listCom
-            .GroupBy(it => it.Area_Code)
+            var dataAvgGroundWater = listCom.GroupBy(it => it.Area_Code)
             .Select(it => new
             {
                 Area_Code = it.Key,
-                sumGroundWaterNotProblem = it.Where(x => !dataEACountGroundWaterOver100.Any(i => i.EA == x.EA))
-                .Sum(x => x.CountGroundWater),
-                total = it.Where(x => !dataEACountGroundWaterOver100.Any(i => i.EA == x.EA)).Count()
+                sumGroundWaterNotProblem = it.Where(x => !eaProblem.Contains(x.EA)).Sum(x => x.CountGroundWater),
+                total = it.Where(x => !eaProblem.Contains(x.EA)).Count()
             })
             .Select(it => new
             {
                 Area_Code = it.Area_Code,
-                avgCountGroundWater = Math.Round(it.sumGroundWaterNotProblem.Value / it.total)
+                avg = Math.Round(it.sumGroundWaterNotProblem.Value / it.total)
             })
             .ToList();
-            Console.WriteLine($"dataAvgCountGroundWater : {dataAvgCountGroundWater.Count}");
 
-            // ส่วน Update
             var count = 0;
-            dataEACountGroundWaterOver100.ForEach(it =>
+            dataGroupEAHasProblem.ForEach(dataEA =>
             {
                 count++;
-                Console.WriteLine($"Round : {count} / {dataEACountGroundWaterOver100.Count},EA = {it.EA}");
-                var avg = dataAvgCountGroundWater.FirstOrDefault(x => x.Area_Code == it.AreaCode).avgCountGroundWater;
+                Console.WriteLine($"Round EA : {count} / {dataGroupEAHasProblem.Count}");
+                var avg = dataAvgGroundWater.FirstOrDefault(it => it.Area_Code == dataEA.Area_Code)?.avg ?? 0;
                 var def = Builders<ResultDataEA>.Update
-                .Set(x => x.CountGroundWaterCom, avg);
-                collectionResultDataEA.UpdateOne(x => x.Id == it.EA, def);
-                Console.WriteLine($"EA {it.EA} Update Done!");
+                .Set(it => it.CountGroundWaterCom, avg);
+                collectionResultDataEA.UpdateOne(it => it.Id == dataEA.EA, def);
+                Console.WriteLine($"{dataEA.EA} Update Done!");
             });
-            Console.WriteLine("All Update Done!");
         }
 
         // 10.จำนวนประชากร -> CountPopulation ที่มีค่าเกิน 20000 (do)

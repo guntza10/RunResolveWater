@@ -76,32 +76,32 @@ namespace Test.models
         /// <summary>
         /// ขุ่น/ตะกอน  
         /// </summary>
-        public string TurbidWater { get; set; }
+        public bool TurbidWater { get; set; }
 
         /// <summary>
         /// เค็ม/กร่อย  
         /// </summary>
-        public string SaltWater { get; set; }
+        public bool SaltWater { get; set; }
 
         /// <summary>
         /// มีกลิ่น
         /// /// </summary>
-        public string Smell { get; set; }
+        public bool Smell { get; set; }
 
         /// <summary>
         /// คราบมัน
         /// </summary>
-        public string FilmOfOil { get; set; }
+        public bool FilmOfOil { get; set; }
 
         /// <summary>
         /// ฝ้าขาว
         /// </summary>
-        public string FogWater { get; set; }
+        public bool FogWater { get; set; }
 
         /// <summary>
         /// น้ำกระด้าง
         /// </summary>
-        public string HardWater { get; set; }
+        public bool HardWater { get; set; }
 
         /// <summary>
         /// สัดส่วนเพื่อการเกษตร
@@ -162,7 +162,7 @@ namespace Test.models
         /// <summary>
         /// ใช้น้ำประปานครหลวง
         /// </summary>
-        public string DoingMWA { get; set; }
+        public bool DoingMWA { get; set; }
 
         /// <summary>
         /// ปริมาณน้ำประปานครหลวง ลบ.ม./เดือน 
@@ -177,37 +177,37 @@ namespace Test.models
         /// <summary>
         /// ขุ่น/ตะกอน ประปานครหลวง
         /// </summary>
-        public string TurbidWaterMWA { get; set; }
+        public bool TurbidWaterMWA { get; set; }
 
         /// <summary>
         /// เค็ม/กร่อย ประปานครหลวง
         /// </summary>
-        public string SaltWaterMWA { get; set; }
+        public bool SaltWaterMWA { get; set; }
 
         /// <summary>
         /// มีกลิ่น ประปานครหลวง
         /// </summary>
-        public string SmellMWA { get; set; }
+        public bool SmellMWA { get; set; }
 
         /// <summary>
         /// คราบมัน ประปานครหลวง
         /// </summary>
-        public string FilmOfOilMWA { get; set; }
+        public bool FilmOfOilMWA { get; set; }
 
         /// <summary>
         /// ฝ้าขาว ประปานครหลวง
         /// </summary>
-        public string FogWaterMWA { get; set; }
+        public bool FogWaterMWA { get; set; }
 
         /// <summary>
         /// น้ำกระด้าง ประปานครหลวง
         /// </summary>
-        public string HardWaterMWA { get; set; }
+        public bool HardWaterMWA { get; set; }
 
         /// <summary>
         /// สัดส่วนเพื่อการเกษตร ประปานครหลวง
         /// </summary>
-        public double? AgricultureMWA { get; set; }
+        public bool AgricultureMWA { get; set; }
 
         /// <summary>
         /// สัดส่วนเพื่อการบริการ ประปานครหลวง
@@ -232,7 +232,7 @@ namespace Test.models
         /// <summary>
         /// ใช้น้ำประปาส่วนภูมิภาค
         /// </summary>
-        public string DoingPWA { get; set; }
+        public bool DoingPWA { get; set; }
 
         /// <summary>
         /// ปริมาณน้ำประปาส่วนภูมิภาค ลบ.ม./เดือน 
@@ -247,32 +247,32 @@ namespace Test.models
         /// <summary>
         /// ขุ่น/ตะกอน ประปาส่วนภูมิภาค
         /// </summary>
-        public string TurbidWaterPWA { get; set; }
+        public bool TurbidWaterPWA { get; set; }
 
         /// <summary>
         /// เค็ม/กร่อย ประปาส่วนภูมิภาค
         /// </summary>
-        public string SaltWaterPWA { get; set; }
+        public bool SaltWaterPWA { get; set; }
 
         /// <summary>
         /// มีกลิ่น ประปาส่วนภูมิภาค
         /// </summary>
-        public string SmellPWA { get; set; }
+        public bool SmellPWA { get; set; }
 
         /// <summary>
         /// คราบมัน ประปาส่วนภูมิภาค
         /// </summary>
-        public string FilmOfOilPWA { get; set; }
+        public bool FilmOfOilPWA { get; set; }
 
         /// <summary>
         /// ฝ้าขาว ประปาส่วนภูมิภาค
         /// </summary>
-        public string FogWaterPWA { get; set; }
+        public bool FogWaterPWA { get; set; }
 
         /// <summary>
         /// น้ำกระด้าง ประปาส่วนภูมิภาค
         /// </summary>
-        public string HardWaterPWA { get; set; }
+        public bool HardWaterPWA { get; set; }
 
         /// <summary>
         /// สัดส่วนเพื่อการเกษตร ประปาส่วนภูมิภาค
@@ -302,7 +302,7 @@ namespace Test.models
         /// <summary>
         /// ใช้น้ำประปาอื่น ๆ
         /// </summary>
-        public string DoingOther { get; set; }
+        public bool DoingOther { get; set; }
 
         /// <summary>
         /// ปริมาณน้ำประปาอื่น ๆ ลบ.ม./เดือน 
@@ -317,32 +317,32 @@ namespace Test.models
         /// <summary>
         /// ขุ่น/ตะกอน ประปาอื่น ๆ
         /// </summary>
-        public string TurbidWaterOther { get; set; }
+        public bool TurbidWaterOther { get; set; }
 
         /// <summary>
         /// เค็ม/กร่อย ประปาอื่น ๆ
         /// </summary>
-        public string SaltWaterOther { get; set; }
+        public bool SaltWaterOther { get; set; }
 
         /// <summary>
         /// มีกลิ่น ประปาอื่น ๆ
         /// </summary>
-        public string SmellOther { get; set; }
+        public bool SmellOther { get; set; }
 
         /// <summary>
         /// คราบมัน ประปาอื่น ๆ
         /// </summary>
-        public string FilmOfOilOther { get; set; }
+        public bool FilmOfOilOther { get; set; }
 
         /// <summary>
         /// ฝ้าขาว ประปาอื่น ๆ
         /// </summary>
-        public string FogWaterOther { get; set; }
+        public bool FogWaterOther { get; set; }
 
         /// <summary>
         /// น้ำกระด้าง ประปาอื่น ๆ
         /// </summary>
-        public string HardWaterOther { get; set; }
+        public bool HardWaterOther { get; set; }
 
         /// <summary>
         /// สัดส่วนเพื่อการเกษตร ประปาอื่น ๆ
@@ -409,22 +409,22 @@ namespace Test.models
         /// <summary>
         /// สระน้ำ เค็ม/กร่อย  
         /// </summary>
-        public string SaltWaterPool { get; set; }
+        public bool SaltWaterPool { get; set; }
 
         /// <summary>
         /// สระน้ำ มีกลิ่น
         /// /// </summary>
-        public string SmellPool { get; set; }
+        public bool SmellPool { get; set; }
 
         /// <summary>
         /// สระน้ำ คราบมัน
         /// </summary>
-        public string FilmOfOilPool { get; set; }
+        public bool FilmOfOilPool { get; set; }
 
         /// <summary>
         /// สระน้ำ ฝ้าขาว
         /// </summary>
-        public string FogWaterPool { get; set; }
+        public bool FogWaterPool { get; set; }
 
         /// <summary>
         /// สัดส่วนสระน้ำเพื่อการเกษตร
@@ -474,22 +474,22 @@ namespace Test.models
         /// <summary>
         /// ชลประทาน เค็ม/กร่อย  
         /// </summary>
-        public string SaltWaterIrrigation { get; set; }
+        public bool SaltWaterIrrigation { get; set; }
 
         /// <summary>
         /// ชลประทาน มีกลิ่น
         /// </summary>
-        public string SmellIrrigation { get; set; }
+        public bool SmellIrrigation { get; set; }
 
         /// <summary>
         /// ชลประทาน คราบมัน
         /// </summary>
-        public string FilmOfOilIrrigation { get; set; }
+        public bool FilmOfOilIrrigation { get; set; }
 
         /// <summary>
         /// ชลประทาน ฝ้าขาว
         /// </summary>
-        public string FogWaterIrrigation { get; set; }
+        public bool FogWaterIrrigation { get; set; }
 
         /// <summary>
         /// สัดส่วนชลประทานเพื่อการเกษตร
@@ -534,22 +534,22 @@ namespace Test.models
         /// <summary>
         /// แม่น้ำ เค็ม/กร่อย  
         /// </summary>
-        public string SaltWaterRiver { get; set; }
+        public bool SaltWaterRiver { get; set; }
 
         /// <summary>
         /// แม่น้ำ มีกลิ่น
         /// </summary>
-        public string SmellRiver { get; set; }
+        public bool SmellRiver { get; set; }
 
         /// <summary>
         /// แม่น้ำ คราบมัน
         /// </summary>
-        public string FilmOfOilRiver { get; set; }
+        public bool FilmOfOilRiver { get; set; }
 
         /// <summary>
         /// แม่น้ำ ฝ้าขาว
         /// </summary>
-        public string FogWaterRiver { get; set; }
+        public bool FogWaterRiver { get; set; }
 
         /// <summary>
         /// สัดส่วนแม่น้ำเพื่อการเกษตร
@@ -953,52 +953,52 @@ namespace Test.models
         /// <summary>
         /// ข้อมูลตัวซ้ำ
         /// </summary>
-        public string Duplicate { get; set; }
+        public bool Duplicate { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 26.ปริมาณการใช้น้ำบาดาลเพื่อการเกษตร(น้ำบาดาล น้ำซื้อ)
         /// </summary>
-        public string AdjustedCubicMeterGroundWaterForAgriculture { get; set; }
+        public bool AdjustedCubicMeterGroundWaterForAgriculture { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 27.ปริมาณการใช้น้ำบาดาลเพื่อการบริการ(น้ำบาดาล น้ำซื้อ)
         /// </summary>
-        public string AdjustedCubicMeterGroundWaterForService { get; set; }
+        public bool AdjustedCubicMeterGroundWaterForService { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 28.ปริมาณการใช้น้ำบาดาลเพื่อการอุตสาหกรรม(น้ำบาดาล น้ำซื้อ)
         /// </summary>
-        public string AdjustedCubicMeterGroundWaterForProduct { get; set; }
+        public bool AdjustedCubicMeterGroundWaterForProduct { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 29.ปริมาณการใช้น้ำบาดาลเพื่อการอุปโภคบริโภค(น้ำบาดาล น้ำซื้อ)
         /// </summary>
-        public string AdjustedCubicMeterGroundWaterForDrink { get; set; }
+        public bool AdjustedCubicMeterGroundWaterForDrink { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 34.ปริมาณการใช้น้ำผิวดินเพื่อการเกษตร (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
-        public string AdjustedCubicMeterSurfaceForAgriculture { get; set; }
+        public bool AdjustedCubicMeterSurfaceForAgriculture { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 35.ปริมาณการใช้น้ำผิวดินเพื่อการบริการ (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
-        public string AdjustedCubicMeterSurfaceForService { get; set; }
+        public bool AdjustedCubicMeterSurfaceForService { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 36.ปริมาณการใช้น้ำผิวดินเพื่อการอุตสาหกรรม (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
-        public string AdjustedCubicMeterSurfaceForProduct { get; set; }
+        public bool AdjustedCubicMeterSurfaceForProduct { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 37.ปริมาณการใช้น้ำผิวดินเพื่อการอุปโภคบริโภค (สระน้ำ แม่น้ำ ชลประทาน น้ำฝนกักเก็บ)
         /// </summary>
-        public string AdjustedCubicMeterSurfaceForDrink { get; set; }
+        public bool AdjustedCubicMeterSurfaceForDrink { get; set; }
 
         /// <summary>
         /// ค่าปรับแต่ง 38.ปริมาณน้ำบาดาลที่พัฒนามาใช้ (ปริมาณน้ำจากรายการ 26-29)
         /// </summary>
-        public string AdjustedCubicMeterGroundWaterForUse { get; set; }
+        public bool AdjustedCubicMeterGroundWaterForUse { get; set; }
         public string Road { get; set; }
         public bool IsAdditionalCom { get; set; }
         // public bool IsOldData { get; set; }
