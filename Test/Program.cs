@@ -25,6 +25,7 @@ namespace Test
         private static IMongoCollection<ContainerNotFound> collectionContainerNotFound { get; set; }
         private static IMongoCollection<IndexInZip> collectionIndexInZip { get; set; }
         private static IMongoCollection<SurveyData> collectionSurvey { get; set; }
+
         private static IMongoCollection<Zip> collectionZip { get; set; }
         public static IMongoCollection<LocationSampleID> collectionLocationSampleID { get; set; }
 
@@ -33,7 +34,7 @@ namespace Test
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataProcess = database.GetCollection<DataProcessed>("OldDataProcess");
-            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData0526");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCode");
@@ -46,26 +47,66 @@ namespace Test
             collectionZip = database.GetCollection<Zip>("Zip");
             collectionLocationSampleID = database.GetCollection<LocationSampleID>("LocationSampleID");
 
-            // run resolve dataProcess (ระดับ record)
+            CreateIndexForContainerUsage();
+
+            // run resolve dataProcess (ระดับ record) done !!
             // ResolveIsHouseHold(); Mongo
-            // ResolveIsHouseHoldGoodPlumbing();
-            // ResolveCountPopulationOver20000();
+            //ResolveIsHouseHoldGoodPlumbing();
+            //ResolveCountPopulationOver20000();
             // ResolveAvgWaterHeightCmAndTimeWaterHeightCm(); Mongo
             // ResolveWaterSources(); Mongo
-            // ResolveHasntPlumbing();
-            // ResolveNewHasntPlumbing();
-            ResolveCountCommunity();
-            // ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
+            //ResolveHasntPlumbing();         // - runnable 
+            //ResolveNewHasntPlumbing();      // - runnable
+            //ResolveCountCommunity();        // - runnable
+            //ResolveIsGovernmentUsageAndIsGovernmentWaterQuality();
 
             // run resolve (EA) -> ไปทำ collection sum EA,areacode ก่อน
-            // ResolveCountGroundWater(); 
-            // ResolvecountWorkingAge();
-            // ResolveFieldCommunity();
-            // ResolveCountGroundWaterAndWaterSourcesEA();
-            // ResolveCountGroundWaterAndWaterSourcesAreaCode();
-            // GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
-            // ResolveHasntPlumbingForResultDataEA();
+            //ResolveCountGroundWater();
+            //ResolvecountWorkingAge();
+            //ResolveFieldCommunity();
+            //ResolveCountGroundWaterAndWaterSourcesEA();
+            //ResolveCountGroundWaterAndWaterSourcesAreaCode();
+            //GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
+            //ResolveHasntPlumbingForResultDataEA();
         }
+
+        private static void CreateIndexForContainerUsage()
+        {
+            var targetFileToSave = @"D:\IndexContainerUsage.txt"; 
+            List<string> indexContainer = new List<string> { "containername   =>  zip " };
+            var ContainerName = collectionSurvey.Find(it => it.Enlisted == true && it.DeletionDateTime == null)
+                .Project(it => new
+                {
+                    ContainerName = it.ContainerName
+                }).ToList();
+            var groupContainer = ContainerName.GroupBy(it => it.ContainerName, p => new
+            {
+                ContainerName = p.ContainerName
+            }).ToList();
+            Console.WriteLine("Query data done !");
+            foreach (var item in groupContainer)
+            {
+                var locationContainer = collectionIndexInZip
+                    .Find(it => it.ContainerName == item.Key)
+                    .SortByDescending(it => it.ZipName)
+                    .FirstOrDefault();
+                indexContainer.Add($"{item.Key}    =>  {locationContainer.ZipName}");
+            }
+            Console.WriteLine("Add data dont !!");
+            using (System.IO.StreamWriter file =
+                new System.IO.StreamWriter(targetFileToSave))
+            {
+                if (!File.Exists(targetFileToSave))
+                {
+                    foreach (string line in indexContainer)
+                    {
+                        file.WriteLine(line);
+                    }
+                }
+                Console.WriteLine("Creat Index File Done !!");
+            }
+        }
+
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
         public static void ResolveIsHouseHold()
@@ -109,7 +150,7 @@ namespace Test
 
             if (dataArea.Any())
             {
-                return dataArea.FirstOrDefault()?.percent.Value ?? 0;
+                return dataArea.FirstOrDefault()?.percent ?? 0;
             }
             else
             {
@@ -125,7 +166,7 @@ namespace Test
                     };
                 })
                 .ToList();
-                return dataAmp.FirstOrDefault()?.percent.Value ?? 0;
+                return dataAmp.FirstOrDefault()?.percent ?? 0;
             }
         }
 
@@ -135,64 +176,89 @@ namespace Test
             Console.WriteLine("Start ResolveIsHouseHoldGoodPlumbing");
             Console.WriteLine("Quering.....");
 
-            var data = collectionNewDataProcess.Aggregate()
-            .Match(it => it.SampleType == "b" || it.SampleType == "u")
-            .Project(it => new
-            {
-                Id = it._id,
-                SampleType = it.SampleType,
-                Area_Code = it.Area_Code,
-                IsHouseHold = it.IsHouseHold,
-                IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
-            })
-            .ToList();
+            // var data = collectionNewDataProcess.Aggregate()
+            // .Match(it => it.SampleType == "b" || it.SampleType == "u")
+            // .Project(it => new
+            // {
+            //     Id = it._id,
+            //     SampleType = it.SampleType,
+            //     Area_Code = it.Area_Code,
+            //     IsHouseHold = it.IsHouseHold,
+            //     IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
+            // })
+            // .ToList();
 
-            var dataBuilding = data.Where(it => it.SampleType == "b" && it.IsHouseHold != 0)
-            .Select(it => new
-            {
-                Id = it.Id,
-                Area_Code = it.Area_Code,
-                IsHouseHold = it.IsHouseHold
-            })
-            .ToList();
+            // var dataBuilding = data.Where(it => it.SampleType == "b" && it.IsHouseHold != 0)
+            // .Select(it => new
+            // {
+            //     Id = it.Id,
+            //     Area_Code = it.Area_Code,
+            //     IsHouseHold = it.IsHouseHold
+            // })
+            // .ToList();
+            var dataBuildingCount = collectionNewDataProcess.CountDocuments(it => it.SampleType == "b" && it.IsHouseHold != 0);
 
-            var dataUnit = data.Where(it => it.SampleType == "u" && it.IsHouseHold == 1)
-            .Select(it => new DataUnit
-            {
-                AreaCode = it.Area_Code,
-                IsHouseHold = it.IsHouseHold,
-                IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
-            })
-            .ToList();
+            // var dataUnit = data.Where(it => it.SampleType == "u" && it.IsHouseHold == 1)
+            // .Select(it => new DataUnit
+            // {
+            //     AreaCode = it.Area_Code,
+            //     IsHouseHold = it.IsHouseHold,
+            //     IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
+            // })
+            // .ToList();
+            // var dataUnitCount = collectionNewDataProcess.CountDocuments(it => it.SampleType == "u" && it.IsHouseHold == 1);
 
             Console.WriteLine("Query Done!");
-            Console.WriteLine($"Total Building done : {dataBuilding.Count}");
-            Console.WriteLine($"Total Unit done : {dataUnit.Count}");
+            Console.WriteLine($"Total Building done : {dataBuildingCount}");
+            // Console.WriteLine($"Total Unit done : {dataUnitCount}");
 
-            var areaGrouping = dataBuilding.GroupBy(it => it.Area_Code).ToList();
+            var areaToRun = collectionNewDataProcess.Distinct(it => it.Area_Code, it => it.SampleType == "b" && it.IsHouseHold != 0).ToList();
+
+            // var areaGrouping = dataBuilding.GroupBy(it => it.Area_Code).ToList();
             // var areaUse = areaGrouping.Skip(0).ToList();
-            Console.WriteLine($"Total area : {areaGrouping.Count}");
+            Console.WriteLine($"Total area : {areaToRun.Count}");
+            // Console.WriteLine($"Total area : {areaGrouping.Count}");
 
             var countAreaUpdate = 0;
             var countTotalBuildingAlreadyUpdate = 0;
-            foreach (var areaGroup in areaGrouping)
+            foreach (var areaCodeToRun in areaToRun)
             {
                 countAreaUpdate++;
-                Console.WriteLine($"round area : {countAreaUpdate} / {areaGrouping.Count}");
+                Console.WriteLine($"round area : {countAreaUpdate} / {areaToRun.Count}");
 
-                var areaCode = areaGroup.Key;
+                var areaCode = areaCodeToRun; // areaGroup.Key;
+
+                var dataUnit = collectionNewDataProcess.Find(it => it.SampleType == "u" && it.IsHouseHold == 1 && it.Area_Code == areaCode)
+                    .Project(it => new DataUnit
+                    {
+                        AreaCode = it.Area_Code,
+                        IsHouseHold = it.IsHouseHold,
+                        IsHouseHoldGoodPlumbing = it.IsHouseHoldGoodPlumbing
+                    })
+                    .ToList();
+
                 var percent = percentIsHouseHoldGoodPlumbing(areaCode, dataUnit);
 
                 Console.WriteLine($"percent of {areaCode} : {percent}");
 
+                var dataBuilding = collectionNewDataProcess.Find(it => it.SampleType == "b" && it.IsHouseHold != 0 && it.Area_Code == areaCode)
+                    .Project(it => new
+                    {
+                        Id = it._id,
+                        Area_Code = it.Area_Code,
+                        IsHouseHold = it.IsHouseHold
+                    })
+                    .ToList();
+
                 var countBuildingInArea = 0;
-                areaGroup.ToList().ForEach(it =>
+                // areaGroup.ToList().ForEach(it =>
+                dataBuilding.ForEach(it =>
                 {
                     countBuildingInArea++;
                     countTotalBuildingAlreadyUpdate++;
-                    Console.WriteLine($"round update building : {countBuildingInArea} / {areaGroup.Count()}");
+                    Console.WriteLine($"round update building : {countBuildingInArea} / {dataBuilding.Count}");
 
-                    var newIsHouseHoldGoodPlumbing = Math.Round(it.IsHouseHold.Value * percent / 100);
+                    var newIsHouseHoldGoodPlumbing = Math.Round((it.IsHouseHold ?? 0.0) * percent / 100);
 
                     Console.WriteLine($"newIsHouseHoldGoodPlumbing : {newIsHouseHoldGoodPlumbing}");
 
@@ -245,9 +311,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolveCountGroundWater");
             Console.WriteLine("Querying.....................");
-            var listCom = collectionNewDataProcess.Aggregate()
-            .Match(it => it.SampleType == "c")
-            .ToList();
+            var listCom = collectionNewDataProcess.Find(it => it.SampleType == "c").ToList();
 
             Console.WriteLine($"listCom : {listCom.Count}");
 
@@ -285,7 +349,7 @@ namespace Test
             .Select(it => new
             {
                 Area_Code = it.Area_Code,
-                avgCountGroundWater = Math.Round(it.sumGroundWaterNotProblem.Value / it.total)
+                avgCountGroundWater = Math.Round((it.sumGroundWaterNotProblem ?? 0.0)/ it.total)
             })
             .ToList();
             Console.WriteLine($"dataAvgCountGroundWater : {dataAvgCountGroundWater.Count}");
@@ -348,7 +412,7 @@ namespace Test
                 var dataLess20k = data.Where(x => x.Ea == it.Ea && x.countPopulation < 20000).ToList();
                 var dataOver20k = data.Where(x => x.Ea == it.Ea && x.countPopulation > 20000).ToList();
 
-                var avg = Math.Round(dataLess20k.Sum(x => x.countPopulation).Value / dataLess20k.Count);
+                var avg = Math.Round((dataLess20k.Sum(x => x.countPopulation) ?? 0.0) / dataLess20k.Count);
 
                 Console.WriteLine($"Update For dataOver20k");
                 var countUpdate = 0;
@@ -374,7 +438,7 @@ namespace Test
         {
             Console.WriteLine("Start ResolvecountWorkingAge");
             Console.WriteLine("Querying......................................");
-            var data = collectionNewDataProcess.Aggregate()
+            var data = collectionNewDataProcess.Find(it => true)
             .Project(it => new
             {
                 EA = it.EA,
@@ -385,7 +449,7 @@ namespace Test
 
             Console.WriteLine($"data : {data.Count}");
 
-            var listEA = data.Where(it => it.EA != "")
+            var listEA = data.Where(it => !string.IsNullOrEmpty(it.EA))
             .GroupBy(it => it.EA)
             .Select(it => new
             {
@@ -426,8 +490,8 @@ namespace Test
             {
                 count++;
                 System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
-                var newCountWorkingAge = Math.Round(dataPercentRegion
-                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1)).percentRegion.Value * it.SumCountPopulation.Value / 100);
+                var newCountWorkingAge = Math.Floor((dataPercentRegion
+                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1))?.percentRegion ?? 0.0 ) * (it.SumCountPopulation ?? 0.0) / 100);
                 var def = Builders<ResultDataEA>.Update
                 .Set(x => x.CountWorkingAge, newCountWorkingAge);
                 collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
@@ -450,7 +514,7 @@ namespace Test
             .ToList();
             Console.WriteLine($"data : {data.Count}");
 
-            var listEA = data.Where(it => it.EA != "")
+            var listEA = data.Where(it => !string.IsNullOrEmpty(it.EA))
             .GroupBy(it => it.EA)
             .Select(it => new
             {
@@ -477,7 +541,7 @@ namespace Test
                  return new
                  {
                      Region = it.Key,
-                     avg = sumFieldCommunity.Value / totalFieldCommunity
+                     avg = (sumFieldCommunity ?? 0.0) / totalFieldCommunity
                  };
              })
              .ToList();
@@ -628,10 +692,10 @@ namespace Test
             Console.WriteLine("Start ResolveCountCommunity");
             Console.WriteLine("Quering....................");
 
-            var data = collectionNewDataProcess.Aggregate()
-            .Project(it => new
+            var listCom = collectionNewDataProcess.Find(it => it.SampleType == "c")
+            .Project(it => new CommunityUse
             {
-                SampleType = it.SampleType,
+                //SampleType = it.SampleType,
                 areaCode = it.Area_Code,
                 CountCommunityHasDisaster = it.CountCommunityHasDisaster,
                 CountCommunity = it.CountCommunity,
@@ -639,15 +703,15 @@ namespace Test
             })
             .ToList();
 
-            var listCom = data.Where(it => it.SampleType == "c")
-            .Select(it => new CommunityUse
-            {
-                areaCode = it.areaCode,
-                CountCommunityHasDisaster = it.CountCommunityHasDisaster,
-                CountCommunity = it.CountCommunity,
-                CommunityNatureDisaster = it.CommunityNatureDisaster
-            })
-            .ToList();
+            //var listCom = data.Where(it => it.SampleType == "c")
+            //.Select(it => new CommunityUse
+            //{
+            //    areaCode = it.areaCode,
+            //    CountCommunityHasDisaster = it.CountCommunityHasDisaster,
+            //    CountCommunity = it.CountCommunity,
+            //    CommunityNatureDisaster = it.CommunityNatureDisaster
+            //})
+            //.ToList();
 
             System.Console.WriteLine($"Qry listCountCommu Done = {listCom.Count}");
 
@@ -661,7 +725,7 @@ namespace Test
 
             System.Console.WriteLine($"Qry listAmountCommu Done = {listAmountCommu.Count}");
 
-            var dataArea = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var dataArea = collectionNewDataProcess.Find(it => true)
             .Project(it => new
             {
                 Area_Code = it.Area_Code,
@@ -669,6 +733,15 @@ namespace Test
                 SampleType = it.SampleType
             })
             .ToList();
+
+            //var dataArea = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            //.Project(it => new
+            //{
+            //    Area_Code = it.Area_Code,
+            //    EA = it.EA,
+            //    SampleType = it.SampleType
+            //})
+            //.ToList();
 
             var listEACommu = dataArea.GroupBy(it => it.Area_Code)
             .Select(x => new
@@ -737,7 +810,7 @@ namespace Test
 
                     System.Console.WriteLine($"Generate dataProcessUpdate done.");
 
-                    var amountDataUpdateHasDisaster = AmountCountCommunityHasDisaster(listCom, area.areaCode, differnt.Value);
+                    var amountDataUpdateHasDisaster = AmountCountCommunityHasDisaster(listCom, area.areaCode, (differnt ?? 0.0));
                     if (amountDataUpdateHasDisaster != 0)
                     {
                         dataProcessUpdate.Take((int)amountDataUpdateHasDisaster).ToList().ForEach(it => it.CountCommunityHasDisaster = 1);
@@ -863,6 +936,7 @@ namespace Test
         // 21.สถานที่ราชการที่มีน้ำประปาที่มีคุณภาพมาตรฐาน -> IsGovernmentWaterQuality
         public static void ResolveIsGovernmentUsageAndIsGovernmentWaterQuality()
         {
+            Console.WriteLine("ResolveIsGovernmentUsageAndIsGovernmentWaterQuality Process...");
             var listGovernment = collectionNewDataProcess.Find(it => it.IsGovernment == 1).ToList();
             Console.WriteLine($"List Government done : {listGovernment.Count}");
 
@@ -886,26 +960,28 @@ namespace Test
                     var validationWaterQuality = road.Any(it => it.IsGovernmentWaterQuality == 1);
                     if (validationWaterUsage)
                     {
-                        var listWrites = new List<WriteModel<DataProcessed>>();
-                        var filterDefinition = Builders<DataProcessed>.Filter
-                                .Where(it => it.EA == ea.Key && it.Road == road.Key);
+                        //var listWrites = new List<WriteModel<DataProcessed>>();
+                        //var filterDefinition = Builders<DataProcessed>.Filter
+                        //        .Where(it => it.EA == ea.Key && it.Road == road.Key);
 
                         if (validationWaterUsage && validationWaterQuality)
                         {
                             var updateDefinitionAll = Builders<DataProcessed>.Update
                                 .Set(it => it.IsGovernmentUsage, 1)
                                 .Set(it => it.IsGovernmentWaterQuality, 1);
-                            listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinitionAll));
-                            Console.WriteLine("Update WaterUsage and WaterQuality");
+                            collectionNewDataProcess.UpdateMany(it => it.EA == ea.Key && it.IsGovernment == 1 && it.Road == road.Key, updateDefinitionAll);
+                            //listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinitionAll));
+                            //Console.WriteLine("Update WaterUsage and WaterQuality");
                         }
                         else
                         {
                             var updateDefinitionOnlyUsage = Builders<DataProcessed>.Update
                                 .Set(it => it.IsGovernmentUsage, 1);
-                            listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinitionOnlyUsage));
-                            Console.WriteLine("Update Only WaterUsage");
+                            collectionNewDataProcess.UpdateMany(it => it.EA == ea.Key && it.IsGovernment == 1 && it.Road == road.Key, updateDefinitionOnlyUsage);
+                            //listWrites.Add(new UpdateManyModel<DataProcessed>(filterDefinition, updateDefinitionOnlyUsage));
+                            //Console.WriteLine("Update Only WaterUsage");
                         }
-                        collectionNewDataProcess.BulkWrite(listWrites);
+                        //collectionNewDataProcess.BulkWrite(listWrites);
                         Console.WriteLine("Update data Complete");
                     }
                 }
@@ -961,7 +1037,7 @@ namespace Test
 
             Console.WriteLine($"listEAUpdate : {listEaUpdate.Count}");
 
-            var data = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var data = collectionNewDataProcess.Aggregate()
             .Project(it => new
             {
                 EA = it.EA,
@@ -984,7 +1060,7 @@ namespace Test
                     WaterSources = i.WaterSources
                 })
             })
-            .Where(it => it.EA != "")
+            .Where(it => !string.IsNullOrEmpty(it.EA ))
             .ToList();
 
             Console.WriteLine($"dataEA : {dataEA.Count}");
@@ -992,24 +1068,29 @@ namespace Test
             var count = 0;
             listEaUpdate.ForEach(it =>
             {
-                count++;
-                Console.WriteLine($"Round : {count} / {listEaUpdate.Count}, EA = {it.EA}");
-                var listDataEA = dataEA.FirstOrDefault(i => i.EA == it.EA).listData;
-                var dataUnit = listDataEA.Where(i => i.SampleType == "u").ToList();
-                var dataCom = listDataEA.Where(i => i.SampleType == "c").ToList();
+                if (true)
+                {
+                    count++;
+                    Console.WriteLine($"Round : {count} / {listEaUpdate.Count}, EA = {it.EA}");
+                    var listDataEA = dataEA.FirstOrDefault(i => i.EA == it.EA)?.listData;
+                    if (null != listDataEA) {
+                        var dataUnit = listDataEA.Where(i => i.SampleType == "u").ToList();
+                        var dataCom = listDataEA.Where(i => i.SampleType == "c").ToList();
 
-                var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
-                var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
-                var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
-                var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
+                        var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
+                        var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
+                        var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
+                        var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
 
-                var def = Builders<ResultDataEA>.Update
-                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
-                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
-                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
-                .Set(i => i.WaterSourcesCom, waterSourcesCom);
-                collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
-                Console.WriteLine($"EA {it.EA} Update Done!");
+                        var def = Builders<ResultDataEA>.Update
+                        .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                        .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                        .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                        .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                        collectionResultDataEA.UpdateOne(i => i.Id == it.EA, def);
+                        Console.WriteLine($"EA {it.EA} Update Done!");
+                    }
+                }
             });
             Console.WriteLine("All Update Done!");
         }
@@ -1020,7 +1101,7 @@ namespace Test
             Console.WriteLine("Start ResolveCountGroundWaterAndWaterSourcesAreaCode");
             Console.WriteLine("Querying............................................");
 
-            var listAreaCodeUpdate = collectionResultDataAreaCode.Aggregate()
+            var listAreaCodeUpdate = collectionResultDataAreaCode.Find(it => true)
             .Project(it => new
             {
                 Area_Code = it.Id
@@ -1028,30 +1109,31 @@ namespace Test
             .ToList();
             Console.WriteLine($"listAreaCodeUpdate : {listAreaCodeUpdate.Count}");
 
-            var data = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
-            .Match(it => it.Area_Code != "")
-            .Project(it => new
-            {
-                Area_Code = it.Area_Code,
-                SampleType = it.SampleType,
-                CountGroundWater = it.CountGroundWater,
-                WaterSources = it.WaterSources
-            })
-            .ToList();
+            var data = collectionNewDataProcess.Aggregate()
+                .Match(it => it.Area_Code != "")
+                .Project(it => new
+                {
+                    Area_Code = it.Area_Code,
+                    SampleType = it.SampleType,
+                    CountGroundWater = it.CountGroundWater,
+                    WaterSources = it.WaterSources
+                })
+                .ToList();
             Console.WriteLine($"data : {data.Count}");
 
-            var dataAreaCode = data.GroupBy(it => it.Area_Code)
-            .Select(it => new
-            {
-                Area_Code = it.Key,
-                listData = it.Select(i => new
+            var dataAreaCode = data.Where(it => !string.IsNullOrEmpty(it.Area_Code))
+                .GroupBy(it => it.Area_Code)
+                .Select(it => new
                 {
-                    SampleType = i.SampleType,
-                    CountGroundWater = i.CountGroundWater,
-                    WaterSources = i.WaterSources
+                    Area_Code = it.Key,
+                    listData = it.Select(i => new
+                    {
+                        SampleType = i.SampleType,
+                        CountGroundWater = i.CountGroundWater,
+                        WaterSources = i.WaterSources
+                    })
                 })
-            })
-            .ToList();
+                .ToList();
 
             Console.WriteLine($"dataAreaCode : {dataAreaCode.Count}");
 
@@ -1060,22 +1142,26 @@ namespace Test
             {
                 count++;
                 Console.WriteLine($"Round : {count} / {listAreaCodeUpdate.Count} , Area_Code = {it.Area_Code}");
-                var listDataAreaCode = dataAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code).listData;
-                var dataUnit = listDataAreaCode.Where(i => i.SampleType == "u").ToList();
-                var dataCom = listDataAreaCode.Where(i => i.SampleType == "c").ToList();
+                var listDataAreaCode = dataAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code)?.listData;
+                if (null != listDataAreaCode)
+                {
+                    var dataUnit = listDataAreaCode.Where(i => i.SampleType == "u").ToList();
+                    var dataCom = listDataAreaCode.Where(i => i.SampleType == "c").ToList();
 
-                var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
-                var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
-                var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
-                var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
+                    var countGroundWaterUnit = dataUnit.Sum(i => i.CountGroundWater);
+                    var countGroundWaterCom = dataCom.Sum(i => i.CountGroundWater);
+                    var waterSourcesUnit = dataUnit.Sum(i => i.WaterSources);
+                    var waterSourcesCom = dataCom.Sum(i => i.WaterSources);
 
-                var def = Builders<ResultDataAreaCode>.Update
-                .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
-                .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
-                .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
-                .Set(i => i.WaterSourcesCom, waterSourcesCom);
-                collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
-                Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");
+                    var def = Builders<ResultDataAreaCode>.Update
+                    .Set(i => i.CountGroundWaterUnit, countGroundWaterUnit)
+                    .Set(i => i.CountGroundWaterCom, countGroundWaterCom)
+                    .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
+                    .Set(i => i.WaterSourcesCom, waterSourcesCom);
+                    collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
+                    Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");  
+                }
+                
             });
             Console.WriteLine("Update Done!");
         }
@@ -1181,7 +1267,9 @@ namespace Test
                 count++;
                 Console.WriteLine($"Round : {count} / {areaExist.Count()}");
                 var dataInfo = rawDataAreaCode.FirstOrDefault(i => i.Area_Code == it.Area_Code);
-                var defArea = Builders<ResultDataAreaCode>.Update
+                if (null != dataInfo)
+                {
+                    var defArea = Builders<ResultDataAreaCode>.Update
                         .Set(data => data.REG, dataInfo.REG)
                         .Set(data => data.REG_NAME, dataInfo.REG_NAME)
                         .Set(data => data.CWT, dataInfo.CWT)
@@ -1190,8 +1278,10 @@ namespace Test
                         .Set(data => data.AMP_NAME, dataInfo.AMP_NAME)
                         .Set(data => data.TAM, dataInfo.TAM)
                         .Set(data => data.TAM_NAME, dataInfo.TAM_NAME);
-                collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
-                Console.WriteLine($"area {it.Area_Code} Update Done!");
+                    collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
+                    Console.WriteLine($"area {it.Area_Code} Update Done!");
+                }
+                
             });
             Console.WriteLine("All Update Done!");
         }
@@ -1209,7 +1299,7 @@ namespace Test
 
             Console.WriteLine($"listEAUpdate : {listEAUpdate.Count}");
 
-            var data = collectionNewDataProcess.Aggregate(new AggregateOptions { AllowDiskUse = true })
+            var data = collectionNewDataProcess.Find(it => true)
             .Project(it => new
             {
                 EA = it.EA,
@@ -1256,7 +1346,7 @@ namespace Test
             {
                 count++;
                 Console.WriteLine($"Round : {count} / {listEAUpdate.Count}, EA = {ea.EA}");
-                var newHasntPlumbing = listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA).Avg.Value;
+                var newHasntPlumbing = (listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA)?.Avg ??0.0);
                 var def = Builders<ResultDataEA>.Update
                 .Set(it => it.HasntPlumbing, newHasntPlumbing);
                 collectionResultDataEA.UpdateOne(it => it.Id == ea.EA, def);
@@ -1591,10 +1681,12 @@ namespace Test
                 Console.WriteLine($"Round : {count} / {dataResultEA.Count}");
 
                 var dataMatch = dataEA.FirstOrDefault(it => it.EA == data.EA);
-
-                var def = Builders<ResultDataEA>.Update
-                .Set(it => it.HasntPlumbing, dataMatch?.Avg ?? 0);
-                collectionResultDataEA.UpdateOne(it => it.Id == data.EA, def);
+                if (null != dataMatch)
+                {
+                    var def = Builders<ResultDataEA>.Update
+                    .Set(it => it.HasntPlumbing, dataMatch?.Avg ?? 0);
+                    collectionResultDataEA.UpdateOne(it => it.Id == data.EA, def);
+                }
             });
 
             Console.WriteLine("Update All Done!");

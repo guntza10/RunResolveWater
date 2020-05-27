@@ -1,5 +1,5 @@
-// add field IsAdditionalCom
-db.NewData.updateMany(
+// add field IsAdditionalCom ทำแล้ว
+db.NewData0523.updateMany(
 {},
 [
   {
@@ -12,8 +12,8 @@ db.NewData.updateMany(
 ]
 );
 
-// 2.ครัวเรือนทั้งหมด -> IsHouseHold (do)
-db.NewData.updateMany(
+// 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) ทำแล้ว
+db.NewData0523.updateMany(
   {
     SampleType: "u",
     IsHouseHold: 0,
@@ -26,7 +26,7 @@ db.NewData.updateMany(
   }
 );
 
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       SampleType: "u",
@@ -44,9 +44,9 @@ db.NewData.aggregate([
   }
 ]);
 
-//16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm
+//16.ระดับความลึกของน้ำท่วม (ในเขตที่อยู่อาศัย) -> AvgWaterHeightCm ทำแล้ว
 //17.ระยะเวลาที่น้ำท่วมขัง (ในเขตที่อยู่อาศัย) -> TimeWaterHeightCm
-db.NewData.updateMany(
+db.NewData0523.updateMany(
   {
     $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }],
   },
@@ -58,7 +58,7 @@ db.NewData.updateMany(
   }
 );
 
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
@@ -81,7 +81,7 @@ db.NewData.aggregate([
   }
 ]);
 
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     $match: {
       $or: [{ AvgWaterHeightCm: 0 }, { TimeWaterHeightCm: 0 }]
@@ -104,8 +104,8 @@ db.NewData.aggregate([
   }
 ]);
 
-//23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) ->
-db.NewData.updateMany(
+//23.แหล่งน้ำขนาดใหญ่ กลาง และเล็ก (สน.2) -> WaterSources (do) -> กำลัง
+db.NewData0523.updateMany(
   {
     SampleType: "c",
     WaterSources: { $lt: 1260 },
@@ -142,7 +142,7 @@ db.NewData.aggregate([
 ]);
 
 // create result data EA
-db.NewData.aggregate(
+db.NewData0523.aggregate(
   [
     {
       $group: {
@@ -238,6 +238,7 @@ db.NewData.aggregate(
     },
     {
       $project: {
+        Area_Code: 1,
         IsAgriculture: 1,
         IsHouseHold: 1,
         IsHouseHoldGoodPlumbing: 1,
@@ -396,7 +397,7 @@ db.ResultNewDataEA.aggregate(
 );
 
 // create result data areacode
-db.NewData.aggregate([
+db.NewData0523.aggregate([
   {
     $group: {
       _id: "$Area_Code",

@@ -73,5 +73,6 @@ namespace Test.models
         public double? CountGroundWaterCom { get; set; }
         public double? WaterSourcesUnit { get; set; }
         public double? WaterSourcesCom { get; set; }
+        public double? Flag { get; set; }
     }
 }
