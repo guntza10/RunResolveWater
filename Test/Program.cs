@@ -47,7 +47,7 @@ namespace Test
             collectionZip = database.GetCollection<Zip>("Zip");
             collectionLocationSampleID = database.GetCollection<LocationSampleID>("LocationSampleID");
 
-            CreateIndexForContainerUsage();
+            // CreateIndexForContainerUsage();
 
             // run resolve dataProcess (ระดับ record) done !!
             // ResolveIsHouseHold(); Mongo
@@ -72,7 +72,7 @@ namespace Test
 
         private static void CreateIndexForContainerUsage()
         {
-            var targetFileToSave = @"D:\IndexContainerUsage.txt"; 
+            var targetFileToSave = @"D:\IndexContainerUsage.txt";
             List<string> indexContainer = new List<string> { "containername   =>  zip " };
             var ContainerName = collectionSurvey.Find(it => it.Enlisted == true && it.DeletionDateTime == null)
                 .Project(it => new
@@ -106,7 +106,6 @@ namespace Test
                 Console.WriteLine("Creat Index File Done !!");
             }
         }
-
 
         // 2.ครัวเรือนทั้งหมด -> IsHouseHold (do) -> ใช้ mongo จะเร็วกว่า (check ก่อนรัน)
         public static void ResolveIsHouseHold()
@@ -482,7 +481,7 @@ namespace Test
                 count++;
                 System.Console.WriteLine($"Round {count} / {eaHasProblem.Count}");
                 var newCountWorkingAge = Math.Floor((dataPercentRegion
-                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1))?.percentRegion ?? 0.0 ) * (it.SumCountPopulation ?? 0.0) / 100);
+                    .FirstOrDefault(i => i.Region == it.Ea.Substring(0, 1))?.percentRegion ?? 0.0) * (it.SumCountPopulation ?? 0.0) / 100);
                 var def = Builders<ResultDataEA>.Update
                 .Set(x => x.CountWorkingAge, newCountWorkingAge);
                 collectionResultDataEA.UpdateOne(x => x.Id == it.Ea, def);
@@ -1051,7 +1050,7 @@ namespace Test
                     WaterSources = i.WaterSources
                 })
             })
-            .Where(it => !string.IsNullOrEmpty(it.EA ))
+            .Where(it => !string.IsNullOrEmpty(it.EA))
             .ToList();
 
             Console.WriteLine($"dataEA : {dataEA.Count}");
@@ -1064,7 +1063,8 @@ namespace Test
                     count++;
                     Console.WriteLine($"Round : {count} / {listEaUpdate.Count}, EA = {it.EA}");
                     var listDataEA = dataEA.FirstOrDefault(i => i.EA == it.EA)?.listData;
-                    if (null != listDataEA) {
+                    if (null != listDataEA)
+                    {
                         var dataUnit = listDataEA.Where(i => i.SampleType == "u").ToList();
                         var dataCom = listDataEA.Where(i => i.SampleType == "c").ToList();
 
@@ -1150,9 +1150,9 @@ namespace Test
                     .Set(i => i.WaterSourcesUnit, waterSourcesUnit)
                     .Set(i => i.WaterSourcesCom, waterSourcesCom);
                     collectionResultDataAreaCode.UpdateOne(i => i.Id == it.Area_Code, def);
-                    Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");  
+                    Console.WriteLine($"Area_Code {it.Area_Code} Update Done!");
                 }
-                
+
             });
             Console.WriteLine("Update Done!");
         }
@@ -1272,7 +1272,7 @@ namespace Test
                     collectionResultDataAreaCode.UpdateOne(x => x.Id == it.Area_Code, defArea);
                     Console.WriteLine($"area {it.Area_Code} Update Done!");
                 }
-                
+
             });
             Console.WriteLine("All Update Done!");
         }
@@ -1337,7 +1337,7 @@ namespace Test
             {
                 count++;
                 Console.WriteLine($"Round : {count} / {listEAUpdate.Count}, EA = {ea.EA}");
-                var newHasntPlumbing = (listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA)?.Avg ??0.0);
+                var newHasntPlumbing = (listEASumHasntPlumbing.FirstOrDefault(it => it.EA == ea.EA)?.Avg ?? 0.0);
                 var def = Builders<ResultDataEA>.Update
                 .Set(it => it.HasntPlumbing, newHasntPlumbing);
                 collectionResultDataEA.UpdateOne(it => it.Id == ea.EA, def);
@@ -1804,94 +1804,94 @@ namespace Test
             }
         }
 
-        private static void FindDataMissing()
-        {
-            Console.WriteLine("FindDataMissing Processing.....");
+        // private static void FindDataMissing()
+        // {
+        //     Console.WriteLine("FindDataMissing Processing.....");
 
-            var roundProcess = 0;
-            var skipSize = 0;
-            var limitSize = 100000;
-            var countFound = 0;
-            var countNotFound = 0;
+        //     var roundProcess = 0;
+        //     var skipSize = 0;
+        //     var limitSize = 100000;
+        //     var countFound = 0;
+        //     var countNotFound = 0;
 
-            Console.WriteLine("Query data ......");
-            var missingData = collectionContainerNotFound.Aggregate()
-                .Match(it => it.ContainerName == "")
-                .Project(it => new
-                {
-                    SampleId = it.Id
-                })
-                .ToList();
-            Console.WriteLine("Query data missing complete");
-            while (skipSize < missingData.Count)
-            {
-                roundProcess++;
-                Console.WriteLine($"Round {roundProcess}");
-                var misstingSampleID = missingData.Select(it => it.SampleId
-                .Split(".")
-                .FirstOrDefault())
-                    .Skip(skipSize)
-                    .Take(limitSize)
-                    .ToList();
-                Console.WriteLine("Sort data complete");
-                // error out size
-                var dataMatchInSurvey = collectionSurvey.Aggregate()
-                        .Match(it => misstingSampleID.Contains(it.SampleId))
-                        .Project(it => new
-                        {
-                            containerName = it.ContainerName
-                        })
-                        .ToList();
-                var currentContainer = dataMatchInSurvey.Select(it => it.containerName).Distinct().ToList();
-                var countContainerProcess = 0;
+        //     Console.WriteLine("Query data ......");
+        //     var missingData = collectionContainerNotFound.Aggregate()
+        //         .Match(it => it.ContainerName == "")
+        //         .Project(it => new
+        //         {
+        //             SampleId = it.Id
+        //         })
+        //         .ToList();
+        //     Console.WriteLine("Query data missing complete");
+        //     while (skipSize < missingData.Count)
+        //     {
+        //         roundProcess++;
+        //         Console.WriteLine($"Round {roundProcess}");
+        //         var misstingSampleID = missingData.Select(it => it.SampleId
+        //         .Split(".")
+        //         .FirstOrDefault())
+        //             .Skip(skipSize)
+        //             .Take(limitSize)
+        //             .ToList();
+        //         Console.WriteLine("Sort data complete");
+        //         // error out size
+        //         var dataMatchInSurvey = collectionSurvey.Aggregate()
+        //                 .Match(it => misstingSampleID.Contains(it.SampleId))
+        //                 .Project(it => new
+        //                 {
+        //                     containerName = it.ContainerName
+        //                 })
+        //                 .ToList();
+        //         var currentContainer = dataMatchInSurvey.Select(it => it.containerName).Distinct().ToList();
+        //         var countContainerProcess = 0;
 
-                foreach (var container in currentContainer)
-                {
-                    countContainerProcess++;
-                    var finddatainIndex = collectionIndexInZip.Aggregate()
-                     .Match(it => it.ContainerName == container)
-                     .Project(it => new
-                     {
-                         containerName = it.ContainerName,
-                         ZipName = it.ZipName
-                     })
-                     .FirstOrDefault();
-                    if (finddatainIndex != null)
-                    {
-                        Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is Found !");
-                        countFound++;
-                    }
-                    else
-                    {
-                        Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is not Found !");
-                        countNotFound++;
-                    }
-                }
-                Console.WriteLine("Match data complete");
-                skipSize += 100000;
-            }
-            Console.WriteLine("Fetch data done !");
-            Console.WriteLine($"Data found : {countFound}");
-            Console.WriteLine($"Data not found : {countNotFound}");
+        //         foreach (var container in currentContainer)
+        //         {
+        //             countContainerProcess++;
+        //             var finddatainIndex = collectionIndexInZip.Aggregate()
+        //              .Match(it => it.ContainerName == container)
+        //              .Project(it => new
+        //              {
+        //                  containerName = it.ContainerName,
+        //                  ZipName = it.ZipName
+        //              })
+        //              .FirstOrDefault();
+        //             if (finddatainIndex != null)
+        //             {
+        //                 Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is Found !");
+        //                 countFound++;
+        //             }
+        //             else
+        //             {
+        //                 Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is not Found !");
+        //                 countNotFound++;
+        //             }
+        //         }
+        //         Console.WriteLine("Match data complete");
+        //         skipSize += 100000;
+        //     }
+        //     Console.WriteLine("Fetch data done !");
+        //     Console.WriteLine($"Data found : {countFound}");
+        //     Console.WriteLine($"Data not found : {countNotFound}");
 
-            //backup code 
-            //var dataMatchInSurvey = collectionSurvey.Aggregate()
-            //           .Match(it => misstingSampleID.Contains(it.SampleId))
-            //           .Project(it => new
-            //           {
-            //               SampleId = it.SampleId,
-            //               containerName = it.ContainerName,
-            //               userID = it.UserId
-            //           })
-            //           .ToList();
-            //Console.WriteLine("Match data complete");
-            //foreach (var item in dataMatchInSurvey)
-            //{
-            //    countProcess++;
-            //    Console.WriteLine($"{countProcess}/{missingData.Count} : {item.SampleId} Found at : {item.containerName} , Upload by {item.userID}");
-            //}
-            //skipSize += 100000;
-        }
+        //     //backup code 
+        //     //var dataMatchInSurvey = collectionSurvey.Aggregate()
+        //     //           .Match(it => misstingSampleID.Contains(it.SampleId))
+        //     //           .Project(it => new
+        //     //           {
+        //     //               SampleId = it.SampleId,
+        //     //               containerName = it.ContainerName,
+        //     //               userID = it.UserId
+        //     //           })
+        //     //           .ToList();
+        //     //Console.WriteLine("Match data complete");
+        //     //foreach (var item in dataMatchInSurvey)
+        //     //{
+        //     //    countProcess++;
+        //     //    Console.WriteLine($"{countProcess}/{missingData.Count} : {item.SampleId} Found at : {item.containerName} , Upload by {item.userID}");
+        //     //}
+        //     //skipSize += 100000;
+        // }
 
         public static void InsertMissingData()
         {
