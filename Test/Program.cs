@@ -25,9 +25,9 @@ namespace Test
         private static IMongoCollection<ContainerNotFound> collectionContainerNotFound { get; set; }
         private static IMongoCollection<IndexInZip> collectionIndexInZip { get; set; }
         private static IMongoCollection<SurveyData> collectionSurvey { get; set; }
-
         private static IMongoCollection<Zip> collectionZip { get; set; }
         public static IMongoCollection<LocationSampleID> collectionLocationSampleID { get; set; }
+        private static IMongoCollection<waterSourceCom> collectionWaterSourceCome { get; set; }
 
         static void Main(string[] args)
         {
@@ -46,6 +46,7 @@ namespace Test
             collectionSurvey = database.GetCollection<SurveyData>("Survey");
             collectionZip = database.GetCollection<Zip>("Zip");
             collectionLocationSampleID = database.GetCollection<LocationSampleID>("LocationSampleID");
+            collectionWaterSourceCome = database.GetCollection<waterSourceCom>("waterSourceCom");
 
             // CreateIndexForContainerUsage();
 
@@ -69,9 +70,11 @@ namespace Test
             //GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
             //ResolveHasntPlumbingForResultDataEA();
 
-            var exporter = new CreateFileManager();
+            // var exporter = new CreateFileManager();
             // exporter.ExportCsvDataAreaProblem();
-            exporter.ReadWaterSourceCom();
+            // exporter.ReadWaterSourceCom();
+
+            UpdateWaterSouceCom();
         }
 
         private static void CreateIndexForContainerUsage()
@@ -1946,6 +1949,78 @@ namespace Test
             Console.WriteLine("Add Missing Data Done!");
         }
 
+        public static void UpdateWaterSouceCom()
+        {
+            var dataCom = collectionNewDataProcess.Find(it => it.SampleType == "c")
+            .Project(it => new
+            {
+                Id = it._id,
+                SampleId = it.SampleId,
+                EA = it.EA,
+                IsAdditionalCom = it.IsAdditionalCom
+            })
+            .ToList();
+
+            var dataWaterSourceCom = collectionWaterSourceCome.Find(it => true).ToList();
+
+            var dataGroupEA = dataCom.Where(it => it.IsAdditionalCom == false)
+            .GroupBy(it => it.EA).Select(it => new
+            {
+                EA = it.Key,
+                listComEA = it.ToList()
+            })
+            .ToList();
+
+            var countEA = 0;
+            var totalEA = dataGroupEA.Count;
+
+            dataGroupEA.ForEach(data =>
+            {
+                countEA++;
+                Console.WriteLine($"round EA : {countEA} / {totalEA}");
+
+                var dataWaterSource = dataWaterSourceCom.FirstOrDefault(it => it.Id == data.EA);
+                var count = 0;
+                if (dataWaterSource != null)
+                {
+                    var listDataInsert = data.listComEA.Select(it => new dataInsert
+                    {
+                        Id = it.Id,
+                        SampleId = it.SampleId,
+                        EA = it.EA,
+                        WaterSource = 0
+                    })
+                    .ToList();
+
+                    listDataInsert[0].WaterSource = dataWaterSource.WaterSources;
+
+                    var total = listDataInsert.Count;
+                    listDataInsert.ForEach(insert =>
+                    {
+                        count++;
+                        Console.WriteLine($"data  : {count} / {total} ,waterSource : {insert.WaterSource}");
+                        // var def1 = Builders<DataProcessed>.Update
+                        // .Set(it => it.WaterSources, insert.WaterSource);
+                        // collectionNewDataProcess.UpdateOne(it => it._id == insert.Id, def1);
+                    });
+                }
+                else
+                {
+                    Console.WriteLine("Not Found EA");
+                    //     var def2 = Builders<DataProcessed>.Update
+                    //    .Set(it => it.WaterSources, 0);
+
+                    var total2 = data.listComEA.Count;
+                    data.listComEA.ForEach(ea =>
+                    {
+                        count++;
+                        Console.WriteLine($"data  : {count} / {total2}");
+                        // collectionNewDataProcess.UpdateOne(it => it._id == ea.Id, def2);
+                    });
+                }
+            });
+            Console.WriteLine("Done All!");
+        }
     }
 }
 enum WeekDays
