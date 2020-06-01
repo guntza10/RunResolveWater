@@ -69,8 +69,9 @@ namespace Test
             //GetDataAndLookUpForAddAnAddressInfomationInResultDataAreaCode();
             //ResolveHasntPlumbingForResultDataEA();
 
-            // var exporter = new CreateFileManager();
+            var exporter = new CreateFileManager();
             // exporter.ExportCsvDataAreaProblem();
+            exporter.ReadWaterSourceCom();
         }
 
         private static void CreateIndexForContainerUsage()

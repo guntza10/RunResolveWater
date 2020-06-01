@@ -16,6 +16,7 @@ namespace Test
         private static IMongoCollection<ResultDataAreaCode> collectionResultDataAreaCode { get; set; }
         static IMongoCollection<EaInfomation> collectionEaData { get; set; }
         private static IMongoCollection<DataProcessed> collectionNewDataProcess { get; set; }
+        private static IMongoCollection<waterSourceCom> collectionWaterSourceCome { get; set; }
 
         public CreateFileManager()
         {
@@ -25,6 +26,7 @@ namespace Test
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultDataAreaCode");
             collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData0526");
             collectionEaData = database.GetCollection<EaInfomation>("ea");
+            collectionWaterSourceCome = database.GetCollection<waterSourceCom>("waterSourceCom");
         }
 
         public void ResultDataAreaCodeWriteFile()
@@ -178,6 +180,54 @@ namespace Test
             {
                 csv.WriteRecords(dataList);
             }
+        }
+
+        public void ReadWaterSourceCom()
+        {
+            var path = @"C:\Users\Gun\Desktop\Work\RunResolveWater\Test\waterSourceCom.csv";
+
+            var dataWaterSource = new List<WaterSourceData>();
+            using (var reader = new StreamReader(path))
+            {
+                var dataFromRead = reader.ReadToEnd();
+                var dataLine = dataFromRead.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                dataLine.Skip(1).ToList().ForEach(data =>
+                {
+                    var rawData = data.Split(',').ToList();
+                    dataWaterSource.Add(new WaterSourceData
+                    {
+                        EA = rawData[5],
+                        WaterSources = Convert.ToDouble(rawData[9])
+                    });
+                });
+            }
+
+            Console.WriteLine($"Read Data Done! => total data = {dataWaterSource.Count}");
+
+            var finalData = dataWaterSource.GroupBy(it => it.EA)
+            .Select(it => new waterSourceCom
+            {
+                Id = it.Key,
+                WaterSources = it.Sum(i => i.WaterSources)
+            })
+            .ToList();
+
+            var total = finalData.Count;
+
+            var skip = 0;
+            var countInsert = 0;
+            while (skip < finalData.Count)
+            {
+                var dataInsert = finalData.Skip(skip).Take(1000).ToList();
+                collectionWaterSourceCome.InsertMany(dataInsert);
+                skip += 1000;
+                countInsert += dataInsert.Count;
+                Console.WriteLine($"aleady inserted : {countInsert} / {total} ");
+            }
+
+            Console.WriteLine("Insert Done All!");
+            Console.WriteLine($"Total data insert : {finalData.Count}");
         }
     }
 }
