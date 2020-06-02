@@ -34,7 +34,7 @@ namespace Test
             var mongo = new MongoClient("mongodb://firstclass:Th35F1rstCla55@mongoquickx4h3q4klpbxtq-vm0.southeastasia.cloudapp.azure.com/wdata");
             var database = mongo.GetDatabase("wdata");
             collectionOldDataProcess = database.GetCollection<DataProcessed>("OldDataProcess");
-            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData0526");
+            collectionNewDataProcess = database.GetCollection<DataProcessed>("NewData0601");
             collectionAmountCommunity = database.GetCollection<AmountCommunity>("amountCommunity");
             collectionResultDataEA = database.GetCollection<ResultDataEA>("ResultNewDataEAClean");
             collectionResultDataAreaCode = database.GetCollection<ResultDataAreaCode>("ResultNewDataAreaCode");
@@ -1999,23 +1999,23 @@ namespace Test
                     {
                         count++;
                         Console.WriteLine($"data  : {count} / {total} ,waterSource : {insert.WaterSource}");
-                        // var def1 = Builders<DataProcessed>.Update
-                        // .Set(it => it.WaterSources, insert.WaterSource);
-                        // collectionNewDataProcess.UpdateOne(it => it._id == insert.Id, def1);
+                        var def1 = Builders<DataProcessed>.Update
+                        .Set(it => it.WaterSources, insert.WaterSource);
+                        collectionNewDataProcess.UpdateOne(it => it._id == insert.Id, def1);
                     });
                 }
                 else
                 {
                     Console.WriteLine("Not Found EA");
-                    //     var def2 = Builders<DataProcessed>.Update
-                    //    .Set(it => it.WaterSources, 0);
+                    var def2 = Builders<DataProcessed>.Update
+                   .Set(it => it.WaterSources, 0);
 
                     var total2 = data.listComEA.Count;
                     data.listComEA.ForEach(ea =>
                     {
                         count++;
                         Console.WriteLine($"data  : {count} / {total2}");
-                        // collectionNewDataProcess.UpdateOne(it => it._id == ea.Id, def2);
+                        collectionNewDataProcess.UpdateOne(it => it._id == ea.Id, def2);
                     });
                 }
             });
