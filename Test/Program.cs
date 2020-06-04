@@ -74,7 +74,8 @@ namespace Test
             // exporter.ExportCsvDataAreaProblem();
             // exporter.ReadWaterSourceCom();
 
-            UpdateWaterSouceCom();
+            // UpdateWaterSouceCom();
+            // UpdateWaterCubic();
         }
 
         private static void CreateIndexForContainerUsage()
@@ -1811,94 +1812,94 @@ namespace Test
             }
         }
 
-        // private static void FindDataMissing()
-        // {
-        //     Console.WriteLine("FindDataMissing Processing.....");
+        private static void FindDataMissing()
+        {
+            Console.WriteLine("FindDataMissing Processing.....");
 
-        //     var roundProcess = 0;
-        //     var skipSize = 0;
-        //     var limitSize = 100000;
-        //     var countFound = 0;
-        //     var countNotFound = 0;
+            var roundProcess = 0;
+            var skipSize = 0;
+            var limitSize = 100000;
+            var countFound = 0;
+            var countNotFound = 0;
 
-        //     Console.WriteLine("Query data ......");
-        //     var missingData = collectionContainerNotFound.Aggregate()
-        //         .Match(it => it.ContainerName == "")
-        //         .Project(it => new
-        //         {
-        //             SampleId = it.Id
-        //         })
-        //         .ToList();
-        //     Console.WriteLine("Query data missing complete");
-        //     while (skipSize < missingData.Count)
-        //     {
-        //         roundProcess++;
-        //         Console.WriteLine($"Round {roundProcess}");
-        //         var misstingSampleID = missingData.Select(it => it.SampleId
-        //         .Split(".")
-        //         .FirstOrDefault())
-        //             .Skip(skipSize)
-        //             .Take(limitSize)
-        //             .ToList();
-        //         Console.WriteLine("Sort data complete");
-        //         // error out size
-        //         var dataMatchInSurvey = collectionSurvey.Aggregate()
-        //                 .Match(it => misstingSampleID.Contains(it.SampleId))
-        //                 .Project(it => new
-        //                 {
-        //                     containerName = it.ContainerName
-        //                 })
-        //                 .ToList();
-        //         var currentContainer = dataMatchInSurvey.Select(it => it.containerName).Distinct().ToList();
-        //         var countContainerProcess = 0;
+            Console.WriteLine("Query data ......");
+            var missingData = collectionContainerNotFound.Aggregate()
+                .Match(it => it.ContainerName == "")
+                .Project(it => new
+                {
+                    SampleId = it.Id
+                })
+                .ToList();
+            Console.WriteLine("Query data missing complete");
+            while (skipSize < missingData.Count)
+            {
+                roundProcess++;
+                Console.WriteLine($"Round {roundProcess}");
+                var misstingSampleID = missingData.Select(it => it.SampleId
+                .Split(".")
+                .FirstOrDefault())
+                    .Skip(skipSize)
+                    .Take(limitSize)
+                    .ToList();
+                Console.WriteLine("Sort data complete");
+                // error out size
+                var dataMatchInSurvey = collectionSurvey.Aggregate()
+                        .Match(it => misstingSampleID.Contains(it.SampleId))
+                        .Project(it => new
+                        {
+                            containerName = it.ContainerName
+                        })
+                        .ToList();
+                var currentContainer = dataMatchInSurvey.Select(it => it.containerName).Distinct().ToList();
+                var countContainerProcess = 0;
 
-        //         foreach (var container in currentContainer)
-        //         {
-        //             countContainerProcess++;
-        //             var finddatainIndex = collectionIndexInZip.Aggregate()
-        //              .Match(it => it.ContainerName == container)
-        //              .Project(it => new
-        //              {
-        //                  containerName = it.ContainerName,
-        //                  ZipName = it.ZipName
-        //              })
-        //              .FirstOrDefault();
-        //             if (finddatainIndex != null)
-        //             {
-        //                 Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is Found !");
-        //                 countFound++;
-        //             }
-        //             else
-        //             {
-        //                 Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is not Found !");
-        //                 countNotFound++;
-        //             }
-        //         }
-        //         Console.WriteLine("Match data complete");
-        //         skipSize += 100000;
-        //     }
-        //     Console.WriteLine("Fetch data done !");
-        //     Console.WriteLine($"Data found : {countFound}");
-        //     Console.WriteLine($"Data not found : {countNotFound}");
+                foreach (var container in currentContainer)
+                {
+                    countContainerProcess++;
+                    var finddatainIndex = collectionIndexInZip.Aggregate()
+                     .Match(it => it.ContainerName == container)
+                     .Project(it => new
+                     {
+                         containerName = it.ContainerName,
+                         ZipName = it.ZipName
+                     })
+                     .FirstOrDefault();
+                    if (finddatainIndex != null)
+                    {
+                        Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is Found !");
+                        countFound++;
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{countContainerProcess}/{currentContainer.Count} : {container} is not Found !");
+                        countNotFound++;
+                    }
+                }
+                Console.WriteLine("Match data complete");
+                skipSize += 100000;
+            }
+            Console.WriteLine("Fetch data done !");
+            Console.WriteLine($"Data found : {countFound}");
+            Console.WriteLine($"Data not found : {countNotFound}");
 
-        //     //backup code 
-        //     //var dataMatchInSurvey = collectionSurvey.Aggregate()
-        //     //           .Match(it => misstingSampleID.Contains(it.SampleId))
-        //     //           .Project(it => new
-        //     //           {
-        //     //               SampleId = it.SampleId,
-        //     //               containerName = it.ContainerName,
-        //     //               userID = it.UserId
-        //     //           })
-        //     //           .ToList();
-        //     //Console.WriteLine("Match data complete");
-        //     //foreach (var item in dataMatchInSurvey)
-        //     //{
-        //     //    countProcess++;
-        //     //    Console.WriteLine($"{countProcess}/{missingData.Count} : {item.SampleId} Found at : {item.containerName} , Upload by {item.userID}");
-        //     //}
-        //     //skipSize += 100000;
-        // }
+            //backup code 
+            //var dataMatchInSurvey = collectionSurvey.Aggregate()
+            //           .Match(it => misstingSampleID.Contains(it.SampleId))
+            //           .Project(it => new
+            //           {
+            //               SampleId = it.SampleId,
+            //               containerName = it.ContainerName,
+            //               userID = it.UserId
+            //           })
+            //           .ToList();
+            //Console.WriteLine("Match data complete");
+            //foreach (var item in dataMatchInSurvey)
+            //{
+            //    countProcess++;
+            //    Console.WriteLine($"{countProcess}/{missingData.Count} : {item.SampleId} Found at : {item.containerName} , Upload by {item.userID}");
+            //}
+            //skipSize += 100000;
+        }
 
         public static void InsertMissingData()
         {
@@ -2020,6 +2021,67 @@ namespace Test
                 }
             });
             Console.WriteLine("Done All!");
+        }
+
+        public static void UpdateWaterCubic()
+        {
+            var path = @"C:\Users\Gun\Desktop\DataUpdate";
+
+            var totalFile = Directory.GetFiles(path).ToList();
+            var first = totalFile.FirstOrDefault();
+
+            var count = 0;
+            var totalUpdate = 0;
+            totalFile.ForEach(filePath =>
+            {
+                count++;
+                Console.WriteLine($"round file : {count} / {totalFile.Count}");
+                var fileName = filePath.Split('\\').LastOrDefault();
+                using (var reader = new StreamReader(filePath))
+                {
+                    var readFromFile = reader.ReadToEnd();
+                    var dataLine = readFromFile.Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                    .Skip(1)
+                    .ToList();
+
+                    dataLine.ForEach(dataUpdate =>
+                    {
+                        var data = dataUpdate.Split(',').ToList();
+                        var sampleId = data[0];
+                        var ea = (string.IsNullOrEmpty(data[2])) ? null : data[2];
+                        var CubicMeterGroundWaterForAgriculture = double.TryParse(data[4], out var cubicMeterGroundWaterForAgriculture) ? cubicMeterGroundWaterForAgriculture : 0;
+                        var CubicMeterGroundWaterForService = double.TryParse(data[5], out var cubicMeterGroundWaterForService) ? cubicMeterGroundWaterForService : 0;
+                        var CubicMeterGroundWaterForProduct = double.TryParse(data[6], out var cubicMeterGroundWaterForProduct) ? cubicMeterGroundWaterForProduct : 0;
+                        var CubicMeterGroundWaterForDrink = double.TryParse(data[7], out var cubicMeterGroundWaterForDrink) ? cubicMeterGroundWaterForDrink : 0;
+                        var CubicMeterPlumbingForAgriculture = double.TryParse(data[8], out var cubicMeterPlumbingForAgriculture) ? cubicMeterPlumbingForAgriculture : 0;
+                        var CubicMeterPlumbingForService = double.TryParse(data[9], out var cubicMeterPlumbingForService) ? cubicMeterPlumbingForService : 0;
+                        var CubicMeterPlumbingForProduct = double.TryParse(data[10], out var cubicMeterPlumbingForProduct) ? cubicMeterPlumbingForProduct : 0;
+                        var CubicMeterPlumbingForDrink = double.TryParse(data[11], out var cubicMeterPlumbingForDrink) ? cubicMeterPlumbingForDrink : 0;
+                        var CubicMeterSurfaceForAgriculture = double.TryParse(data[12], out var cubicMeterSurfaceForAgriculture) ? cubicMeterSurfaceForAgriculture : 0;
+                        var CubicMeterSurfaceForService = double.TryParse(data[13], out var cubicMeterSurfaceForService) ? cubicMeterSurfaceForService : 0;
+                        var CubicMeterSurfaceForProduct = double.TryParse(data[14], out var cubicMeterSurfaceForProduct) ? cubicMeterSurfaceForProduct : 0;
+                        var CubicMeterSurfaceForDrink = double.TryParse(data[15], out var cubicMeterSurfaceForDrink) ? cubicMeterSurfaceForDrink : 0;
+                        var def = Builders<DataProcessed>.Update
+                        .Set(it => it.CubicMeterGroundWaterForAgriculture, CubicMeterGroundWaterForAgriculture)
+                        .Set(it => it.CubicMeterGroundWaterForService, CubicMeterGroundWaterForService)
+                        .Set(it => it.CubicMeterGroundWaterForProduct, CubicMeterGroundWaterForProduct)
+                        .Set(it => it.CubicMeterGroundWaterForDrink, CubicMeterGroundWaterForDrink)
+                        .Set(it => it.CubicMeterPlumbingForAgriculture, CubicMeterPlumbingForAgriculture)
+                        .Set(it => it.CubicMeterPlumbingForService, CubicMeterPlumbingForService)
+                        .Set(it => it.CubicMeterPlumbingForProduct, CubicMeterPlumbingForProduct)
+                        .Set(it => it.CubicMeterPlumbingForDrink, CubicMeterPlumbingForDrink)
+                        .Set(it => it.CubicMeterSurfaceForAgriculture, CubicMeterSurfaceForAgriculture)
+                        .Set(it => it.CubicMeterSurfaceForService, CubicMeterSurfaceForService)
+                        .Set(it => it.CubicMeterSurfaceForProduct, CubicMeterSurfaceForProduct)
+                        .Set(it => it.CubicMeterSurfaceForDrink, CubicMeterSurfaceForDrink);
+
+                        collectionNewDataProcess.UpdateOne(it => it.SampleId == sampleId && it.EA == ea, def);
+                        totalUpdate++;
+                        Console.WriteLine($"update already : {totalUpdate}");
+                    });
+                }
+            });
+            Console.WriteLine("Update Done All!");
         }
     }
 }
