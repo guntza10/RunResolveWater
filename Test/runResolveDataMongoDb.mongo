@@ -3256,3 +3256,20 @@ db.dataMissing.aggregate([
     $out: "IsOldDataTrue"
   }
 ])
+
+db.NewData0601.aggregate([
+  {
+    $match: {
+      CanComputeCubicMeterForDrink: "False",
+      $or: [
+        {"SampleType": "b"},{"SampleType": "u"}
+      ]
+    }
+  },
+  {
+    $count: "count"
+  },
+  {
+    $out: "countCanComputeCubicMeterForDrink"
+  }
+]);
